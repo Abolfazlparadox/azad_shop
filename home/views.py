@@ -5,7 +5,7 @@ from iranian_cities.models import Province
 class HomeTemplateView(TemplateView):
     template_name = 'home/index.html'
 
-
+#hi
 def search_location(request):
     q = request.GET.get('q', '').strip()
     if q:
