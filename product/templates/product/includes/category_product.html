@@ -1,0 +1,15 @@
+{% load static %}
+
+{% for category in all_categories %}
+<li>
+    <div class="form-check ps-0 m-0 category-list-box">
+        <input class="checkbox_animated" type="checkbox" name="category" value="{{ category.slug }}" id="cat_{{ category.slug }}">
+        <label class="form-check-label" for="cat_{{ category.slug }}">
+            <span class="name">{{ category.title }}</span>
+            <span class="number">({{ category.products.count }})</span>
+        </label>
+    </div>
+</li>
+{% empty %}
+<li>هیچ دسته‌بندی موجود نیست.</li>
+{% endfor %}

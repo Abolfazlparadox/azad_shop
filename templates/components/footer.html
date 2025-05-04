@@ -1,0 +1,228 @@
+{% load static %}
+{% load thumbnail %}
+<!-- Footer Section Start -->
+<footer class="section-t-space">
+        <div class="container-fluid-lg">
+            <div class="service-section">
+                <div class="row g-3">
+                    <div class="col-12">
+                        <div class="service-contain">
+                            {% for option in site_settings.options.all %}
+                                <div class="service-box">
+                                    <div class="service-image">
+                                        <img src="{{ option.logo.url }}" class="blur-up lazyload" alt="">
+                                    </div>
+
+                                    <div class="service-detail">
+                                        <h5>{{ option.name }}</h5>
+                                    </div>
+                                </div>
+                            {% endfor %}
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="main-footer section-b-space section-t-space">
+                <div class="row g-md-4 g-3">
+                    <div class="col-xl-3 col-lg-4 col-sm-6">
+                        <div class="footer-logo">
+                            <div class="theme-logo">
+                                <a href="{% url 'home' %}" class="web-logo nav-logo">
+                                    {% if site_settings.site_logo %}
+                                      {% thumbnail site_settings.site_logo "840x150" crop="center" as thumb %}
+                                        <img src="{{ thumb.url }}"
+                                             width="{{ thumb.width }}"
+                                             height="{{ thumb.height }}"
+                                             class="img-fluid blur-up lazyload"
+                                             alt="{{ site_settings.site_name }}">
+                                      {% endthumbnail %}
+                                    {% else %}
+                                      <img src="{% static 'images/logo/1.png' %}"
+                                           width="840" height="150"
+                                           class="img-fluid blur-up lazyload"
+                                           alt="{{ site_settings.site_name }}">
+                                    {% endif %}
+                                </a>
+                            </div>
+
+                            <div class="footer-logo-contain">
+                                <p>{{ site_settings.slogan }}</p>
+
+                                <ul class="address">
+                                    <li>
+                                        <i data-feather="home"></i>
+                                        <a href="javascript:void(0)">تهران - دانشگاه ازاد مرکزی
+                                    <li>
+                                        <i data-feather="mail"></i>
+                                        <a href="javascript:void(0)">{{ site_settings.email }}</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                        <div class="footer-title">
+                            <h4>دسته بندی</h4>
+                        </div>
+
+                        <div class="footer-contain">
+                            <ul>
+                                <li>
+                                    <a href="shop-left-sidebar.html" class="text-content">میوه وسبزیجات</a>
+                                </li>
+                                <li>
+                                    <a href="shop-left-sidebar.html" class="text-content">گوشت</a>
+                                </li>
+                                <li>
+                                    <a href="shop-left-sidebar.html" class="text-content">غذای دریایی</a>
+                                </li>
+                                <li>
+                                    <a href="shop-left-sidebar.html" class="text-content">غذای منجمد شده</a>
+                                </li>
+                                <li>
+                                    <a href="shop-left-sidebar.html" class="text-content">بیسکویت</a>
+                                </li>
+                                <li>
+                                    <a href="shop-left-sidebar.html" class="text-content">انرژی زا</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="col-xl col-lg-2 col-sm-3">
+                        <div class="footer-title">
+                            <h4>دسترسی سریع</h4>
+                        </div>
+
+                        <div class="footer-contain">
+                            <ul>
+                                <li>
+                                    <a href="{% url 'home' %}" class="text-content">خانه</a>
+                                </li>
+{#                                <li>#}
+{#                                    <a href="{% url 'product-list' %}" class="text-content">فروشگاه</a>#}
+{#                                </li>#}
+                                <li>
+                                    <a href="about-us.html" class="text-content">درباره ما</a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'posts' %}" class="text-content">وبلاگ</a>
+                                </li>
+                                <li>
+                                    <a href="contact-us.html" class="text-content">تماس با ما</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-2 col-sm-3">
+                        <div class="footer-title">
+                            <h4>لینک های مهم</h4>
+                        </div>
+
+                        <div class="footer-contain">
+                            <ul>
+                                <li>
+                                    <a href="order-success.html" class="text-content">خرید راحت</a>
+                                </li>
+                                <li>
+                                    <a href="user-dashboard.html" class="text-content">حساب کاربری</a>
+                                </li>
+                                <li>
+                                    <a href="order-tracking.html" class="text-content">پیگیری سفارش</a>
+                                </li>
+                                <li>
+                                    <a href="wishlist.html" class="text-content">لیست علاقه‌مندی</a>
+                                </li>
+                                <li>
+                                    <a href="search.html" class="text-content">جستجو</a>
+                                </li>
+                                <li>
+                                    <a href="faq.html" class="text-content">سوالات متداول</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-lg-4 col-sm-6">
+                        <div class="footer-title">
+                            <h4>تماس با ما</h4>
+                        </div>
+
+                        <div class="footer-contact">
+                            <ul>
+                                <li>
+                                    <div class="footer-number">
+                                        <i data-feather="phone"></i>
+                                        <div class="contact-number">
+                                            <h6 class="text-content">پشتیبانی 24 ساعته :</h6>
+                                            <h5>{{ site_settings.phone }}</h5>
+                                        </div>
+                                    </div>
+                                </li>
+
+                                <li>
+                                    <div class="footer-number">
+                                        <i data-feather="mail"></i>
+                                        <div class="contact-number">
+                                            <h6 class="text-content">آدرس ایمیل :</h6>
+                                            <h5>{{ site_settings.email }}</h5>
+                                        </div>
+                                    </div>
+                                </li>
+
+{#                                <li class="social-app mb-0">#}
+{#                                    <h5 class="mb-2 text-content">دانلود اپلیکیشن :</h5>#}
+{#                                    <ul>#}
+{#                                        <li class="mb-0">#}
+{#                                            <a href="https://play.google.com/store/apps" target="_blank">#}
+{#                                                <img src="{% static 'images/playstore.svg' %}" class="blur-up lazyload"#}
+{#                                                     alt="">#}
+{#                                            </a>#}
+{#                                        </li>#}
+{#                                        <li class="mb-0">#}
+{#                                            <a href="https://www.apple.com/in/app-store/" target="_blank">#}
+{#                                                <img src="{% static 'images/appstore.svg' %}" class="blur-up lazyload"#}
+{#                                                     alt="">#}
+{#                                            </a>#}
+{#                                        </li>#}
+{#                                    </ul>#}
+{#                                </li>#}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sub-footer section-small-space d-flex">
+                <div class="reserve" style="width: 80%;">
+                    <h6 class="text-content">{{ site_settings.copy_right }}</h6>
+                </div>
+                <b></b>
+                <div class="social-link" style="width: 20%;">
+                    <h6 class="text-content">شبکه های اجتماعی :</h6>
+                    <ul>
+                        {% for link in social_links %}
+                            <li>
+                                <a href="{{ link.url }}" target="_blank">
+                                    {% with link.title|lower as title_lower %}
+                                        {% if "facebook" in title_lower %}
+                                            <i class="fa-brands fa-facebook-f"></i>
+                                        {% elif "twitter" in title_lower %}
+                                            <i class="fa-brands fa-twitter"></i>
+                                        {% elif "instagram" in title_lower %}
+                                            <i class="fa-brands fa-instagram"></i>
+                                        {% endif %}
+                                    {% endwith %}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+<!-- Footer Section End -->

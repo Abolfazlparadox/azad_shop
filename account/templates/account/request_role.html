@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load static%}
+{% block title %}درخواست نقش جدید{% endblock %}
+{% block body %}
+<div class="container py-5">
+  <h2>درخواست نقش جدید</h2>
+  <form method="post" class="row g-3">
+    {% csrf_token %}
+    <div class="col-md-4">
+      {{ form.university.label_tag }}
+      {{ form.university }}
+      {{ form.university.errors }}
+    </div>
+    <div class="col-md-4">
+      {{ form.role.label_tag }}
+      {{ form.role }}
+      {{ form.role.errors }}
+    </div>
+    <div class="col-md-4">
+      {{ form.code.label_tag }}
+      {{ form.code }}
+      {{ form.code.errors }}
+    </div>
+    <div class="col-12">
+      <button class="btn btn-primary" type="submit">ارسال درخواست</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

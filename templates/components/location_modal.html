@@ -1,0 +1,91 @@
+{% load static %}
+<!-- Location Modal Start -->
+<div class="modal location-modal fade theme-modal" id="locationModal" tabindex="-1"
+     aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">آدرس خود را انتخاب کنید</h5>
+        <p class="mt-1 text-content">آدرس خود را وارد کنید تا ما پیشنهاد را برای منطقه شما مشخص می کنیم.</p>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="location-list">
+          <div class="search-input">
+            <input type="search" class="form-control" id="locationSearchInput" placeholder="محل خود را جستجو کنید">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </div>
+          <div class="disabled-box">
+            <h6>انتخاب مکان شما</h6>
+          </div>
+          <ul class="location-select custom-height" id="locationResults">
+            <!-- Filled dynamically -->
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Location Modal End -->
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const input = document.getElementById('locationSearchInput');
+  const results = document.getElementById('locationResults');
+  const modalEl = document.getElementById('locationModal');
+
+  function renderList(data) {
+    results.innerHTML = '';
+    if (data.length) {
+      data.forEach(item => {
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.href = 'javascript:void(0)';
+        const h6 = document.createElement('h6');
+        h6.textContent = item.name;
+        const span = document.createElement('span');
+        span.textContent = 'حداقل: 100 تومان';
+        a.appendChild(h6);
+        a.appendChild(span);
+        li.appendChild(a);
+        results.appendChild(li);
+      });
+    } else {
+      const li = document.createElement('li');
+      const a = document.createElement('a');
+      a.href = 'javascript:void(0)';
+      const h6 = document.createElement('h6');
+      h6.textContent = 'موردی یافت نشد';
+      a.appendChild(h6);
+      li.appendChild(a);
+      results.appendChild(li);
+    }
+  }
+
+  function fetchLocations(q='') {
+    let url = '{% url "search_location" %}';
+    if (q) url += '?q=' + encodeURIComponent(q);
+    fetch(url)
+      .then(resp => resp.json())
+      .then(renderList)
+      .catch(err => console.error('Location search error:', err));
+  }
+
+  // Load all provinces when modal opens
+  modalEl.addEventListener('shown.bs.modal', function() {
+    fetchLocations('');
+    input.value = '';
+    input.focus();
+  });
+
+  // Filter as user types (after 2 chars, or show all if cleared)
+  input.addEventListener('input', function() {
+    const q = this.value.trim();
+    if (q.length === 0 || q.length >= 2) {
+      fetchLocations(q);
+    }
+  });
+});
+</script>

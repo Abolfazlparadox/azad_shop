@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+<div class="container">
+    <h2 class="text-danger">حساب قفل شده است</h2>
+    <p class="lead">
+        شما بیش از حد مجاز تلاش ناموفق داشته‌اید. لطفا تا زمان زیر منتظر بمانید:
+    </p>
+    <div class="alert alert-warning">
+        <i class="bi bi-clock-history"></i>
+        قفل تا: {{ locked_until|time }} ({{ locked_until|date }})
+    </div>
+    <p>
+        <a href="{% url 'password_reset' %}">آیا رمز عبور خود را فراموش کرده‌اید؟</a>
+    </p>
+</div>
+{% endblock %}

@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+{% block head %}
+    <style>
+        .invalid-feedback {
+            display: block;
+            margin-top: 0.25rem;
+            font-size: 0.875em;
+            color: #dc3545;
+                }
+
+        .alert-link {
+            font-weight: bold;
+            text-decoration: underline;
+        }
+    </style>
+{% endblock %}
+{% block title %}تأیید ایمیل{% endblock %}
+
+{% block body %}
+<section class="log-in-section background-image-2 section-b-space">
+  <div class="container-fluid-lg w-100">
+    <div class="row">
+      <!-- Illustration -->
+      <div class="col-xxl-6 col-xl-5 col-lg-6 d-lg-block d-none ms-auto">
+        <div class="image-contain">
+          <img src="{% static 'images/inner-page/log-in.png' %}"
+               class="img-fluid" alt="">
+        </div>
+      </div>
+
+      <!-- Verification form -->
+      <div class="col-xxl-4 col-xl-5 col-lg-6 col-sm-8 mx-auto">
+        <div class="log-in-box">
+          <div class="log-in-title">
+            <h3>
+              {% blocktrans with site_name=site_settings.site_name %}
+                به {{ site_name }} خوش آمدید
+              {% endblocktrans %}
+            </h3>
+            <h4>{% trans "تأیید ایمیل" %}</h4>
+          </div>
+
+          <div class="input-box">
+            {% if user.email_verified %}
+              <div class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
+                ایمیل شما قبلاً تأیید شده است
+                <a href="{% url 'user_dashboard' %}" class="alert-link">
+                  بازگشت به پیشخوان
+                </a>
+              </div>
+            {% else %}
+              {# Show verification form #}
+            {% endif %}
+              <!-- Main Verification Form -->
+              <form method="post" class="row g-4">
+                {% csrf_token %}
+
+                <!-- System Messages -->
+                {% if messages %}
+                  <div class="col-12">
+                    {% for message in messages %}
+                      <div class="alert alert-{{ message.tags }}">
+                        {{ message|safe }}
+                      </div>
+                    {% endfor %}
+                  </div>
+                {% endif %}
+
+                <!-- Form Errors -->
+                {% if form.non_field_errors %}
+                  <div class="col-12">
+                    <div class="alert alert-danger">
+                      {% for error in form.non_field_errors %}
+                        {{ error }}
+                      {% endfor %}
+                    </div>
+                  </div>
+                {% endif %}
+
+                <!-- Token Input -->
+                <div class="col-12">
+                  <div class="form-floating theme-form-floating log-in-form">
+                    <div class="form-group">
+                      <label for="{{ form.token.id_for_label }}">کد تأیید</label>
+                      <input
+                        type="text"
+                        name="{{ form.token.name }}"
+                        id="{{ form.token.id_for_label }}"
+                        class="form-control {% if form.token.errors %}is-invalid{% endif %}"
+                        placeholder="کد ۶ رقمی ارسال شده"
+                        value="{{ form.token.value|default:'' }}"
+                        required
+                        autofocus
+                      >
+                      {% if form.token.errors %}
+                        <div class="invalid-feedback">
+                          {% for error in form.token.errors %}
+                            {{ error }}
+                          {% endfor %}
+                        </div>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="col-12">
+                  <button type="submit" class="btn btn-primary w-100">
+                    تأیید کد
+                  </button>
+                </div>
+              </form>
+
+              <!-- Resend Code Form -->
+              <div class="col-12 text-center mt-3">
+                <form method="post" action="{% url 'resend-verification' pk=user.pk %}">
+                  {% csrf_token %}
+                  <p class="text-muted mb-1">کد دریافت نکردید؟</p>
+                  <button type="submit" class="btn btn-link">
+                    ارسال مجدد کد تأیید
+                  </button>
+                </form>
+              </div>
+
+              <!-- Debug Info -->
+              {% if debug %}
+              <div class="mt-4 alert alert-info">
+                <h5>اطلاعات اشکال‌زدایی:</h5>
+                <p>شناسه کاربر: {{ user.pk }}</p>
+                <p>توکن فعلی: {{ user.email_verification_token|default:"بدون توکن" }}</p>
+                <p>زمان ایجاد توکن: {{ user.email_verification_token_created|default:"وجود ندارد" }}</p>
+              </div>
+              {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

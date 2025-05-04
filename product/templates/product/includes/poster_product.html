@@ -1,0 +1,14 @@
+{# product/includes/poster_product.html #}
+{% load static %}
+
+<div>
+    <div class="banner-contain-2 hover-effect">
+        <img src="{% static banner.image %}" class="bg-img rounded-3 blur-up lazyload" alt="{{ banner.title }}">
+        <div class="banner-detail p-center-right position-relative shop-banner ms-auto banner-small">
+            <div>
+                <h2>{{ banner.title }}</h2>
+                <h3>{{ banner.discount }}</h3>
+            </div>
+        </div>
+    </div>
+</div>

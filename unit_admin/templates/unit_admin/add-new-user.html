@@ -1,0 +1,108 @@
+{% extends 'unit_admin/base.html' %}
+{% load static %}
+
+{% block title %}پنل مدیریت ادمین - افزودن کاربر جدید{% endblock %}
+
+{% block body %}
+<!-- New User start -->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="row">
+                <div class="col-sm-8 m-auto">
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="title-header option-title">
+                                    <h5>افزودن کاربر جدید</h5>
+                                    <button type="submit" class="align-items-center btn btn-theme d-flex">
+                                        <i data-feather="save"></i>ذخیره کاربر
+                                    </button>
+                                </div>
+
+                                <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link active" id="pills-home-tab"
+                                            data-bs-toggle="pill" data-bs-target="#pills-home"
+                                            type="button">اطلاعات اصلی</button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="pills-profile-tab"
+                                            data-bs-toggle="pill" data-bs-target="#pills-profile"
+                                            type="button">دسترسی‌ها</button>
+                                    </li>
+                                </ul>
+
+                                <div class="tab-content" id="pills-tabContent">
+                                    <!-- تب اطلاعات اصلی -->
+                                    <div class="tab-pane fade show active" id="pills-home" role="tabpanel">
+                                        <div class="card-header-1">
+                                            <h5>مشخصات کاربری</h5>
+                                        </div>
+
+                                        <div class="row">
+                                            {% for field in form %}
+                                                {% if field.name not in 'role' %}
+                                                <div class="mb-4 row align-items-center">
+                                                    <label class="form-label-title col-lg-2 col-md-3 mb-0">
+                                                        {{ field.label }}
+                                                    </label>
+                                                    <div class="col-md-9 col-lg-10">
+                                                        {{ field }}
+                                                        {% if field.errors %}
+                                                        <div class="text-danger small mt-1">
+                                                            {{ field.errors|first }}
+                                                        </div>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+
+                                    <!-- تب دسترسی‌ها -->
+                                    <div class="tab-pane fade" id="pills-profile" role="tabpanel">
+                                        <div class="card-header-1">
+                                            <h5>تعیین سطح دسترسی</h5>
+                                        </div>
+
+                                        <div class="mb-4 row align-items-center">
+                                            <label class="col-md-2 mb-0">نقش کاربر</label>
+                                            <div class="col-md-9">
+                                                {{ form.role }}
+                                            </div>
+                                        </div>
+
+                                        <!-- سایر تنظیمات دسترسی -->
+                                        <div class="card-header-1">
+                                            <h5>مجوزهای سیستمی</h5>
+                                        </div>
+
+                                        <div class="mb-4 row align-items-center">
+                                            <label class="col-md-2 mb-0">مدیریت محصولات</label>
+                                            <div class="col-md-9">
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="checkbox"
+                                                           name="permissions" value="product_add"
+                                                           id="product_add">
+                                                    <label class="form-check-label" for="product_add">
+                                                        افزودن محصول
+                                                    </label>
+                                                </div>
+                                                <!-- سایر چک باکس‌ها -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- New User End -->
+{% endblock %}

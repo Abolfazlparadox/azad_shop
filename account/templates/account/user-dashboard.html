@@ -1,0 +1,2161 @@
+{% extends 'base.html' %}
+{% load static%}
+{% load i18n %}
+{% block title %}داشبورد{% endblock %}
+{% block body %}
+<!-- User Dashboard Section Start -->
+{% if user.access_level < 2 %}
+<div class="alert alert-warning">
+    لطفا اطلاعات پروفایل خود را کامل کنید تا بتوانید درخواست نقش ارسال کنید
+</div>
+{% endif %}
+<section class="user-dashboard-section section-b-space">
+    <div class="container-fluid-lg">
+        <div class="row">
+            <div class="col-xxl-3 col-lg-4">
+              <div class="dashboard-left-sidebar">
+                <div class="close-button d-flex d-lg-none">
+                  <button class="close-sidebar">
+                    <i class="fa-solid fa-xmark"></i>
+                  </button>
+                </div>
+                <div class="profile-box">
+                  <div class="cover-image">
+                    <img src="{% static 'images/inner-page/cover-img.jpg' %}"
+                         class="img-fluid blur-up lazyload"
+                         alt="">
+                  </div>
+
+                  {# ← Avatar‐only form starts here → #}
+                  <form id="avatar-form"
+                        method="post"
+                        enctype="multipart/form-data"
+                        action="{% url 'user_dashboard' %}">
+                    {% csrf_token %}
+
+                    <div class="profile-contain">
+                      <div class="profile-image">
+                        <div class="position-relative">
+                          {% if user.avatar %}
+                            <img src="{{ user.avatar.url }}"
+                                 class="blur-up lazyload update_img"
+                                 alt="{{ user.get_full_name }}">
+                          {% else %}
+                            <img src="{% static 'images/inner-page/user/default-avatar.jpg' %}"
+                                 class="blur-up lazyload update_img"
+                                 alt="{{ user.get_full_name }}">
+                          {% endif %}
+                          <div class="cover-icon">
+                            <i class="fa-solid fa-pen">
+                              <input type="file"
+                                     name="avatar"
+                                     accept="image/*"
+                                     onchange="readURL(this,0); document.getElementById('avatar-form').submit();">
+                            </i>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="profile-name">
+                        <h3>{{ user.get_full_name }}</h3>
+                        <h6 class="text-content">{{ user.email }}</h6>
+                      </div>
+                    </div>
+                  </form>
+                  {# ← Avatar‐only form ends here → #}
+
+                </div>
+
+                <ul class="nav nav-pills user-nav-pills" id="pills-tab" role="tablist">
+                  <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="pills-dashboard-tab" data-bs-toggle="pill"
+                            data-bs-target="#pills-dashboard" type="button"><i data-feather="home"></i>
+                      داشبورد</button>
+                  </li>
+                  <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="pills-order-tab" data-bs-toggle="pill"
+                            data-bs-target="#pills-order" type="button"><i data-feather="shopping-bag"></i>
+                      سفارشات</button>
+                  </li>
+                  <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="pills-wishlist-tab" data-bs-toggle="pill"
+                            data-bs-target="#pills-wishlist" type="button"><i data-feather="heart"></i>
+                      علاقه‌مندی</button>
+                  </li>
+                  <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="pills-card-tab" data-bs-toggle="pill"
+                            data-bs-target="#pills-card" type="button" role="tab"><i data-feather="credit-card"></i>
+                      مالی</button>
+                  </li>
+                  <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="pills-address-tab" data-bs-toggle="pill"
+                            data-bs-target="#pills-address" type="button" role="tab"><i data-feather="map-pin"></i>
+                      آدرس</button>
+                  </li>
+                  <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="pills-profile-tab" data-bs-toggle="pill"
+                            data-bs-target="#pills-profile" type="button" role="tab"><i data-feather="user"></i>
+                      پروفایل</button>
+                  </li>
+                  <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="pills-download-tab" data-bs-toggle="pill"
+                            data-bs-target="#pills-download" type="button" role="tab"><i data-feather="download"></i>
+                      دانلود</button>
+                  </li>
+                  <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="pills-security-tab" data-bs-toggle="pill"
+                            data-bs-target="#pills-security" type="button" role="tab"><i data-feather="shield"></i>
+                      حریم خصوصی</button>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="col-xxl-9 col-lg-8">
+                <button class="btn left-dashboard-show btn-animation btn-md fw-bold d-block mb-4 d-lg-none">نمایش
+                    منو</button>
+                <div class="dashboard-right-sidebar">
+                    <div class="tab-content" id="pills-tabContent">
+                        <div class="tab-pane fade show active" id="pills-dashboard" role="tabpanel">
+                            <div class="dashboard-home">
+                                <div class="title">
+                                    <h2>داشبورد من</h2>
+                                    <span class="title-leaf">
+                                        <svg class="icon-width bg-gray">
+                                            <use xlink:href="svg/leaf.svg#leaf"></use>
+                                        </svg>
+                                    </span>
+                                </div>
+
+                                <div class="dashboard-user-name">
+                                    <h6 class="text-content">سلام, <b class="text-title">{{ user.get_full_name }}</b></h6>
+                                    <p class="text-content">{{ site_settings.about_us_text }}</p>
+                                </div>
+
+                                <div class="total-box">
+                                    <div class="row g-sm-4 g-3">
+                                        <div class="col-xxl-4 col-lg-6 col-md-4 col-sm-6">
+                                            <div class="total-contain">
+                                                <img src="{% static 'images/svg/order.svg' %}"
+                                                    class="img-1 blur-up lazyload" alt="">
+                                                <img src="{% static 'images/svg/order.svg' %}" class="blur-up lazyload"
+                                                    alt="">
+                                                <div class="totle-detail">
+                                                    <h5>مجموع سفارشات</h5>
+                                                    <h3>3658</h3>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xxl-4 col-lg-6 col-md-4 col-sm-6">
+                                            <div class="total-contain">
+                                                <img src="{% static 'images/svg/pending.svg' %}"
+                                                    class="img-1 blur-up lazyload" alt="">
+                                                <img src="{% static 'images/svg/pending.svg' %}" class="blur-up lazyload"
+                                                    alt="">
+                                                <div class="totle-detail">
+                                                    <h5>سفارشات در انتظار</h5>
+                                                    <h3>254</h3>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xxl-4 col-lg-6 col-md-4 col-sm-6">
+                                            <div class="total-contain">
+                                                <img src="{% static 'images/svg/wishlist.svg' %}"
+                                                    class="img-1 blur-up lazyload" alt="">
+                                                <img src="{% static 'images/svg/wishlist.svg' %}"
+                                                    class="blur-up lazyload" alt="">
+                                                <div class="totle-detail">
+                                                    <h5>مجموع علاقه‌مندی ها</h5>
+                                                    <h3>32158</h3>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="dashboard-title">
+                                    <h3>اطلاعات حساب کاربری</h3>
+                                </div>
+
+                                <div class="row g-4">
+                                    <div class="col-xxl-12">
+                                        <div class="dashboard-content-title">
+                                            <h4>اطلاعات اولیه <a href="javascript:void(0)"
+                                                    data-bs-toggle="modal" data-bs-target="#editProfile">ویرایش</a>
+                                            </h4>
+                                        </div>
+                                        <div class="dashboard-detail">
+                                            <h6 class="text-content">{{ user.get_full_name }}</h6>
+                                            <h6 class="text-content">{{ user.email }}</h6>
+                                           <a href="{% url 'change_password' %}">تغییر رمز عبور</a>
+                                        </div>
+                                    </div>
+
+{#                                    <div class="col-xxl-6">#}
+{#                                        <div class="dashboard-content-title">#}
+{#                                            <h4>خبرنامه <a href="javascript:void(0)" data-bs-toggle="modal"#}
+{#                                                    data-bs-target="#editProfile">ویرایش</a></h4>#}
+{#                                        </div>#}
+{#                                        <div class="dashboard-detail">#}
+{#                                            <h6 class="text-content">شما در حال حاضر عضو خبرنامه نیستید!</h6>#}
+{#                                        </div>#}
+{#                                    </div>#}
+
+                                    <div class="col-12">
+                                      <div class="dashboard-content-title">
+                                        <h4>
+                                          آدرس های شما
+                                          <a href="javascript:void(0)"
+                                             data-bs-toggle="modal"
+                                             data-bs-target="#add-address">افزودن</a>
+                                        </h4>
+                                      </div>
+
+                                      <div class="row g-4">
+                                        {% for addr in addresses %}
+                                          <div class="col-xxl-6">
+                                            <div class="dashboard-detail">
+                                              <h6 class="text-content">{{ addr.get_category_display }}</h6>
+                                              <h6 class="text-content">{{ addr.address }}</h6>
+                                              <a href="javascript:void(0)"
+                                                 data-bs-toggle="modal"
+                                                 data-bs-target="#edit-address-{{ addr.id }}">ویرایش آدرس</a>
+                                            </div>
+                                          </div>
+                                        {% empty %}
+                                          <p>شما هنوز هیچ آدرسی ثبت نکرده‌اید.</p>
+                                        {% endfor %}
+                                      </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="pills-wishlist" role="tabpanel">
+                            <div class="dashboard-wishlist">
+                                <div class="title">
+                                    <h2>لیست علاقه‌مندی های من</h2>
+                                    <span class="title-leaf title-leaf-gray">
+                                        <svg class="icon-width bg-gray">
+                                            <use xlink:href="svg/leaf.svg#leaf"></use>
+                                        </svg>
+                                    </span>
+                                </div>
+                                <div class="row g-sm-4 g-3">
+                                    <div class="col-xxl-3 col-lg-6 col-md-4 col-sm-6">
+                                        <div class="product-box-3 theme-bg-white h-100">
+                                            <div class="product-header">
+                                                <div class="product-image">
+                                                    <a href="product-left-thumbnail.html">
+                                                        <img src="{% static 'images/cake/product/2.png' %}"
+                                                            class="img-fluid blur-up lazyload" alt="">
+                                                    </a>
+
+                                                    <div class="product-header-top">
+                                                        <button class="btn wishlist-button close_button">
+                                                            <i data-feather="x"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="product-footer">
+                                                <div class="product-detail">
+                                                    <span class="span-name">سبزیجات</span>
+                                                    <a href="product-left.html">
+                                                        <h5 class="name">آرد نان و شیرینی تازه 200 گرم</h5>
+                                                    </a>
+                                                    <p class="text-content mt-1 mb-2 product-content">لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است.</p>
+                                                    <h6 class="unit mt-1">250 میلی لیتر</h6>
+                                                    <h5 class="price">
+                                                        <span class="theme-color">8.200 تومان</span>
+                                                        <del>15.150</del>
+                                                    </h5>
+                                                    <div class="add-to-cart-box mt-2">
+                                                        <button class="btn btn-add-cart addcart-button">افزودن
+                                                            <span class="add-icon bg-light-gray"> <i class="fa-solid fa-plus"></i> </span></button>
+                                                        <div class="cart_qty qty-box">
+                                                            <div class="input-group">
+                                                                <button type="button" class="qty-left-minus"
+                                                                    data-type="minus" data-field="">
+                                                                    <i class="fa fa-minus" aria-hidden="true"></i>
+                                                                </button>
+                                                                <input class="form-control input-number qty-input"
+                                                                    type="text" name="quantity" value="0">
+                                                                <button type="button" class="qty-right-plus"
+                                                                    data-type="plus" data-field="">
+                                                                    <i class="fa fa-plus" aria-hidden="true"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xxl-3 col-lg-6 col-md-4 col-sm-6">
+                                        <div class="product-box-3 theme-bg-white h-100">
+                                            <div class="product-header">
+                                                <div class="product-image">
+                                                    <a href="product-left-thumbnail.html">
+                                                        <img src="{% static 'images/cake/product/3.png' %}"
+                                                            class="img-fluid blur-up lazyload" alt="">
+                                                    </a>
+
+                                                    <div class="product-header-top">
+                                                        <button class="btn wishlist-button close_button">
+                                                            <i data-feather="x"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="product-footer">
+                                                <div class="product-detail">
+                                                    <span class="span-name">سبزیجات</span>
+                                                    <a href="product-left.html">
+                                                        <h5 class="name">بیسکویت کره بادام زمینی با کیفیت عالی
+                                                            600 گرم</h5>
+                                                    </a>
+                                                    <p class="text-content mt-1 mb-2 product-content">لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است.</p>
+                                                    <h6 class="unit mt-1">350 گرم</h6>
+                                                    <h5 class="price">
+                                                        <span class="theme-color">4.330 تومان</span>
+                                                        <del>10.360</del>
+                                                    </h5>
+                                                    <div class="add-to-cart-box mt-2">
+                                                        <button class="btn btn-add-cart addcart-button">افزودن
+                                                            <span class="add-icon bg-light-gray"> <i class="fa-solid fa-plus"></i> </span></button>
+                                                        <div class="cart_qty qty-box">
+                                                            <div class="input-group">
+                                                                <button type="button" class="qty-left-minus"
+                                                                    data-type="minus" data-field="">
+                                                                    <i class="fa fa-minus" aria-hidden="true"></i>
+                                                                </button>
+                                                                <input class="form-control input-number qty-input"
+                                                                    type="text" name="quantity" value="0">
+                                                                <button type="button" class="qty-right-plus"
+                                                                    data-type="plus" data-field="">
+                                                                    <i class="fa fa-plus" aria-hidden="true"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xxl-3 col-lg-6 col-md-4 col-sm-6">
+                                        <div class="product-box-3 theme-bg-white h-100">
+                                            <div class="product-header">
+                                                <div class="product-image">
+                                                    <a href="product-left-thumbnail.html">
+                                                        <img src="{% static 'images/cake/product/4.png' %}"
+                                                            class="img-fluid blur-up lazyload" alt="">
+                                                    </a>
+
+                                                    <div class="product-header-top">
+                                                        <button class="btn wishlist-button close_button">
+                                                            <i data-feather="x"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="product-footer">
+                                                <div class="product-detail">
+                                                    <span class="span-name">اسنک</span>
+                                                    <a href="product-left.html">
+                                                        <h5 class="name">چیپس سیب زمینی پاشیده چیلی یومیتوس 100 گرم
+                                                        </h5>
+                                                    </a>
+                                                    <p class="text-content mt-1 mb-2 product-content">لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است و برای شرایط فعلی تکنولوژی مورد نیاز </p>
+                                                    <h6 class="unit mt-1">100 گرم</h6>
+                                                    <h5 class="price">
+                                                        <span class="theme-color">10.250 تومان</span>
+                                                        <del>12.360</del>
+                                                    </h5>
+                                                    <div class="add-to-cart-box mt-2">
+                                                        <button class="btn btn-add-cart addcart-button">افزودن
+                                                            <span class="add-icon bg-light-gray"> <i class="fa-solid fa-plus"></i> </span></button>
+                                                        <div class="cart_qty qty-box">
+                                                            <div class="input-group">
+                                                                <button type="button" class="qty-left-minus"
+                                                                    data-type="minus" data-field="">
+                                                                    <i class="fa fa-minus" aria-hidden="true"></i>
+                                                                </button>
+                                                                <input class="form-control input-number qty-input"
+                                                                    type="text" name="quantity" value="0">
+                                                                <button type="button" class="qty-right-plus"
+                                                                    data-type="plus" data-field="">
+                                                                    <i class="fa fa-plus" aria-hidden="true"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xxl-3 col-lg-6 col-md-4 col-sm-6">
+                                        <div class="product-box-3 theme-bg-white h-100">
+                                            <div class="product-header">
+                                                <div class="product-image">
+                                                    <a href="product-left-thumbnail.html">
+                                                        <img src="{% static 'images/cake/product/5.png' %}"
+                                                            class="img-fluid blur-up lazyload" alt="">
+                                                    </a>
+
+                                                    <div class="product-header-top">
+                                                        <button class="btn wishlist-button close_button">
+                                                            <i data-feather="x"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="product-footer">
+                                                <div class="product-detail">
+                                                    <span class="span-name">سبزیجات</span>
+                                                    <a href="product-left.html">
+                                                        <h5 class="name">کوکی های ترد فانتزی شکلات چیپ</h5>
+                                                    </a>
+                                                    <p class="text-content mt-1 mb-2 product-content">کتابهای زیادی در شصت و سه درصد گذشته، حال و آینده شناخت فراوان جامعه و متخصصان را می طلبد تا با نرم افزارها شناخت بیشتری را برای طراحان رایانه ای علی الخصوص طراحان خلاقی و فرهنگ پیشرو در زبان فارسی ایجاد کرد. </p>
+                                                    <h6 class="unit mt-1">550 گرم</h6>
+                                                    <h5 class="price">
+                                                        <span class="theme-color">14.250 تومان</span>
+                                                        <del>16.270</del>
+                                                    </h5>
+                                                    <div class="add-to-cart-box mt-2">
+                                                        <button class="btn btn-add-cart addcart-button">افزودن
+                                                            <span class="add-icon bg-light-gray"> <i class="fa-solid fa-plus"></i> </span></button>
+                                                        <div class="cart_qty qty-box">
+                                                            <div class="input-group">
+                                                                <button type="button" class="qty-left-minus"
+                                                                    data-type="minus" data-field="">
+                                                                    <i class="fa fa-minus" aria-hidden="true"></i>
+                                                                </button>
+                                                                <input class="form-control input-number qty-input"
+                                                                    type="text" name="quantity" value="0">
+                                                                <button type="button" class="qty-right-plus"
+                                                                    data-type="plus" data-field="">
+                                                                    <i class="fa fa-plus" aria-hidden="true"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xxl-3 col-lg-6 col-md-4 col-sm-6">
+                                        <div class="product-box-3 theme-bg-white h-100">
+                                            <div class="product-header">
+                                                <div class="product-image">
+                                                    <a href="product-left-thumbnail.html">
+                                                        <img src="{% static 'images/cake/product/6.png' %}"
+                                                            class="img-fluid blur-up lazyload" alt="">
+                                                    </a>
+
+                                                    <div class="product-header-top">
+                                                        <button class="btn wishlist-button close_button">
+                                                            <i data-feather="x"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="product-footer">
+                                                <div class="product-detail">
+                                                    <span class="span-name">سبزیجات</span>
+                                                    <a href="product-left.html">
+                                                        <h5 class="name">آرد نان و شیرینی تازه 200 گرم</h5>
+                                                    </a>
+                                                    <p class="text-content mt-1 mb-2 product-content">در این صورت می توان امید داشت که تمام و دشواری موجود در ارائه راهکارها و شرایط سخت تایپ به پایان رسد وزمان مورد نیاز شامل حروفچینی دستاوردهای اصلی و جوابگوی سوالات پیوسته اهل دنیای موجود طراحی اساسا مورد استفاده قرار گیرد.
+                                                    </p>
+                                                    <h6 class="unit mt-1">1 کیلوگرم</h6>
+                                                    <h5 class="price">
+                                                        <span class="theme-color">12.680 تومان</span>
+                                                        <del>14.690</del>
+                                                    </h5>
+                                                    <div class="add-to-cart-box mt-2">
+                                                        <button class="btn btn-add-cart addcart-button">افزودن
+                                                            <span class="add-icon bg-light-gray"> <i class="fa-solid fa-plus"></i> </span></button>
+                                                        <div class="cart_qty qty-box">
+                                                            <div class="input-group">
+                                                                <button type="button" class="qty-left-minus"
+                                                                    data-type="minus" data-field="">
+                                                                    <i class="fa fa-minus" aria-hidden="true"></i>
+                                                                </button>
+                                                                <input class="form-control input-number qty-input"
+                                                                    type="text" name="quantity" value="0">
+                                                                <button type="button" class="qty-right-plus"
+                                                                    data-type="plus" data-field="">
+                                                                    <i class="fa fa-plus" aria-hidden="true"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xxl-3 col-lg-6 col-md-4 col-sm-6">
+                                        <div class="product-box-3 theme-bg-white h-100">
+                                            <div class="product-header">
+                                                <div class="product-image">
+                                                    <a href="product-left-thumbnail.html">
+                                                        <img src="{% static 'images/cake/product/7.png' %}"
+                                                            class="img-fluid blur-up lazyload" alt="">
+                                                    </a>
+
+                                                    <div class="product-header-top">
+                                                        <button class="btn wishlist-button close_button">
+                                                            <i data-feather="x"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="product-footer">
+                                                <div class="product-detail">
+                                                    <span class="span-name">سبزیجات</span>
+                                                    <a href="product-left.html">
+                                                        <h5 class="name">آرد نان و شیرینی تازه 200 گرم</h5>
+                                                    </a>
+                                                    <p class="text-content mt-1 mb-2 product-content"> این یک نوشته آزمایشی است که به طراحان و برنامه نویسان کمک میکند تا این عزیزان با بهره گیری از این نوشته تستی و آزمایشی بتوانند نمونه تکمیل شده از پروژه و طرح خودشان را به کارفرما نمایش دهند، استفاده از این متن تستی می تواند سرعت پیشرفت پروژه را افزایش دهد، و طراحان به جای تایپ و نگارش متن می توانند تنها با یک کپی و پست این متن را در کادرهای مختلف جایگزین نمائید. این نوشته توسط سایت لورم ایپسوم فارسی نگاشته شده است.</p>
+                                                    <h6 class="unit mt-1">250 میلی لیتر</h6>
+                                                    <h5 class="price">
+                                                        <span class="theme-color">8.200 تومان</span>
+                                                        <del>15.150</del>
+                                                    </h5>
+                                                    <div class="add-to-cart-box mt-2">
+                                                        <button class="btn btn-add-cart addcart-button">افزودن
+                                                            <span class="add-icon bg-light-gray"> <i class="fa-solid fa-plus"></i> </span></button>
+                                                        <div class="cart_qty qty-box">
+                                                            <div class="input-group">
+                                                                <button type="button" class="qty-left-minus"
+                                                                    data-type="minus" data-field="">
+                                                                    <i class="fa fa-minus" aria-hidden="true"></i>
+                                                                </button>
+                                                                <input class="form-control input-number qty-input"
+                                                                    type="text" name="quantity" value="0">
+                                                                <button type="button" class="qty-right-plus"
+                                                                    data-type="plus" data-field="">
+                                                                    <i class="fa fa-plus" aria-hidden="true"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xxl-3 col-lg-6 col-md-4 col-sm-6">
+                                        <div class="product-box-3 theme-bg-white h-100">
+                                            <div class="product-header">
+                                                <div class="product-image">
+                                                    <a href="product-left-thumbnail.html">
+                                                        <img src="{% static 'images/cake/product/2.png' %}"
+                                                            class="img-fluid blur-up lazyload" alt="">
+                                                    </a>
+
+                                                    <div class="product-header-top">
+                                                        <button class="btn wishlist-button close_button">
+                                                            <i data-feather="x"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="product-footer">
+                                                <div class="product-detail">
+                                                    <span class="span-name">سبزیجات</span>
+                                                    <a href="product-left.html">
+                                                        <h5 class="name">آرد نان و شیرینی تازه 200 گرم</h5>
+                                                    </a>
+                                                    <p class="text-content mt-1 mb-2 product-content"> این یک نوشته آزمایشی است که به طراحان و برنامه نویسان کمک میکند تا این عزیزان با بهره گیری از این نوشته تستی و آزمایشی بتوانند نمونه تکمیل شده از پروژه و طرح خودشان را به کارفرما نمایش دهند، استفاده از این متن تستی می تواند سرعت پیشرفت پروژه را افزایش دهد، و طراحان به جای تایپ و نگارش متن می توانند تنها با یک کپی و پست این متن را در کادرهای مختلف جایگزین نمائید. این نوشته توسط سایت لورم ایپسوم فارسی نگاشته شده است.</p>
+                                                    <h6 class="unit mt-1">250 میلی لیتر</h6>
+                                                    <h5 class="price">
+                                                        <span class="theme-color">8.200 تومان</span>
+                                                        <del>15.150</del>
+                                                    </h5>
+                                                    <div class="add-to-cart-box mt-2">
+                                                        <button class="btn btn-add-cart addcart-button">افزودن
+                                                            <span class="add-icon bg-light-gray"> <i class="fa-solid fa-plus"></i> </span></button>
+                                                        <div class="cart_qty qty-box">
+                                                            <div class="input-group">
+                                                                <button type="button" class="qty-left-minus"
+                                                                    data-type="minus" data-field="">
+                                                                    <i class="fa fa-minus" aria-hidden="true"></i>
+                                                                </button>
+                                                                <input class="form-control input-number qty-input"
+                                                                    type="text" name="quantity" value="0">
+                                                                <button type="button" class="qty-right-plus"
+                                                                    data-type="plus" data-field="">
+                                                                    <i class="fa fa-plus" aria-hidden="true"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="pills-order" role="tabpanel">
+                            <div class="dashboard-order">
+                                <div class="title">
+                                    <h2>تاریخچه سفارشات من</h2>
+                                    <span class="title-leaf title-leaf-gray">
+                                        <svg class="icon-width bg-gray">
+                                            <use xlink:href="svg/leaf.svg#leaf"></use>
+                                        </svg>
+                                    </span>
+                                </div>
+
+                                <div class="order-contain">
+                                    <div class="order-box dashboard-bg-box">
+                                        <div class="order-container">
+                                            <div class="order-icon">
+                                                <i data-feather="box"></i>
+                                            </div>
+
+                                            <div class="order-detail">
+                                                <h4>وضعیت <span>در انتظار</span></h4>
+                                                <h6 class="text-content">این یک نوشته آزمایشی است که به طراحان و برنامه نویسان کمک میکند تا این عزیزان با بهره گیری از این نوشته تستی و آزمایشی بتوانند. چدار دولسلات گودا. پنیر ماکارونی
+                                                    رشته های پنیر پنیر کوتج فتا هالومی پنیر جارلسبرگ
+                                                    مثلث ها می گویند پنیر.</h6>
+                                            </div>
+                                        </div>
+
+                                        <div class="product-order-detail">
+                                            <a href="product-left-thumbnail.html" class="order-image">
+                                                <img src="{% static 'images/vegetable/product/1.png' %}"
+                                                    class="blur-up lazyload" alt="">
+                                            </a>
+
+                                            <div class="order-wrap">
+                                                <a href="product-left-thumbnail.html">
+                                                    <h3>کوکی های ترد فانتزی شکلات چیپ</h3>
+                                                </a>
+                                                <p class="text-content">چدار دولسلات گودا. پنیر ماکارونی
+                                                    رشته های پنیر پنیر کوتج فتا هالومی پنیر جارلسبرگ
+                                                    مثلث ها می گویند پنیر. </p>
+                                                <ul class="product-size">
+                                                    <li>
+                                                        <div class="size-box">
+                                                            <h6 class="text-content">قیمت : </h6>
+                                                            <h5>20.680 تومان</h5>
+                                                        </div>
+                                                    </li>
+
+                                                    <li>
+                                                        <div class="size-box">
+                                                            <h6 class="text-content">امتیاز : </h6>
+                                                            <div class="product-rating ms-2">
+                                                                <ul class="rating">
+                                                                    <li>
+                                                                        <i data-feather="star" class="fill"></i>
+                                                                    </li>
+                                                                    <li>
+                                                                        <i data-feather="star" class="fill"></i>
+                                                                    </li>
+                                                                    <li>
+                                                                        <i data-feather="star" class="fill"></i>
+                                                                    </li>
+                                                                    <li>
+                                                                        <i data-feather="star" class="fill"></i>
+                                                                    </li>
+                                                                    <li>
+                                                                        <i data-feather="star"></i>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+
+                                                    <li>
+                                                        <div class="size-box">
+                                                            <h6 class="text-content">سازنده : </h6>
+                                                            <h5>اپل</h5>
+                                                        </div>
+                                                    </li>
+
+                                                    <li>
+                                                        <div class="size-box">
+                                                            <h6 class="text-content">مقدار : </h6>
+                                                            <h5>250 گرم</h5>
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="order-box dashboard-bg-box">
+                                        <div class="order-container">
+                                            <div class="order-icon">
+                                                <i data-feather="box"></i>
+                                            </div>
+
+                                            <div class="order-detail">
+                                                <h4>وضعیت <span>در انتظار</span></h4>
+                                                <h6 class="text-content">هر نفسی که فرو می‌ بریم، مرگی را که مدام به ما دست‌ اندازی می‌کند پس می‌زند... در نهایت این مرگ است که باید پیروز شود.هر نفسی که فرو می‌ بریم، مرگی را که مدام به ما دست‌ اندازی می‌کند پس می‌زند... در نهایت این مرگ است که باید پیروز شود.</h6>
+                                            </div>
+                                        </div>
+
+                                        <div class="product-order-detail">
+                                            <a href="product-left.html" class="order-image">
+                                                <img src="{% static 'images/vegetable/product/3.png' %}" alt=""
+                                                    class="blur-up lazyload">
+                                            </a>
+
+                                            <div class="order-wrap">
+                                                <a href="product-left.html">
+                                                    <h3>بیسکویت کره بادام زمینی پرمیوم کره 600 گرم</h3>
+                                                </a>
+                                                <p class="text-content">پیر مردی هر روز تو محله می دید پسر کی با کفش های پاره و پای برهنه با توپ پلاستیکی فوتبال بازی می کند.</p>
+                                                <ul class="product-size">
+                                                    <li>
+                                                        <div class="size-box">
+                                                            <h6 class="text-content">قیمت: </h6>
+                                                            <h5>2.680 تومان</h5>
+                                                        </div>
+                                                    </li>
+
+                                                    <li>
+                                                        <div class="size-box">
+                                                            <h6 class="text-content">امتیاز : </h6>
+                                                            <div class="product-rating ms-2">
+                                                                <ul class="rating">
+                                                                    <li>
+                                                                        <i data-feather="star" class="fill"></i>
+                                                                    </li>
+                                                                    <li>
+                                                                        <i data-feather="star" class="fill"></i>
+                                                                    </li>
+                                                                    <li>
+                                                                        <i data-feather="star" class="fill"></i>
+                                                                    </li>
+                                                                    <li>
+                                                                        <i data-feather="star" class="fill"></i>
+                                                                    </li>
+                                                                    <li>
+                                                                        <i data-feather="star"></i>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+
+                                                    <li>
+                                                        <div class="size-box">
+                                                            <h6 class="text-content">سازنده : </h6>
+                                                            <h5>اپل</h5>
+                                                        </div>
+                                                    </li>
+
+                                                    <li>
+                                                        <div class="size-box">
+                                                            <h6 class="text-content">مقدار : </h6>
+                                                            <h5>250 گرم</h5>
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="order-box dashboard-bg-box">
+                                        <div class="order-container">
+                                            <div class="order-icon">
+                                                <i data-feather="box"></i>
+                                            </div>
+
+                                            <div class="order-detail">
+                                                <h4>وضعیت <span class="success-bg">موفق</span></h4>
+                                                <h6 class="text-content">پیر مردی هر روز تو محله می دید پسر کی با کفش های پاره و پای برهنه با توپ پلاستیکی فوتبال بازی می کند</h6>
+                                            </div>
+                                        </div>
+
+                                        <div class="product-order-detail">
+                                            <a href="product-left.html" class="order-image">
+                                                <img src="{% static 'images/vegetable/product/4.png' %}"
+                                                    class="blur-up lazyload" alt="">
+                                            </a>
+
+                                            <div class="order-wrap">
+                                                <a href="product-left.html">
+                                                    <h3>بسته ترکیبی اسنک آرمور از جوار استیک و چیپس جوار</h3>
+                                                </a>
+                                                <p class="text-content">پسرک کفشا رو پوشید و خوشحال رو به پیر مرد کرد و گفت: شما خدایید؟! پیر مرد لبش را گزید و گفت نه! پسرک گفت پس دوست خدایی، چون من دیشب فقط به خدا گفتم كه کفش ندارم…</p>
+                                                <ul class="product-size">
+                                                    <li>
+                                                        <div class="size-box">
+                                                            <h6 class="text-content">قیمت: </h6>
+                                                            <h5>2.680 تومان</h5>
+                                                        </div>
+                                                    </li>
+
+                                                    <li>
+                                                        <div class="size-box">
+                                                            <h6 class="text-content">امتیاز : </h6>
+                                                            <div class="product-rating ms-2">
+                                                                <ul class="rating">
+                                                                    <li>
+                                                                        <i data-feather="star" class="fill"></i>
+                                                                    </li>
+                                                                    <li>
+                                                                        <i data-feather="star" class="fill"></i>
+                                                                    </li>
+                                                                    <li>
+                                                                        <i data-feather="star" class="fill"></i>
+                                                                    </li>
+                                                                    <li>
+                                                                        <i data-feather="star" class="fill"></i>
+                                                                    </li>
+                                                                    <li>
+                                                                        <i data-feather="star"></i>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+
+                                                    <li>
+                                                        <div class="size-box">
+                                                            <h6 class="text-content">سازنده : </h6>
+                                                            <h5>اپل</h5>
+                                                        </div>
+                                                    </li>
+
+                                                    <li>
+                                                        <div class="size-box">
+                                                            <h6 class="text-content">مقدار : </h6>
+                                                            <h5>250 گرم</h5>
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {# in account/user-dashboard.html #}
+                        <div class="tab-pane fade" id="pills-address" role="tabpanel">
+                          <div class="dashboard-address">
+                            <div class="title title-flex">
+                              <div>
+                                <h2>آدرس‌های شما</h2>
+                                <span class="title-leaf">
+                                  <svg class="icon-width bg-gray">
+                                    <use xlink:href="svg/leaf.svg#leaf"></use>
+                                  </svg>
+                                </span>
+                              </div>
+                              <button class="btn theme-bg-color text-white btn-sm fw-bold mt-lg-0 mt-3"
+                                      data-bs-toggle="modal"
+                                      data-bs-target="#add-address">
+                                <i data-feather="plus" class="me-2"></i>افزودن آدرس جدید
+                              </button>
+                            </div>
+
+                            <div class="row g-sm-4 g-3">
+                              {% for addr in addresses %}
+                                <div class="col-xxl-4 col-xl-6 col-lg-12 col-md-6">
+                                  <div class="address-box">
+                                    <div>
+                                      <div class="form-check">
+                                        <input class="form-check-input"
+                                               type="radio"
+                                               name="default_address"
+                                               id="addr{{ addr.id }}"
+                                               {% if addr.active %}checked{% endif %}
+                                               onchange="location.href='{% url 'address_set_default' addr.id %}'">
+                                      </div>
+
+                                      <div class="label">
+                                        <label for="addr{{ addr.id }}">{{ addr.get_category_display }}</label>
+                                      </div>
+
+                                      <div class="table-responsive address-table">
+                                        <table class="table">
+                                          <tbody>
+                                            <tr>
+                                              <td colspan="2">{{ user.get_full_name }}</td>
+                                            </tr>
+                                            <tr>
+                                              <td>آدرس :</td>
+                                              <td>
+                                                <p>{{ addr.address|linebreaksbr }}</p>
+                                              </td>
+                                            </tr>
+                                            <tr>
+                                              <td>کد پستی :</td>
+                                              <td>{{ addr.postal_code }}</td>
+                                            </tr>
+                                            <tr>
+                                              <td>تلفن :</td>
+                                              <td>{{ addr.telephone }}</td>
+                                            </tr>
+                                          </tbody>
+                                        </table>
+                                      </div>
+                                    </div>
+
+                                    <div class="button-group">
+                                      <button class="btn btn-sm add-button w-100"
+                                              data-bs-toggle="modal"
+                                              data-bs-target="#edit-address-{{ addr.id }}">
+                                        <i data-feather="edit"></i> ویرایش
+                                      </button>
+                                      <button class="btn btn-sm add-button w-100"
+                                              data-bs-toggle="modal"
+                                              data-bs-target="#remove-address-{{ addr.id }}">
+                                        <i data-feather="trash-2"></i> حذف
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              {% empty %}
+                                <p>شما هنوز هیچ آدرسی ثبت نکرده‌اید.</p>
+                              {% endfor %}
+                            </div>
+                          </div>
+                        </div>
+                        <div class="tab-pane fade" id="pills-card" role="tabpanel">
+                            <div class="dashboard-card">
+                                <div class="title title-flex">
+                                    <div>
+                                        <h2>اطلاعات حساب های بانکی</h2>
+                                        <span class="title-leaf">
+                                            <svg class="icon-width bg-gray">
+                                                <use xlink:href="svg/leaf.svg#leaf"></use>
+                                            </svg>
+                                        </span>
+                                    </div>
+
+                                    <button class="btn theme-bg-color text-white btn-sm fw-bold mt-lg-0 mt-3"
+                                        data-bs-toggle="modal" data-bs-target="#editCard"><i data-feather="plus"
+                                            class="me-2"></i> افزودن حساب جدید</button>
+                                </div>
+
+                                <div class="row g-4">
+                                    <div class="col-xxl-4 col-xl-6 col-lg-12 col-sm-6">
+                                        <div class="payment-card-detail">
+                                            <div class="card-details">
+                                                <div class="card-number">
+                                                    <h4>XXXX - XXXX - XXXX - 2548</h4>
+                                                </div>
+
+                                                <div class="valid-detail">
+                                                    <div class="title">
+                                                        <span>فعال</span>
+                                                        <span>1400/10/1</span>
+                                                    </div>
+                                                    <div class="date">
+                                                        <h3>08/05</h3>
+                                                    </div>
+                                                    <div class="primary">
+                                                        <span class="badge bg-pill badge-light">CVV2 : 1454</span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="name-detail">
+                                                    <div class="name">
+                                                        <h5>زینب احمدی</h5>
+                                                    </div>
+                                                    <div class="card-img">
+                                                        <img src="{% static 'images/payment-icon/1.jpg' %}"
+                                                            class="img-fluid blur-up lazyloaded" alt="">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="edit-card">
+                                                <a data-bs-toggle="modal" data-bs-target="#editCard"
+                                                    href="javascript:void(0)"><i class="far fa-edit"></i> ویرایش</a>
+                                                <a href="javascript:void(0)" data-bs-toggle="modal"
+                                                    data-bs-target="#removeProfile"><i
+                                                        class="far fa-minus-square"></i> حذف</a>
+                                            </div>
+                                        </div>
+
+                                        <div class="edit-card-mobile">
+                                            <a data-bs-toggle="modal" data-bs-target="#editCard"
+                                                href="javascript:void(0)"><i class="far fa-edit"></i> ویرایش</a>
+                                            <a href="javascript:void(0)"><i class="far fa-minus-square"></i>
+                                                حذف</a>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xxl-4 col-xl-6 col-lg-12 col-sm-6">
+                                        <div class="payment-card-detail">
+                                            <div class="card-details card-visa">
+                                                <div class="card-number">
+                                                    <h4>XXXX - XXXX - XXXX - 1536</h4>
+                                                </div>
+
+                                                <div class="valid-detail">
+                                                    <div class="title">
+                                                        <span>فعال</span>
+                                                        <span>1400/10/1</span>
+                                                    </div>
+                                                    <div class="date">
+                                                        <h3>08/05</h3>
+                                                    </div>
+                                                    <div class="primary">
+                                                        <span class="badge bg-pill badge-light">CVV2 : 1554</span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="name-detail">
+                                                    <div class="name">
+                                                        <h5>زینب احمدی</h5>
+                                                    </div>
+                                                    <div class="card-img">
+                                                        <img src="{% static 'images/payment-icon/1.jpg' %}"
+                                                            class="img-fluid blur-up lazyloaded" alt="">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="edit-card">
+                                                <a data-bs-toggle="modal" data-bs-target="#editCard"
+                                                    href="javascript:void(0)"><i class="far fa-edit"></i> ویرایش</a>
+                                                <a href="javascript:void(0)" data-bs-toggle="modal"
+                                                    data-bs-target="#removeProfile"><i
+                                                        class="far fa-minus-square"></i> حذف</a>
+                                            </div>
+                                        </div>
+
+                                        <div class="edit-card-mobile">
+                                            <a data-bs-toggle="modal" data-bs-target="#editCard"
+                                                href="javascript:void(0)"><i class="far fa-edit"></i> ویرایش</a>
+                                            <a href="javascript:void(0)"><i class="far fa-minus-square"></i>
+                                                حذف</a>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xxl-4 col-xl-6 col-lg-12 col-sm-6">
+                                        <div class="payment-card-detail">
+                                            <div class="card-details dabit-card">
+                                                <div class="card-number">
+                                                    <h4>XXXX - XXXX - XXXX - 1366</h4>
+                                                </div>
+
+                                                <div class="valid-detail">
+                                                    <div class="title">
+                                                        <span>فعال</span>
+                                                        <span>1400/10/1</span>
+                                                    </div>
+                                                    <div class="date">
+                                                        <h3>08/05</h3>
+                                                    </div>
+                                                    <div class="primary">
+                                                        <span class="badge bg-pill badge-light">CVV2 : 1654</span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="name-detail">
+                                                    <div class="name">
+                                                        <h5>زینب احمدی</h5>
+                                                    </div>
+                                                    <div class="card-img">
+                                                        <img src="{% static 'images/payment-icon/1.jpg' %}"
+                                                            class="img-fluid blur-up lazyloaded" alt="">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="edit-card">
+                                                <a data-bs-toggle="modal" data-bs-target="#editCard"
+                                                    href="javascript:void(0)"><i class="far fa-edit"></i> ویرایش</a>
+                                                <a href="javascript:void(0)" data-bs-toggle="modal"
+                                                    data-bs-target="#removeProfile"><i
+                                                        class="far fa-minus-square"></i> حذف</a>
+                                            </div>
+                                        </div>
+
+                                        <div class="edit-card-mobile">
+                                            <a data-bs-toggle="modal" data-bs-target="#editCard"
+                                                href="javascript:void(0)"><i class="far fa-edit"></i> ویرایش</a>
+                                            <a href="javascript:void(0)"><i class="far fa-minus-square"></i>
+                                                حذف</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="pills-profile" role="tabpanel">
+                            <div class="dashboard-profile">
+                                <div class="title">
+                                    <h2>پروفایل من</h2>
+                                    <span class="title-leaf">
+                                        <svg class="icon-width bg-gray">
+                                            <use xlink:href="svg/leaf.svg#leaf"></use>
+                                        </svg>
+                                    </span>
+                                </div>
+
+                                <div class="profile-detail dashboard-bg-box">
+                                  <div class="dashboard-title">
+                                    <h3>اطلاعات کلی</h3>
+                                  </div>
+                                  <div class="profile-name-detail">
+                                    <div class="d-sm-flex align-items-center d-block">
+                                      <h3>{{ full_name }}</h3>
+                                      <div class="product-rating profile-rating">
+                                        <ul class="rating">
+                                          <!-- static stars; wire up dynamically if you add a rating field -->
+                                          <li><i data-feather="star" class="fill"></i></li>
+                                          <li><i data-feather="star" class="fill"></i></li>
+                                          <li><i data-feather="star" class="fill"></i></li>
+                                          <li><i data-feather="star"></i></li>
+                                          <li><i data-feather="star"></i></li>
+                                        </ul>
+                                      </div>
+                                    </div>
+
+                                    <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#editProfile">ویرایش</a>
+                                  </div>
+
+                                  <div class="location-profile">
+                                    <ul>
+                                      <li>
+                                        <div class="location-box">
+                                          <i data-feather="map-pin"></i>
+                                          <h6>{{ location }}</h6>
+                                        </div>
+                                      </li>
+
+                                      <li>
+                                        <div class="location-box">
+                                          <i data-feather="mail"></i>
+                                          <h6>{{ email }}</h6>
+                                        </div>
+                                      </li>
+
+                                      <li>
+                                        <div class="location-box">
+                                          <i data-feather="check-square"></i>
+                                          <h6>میزان فعالیت : {{ activity_years }} سال</h6>
+                                        </div>
+                                      </li>
+                                    </ul>
+                                  </div>
+
+                                  <div class="profile-description">
+                                    <p>{{ user.profile_description|default:"" }}</p>
+                                  </div>
+                                </div>
+                                <div class="profile-about dashboard-bg-box">
+                                    <div class="row">
+                                        <div class="col-xxl-7">
+                                                {# ← New Roles Section → #}
+                                         <div class="dashboard-title mb-3">
+                                              <h3>نقش‌های من</h3>
+                                            </div>
+
+                                            <div class="table-responsive mb-4">
+                                              <table class="table">
+                                                <tbody>
+                                                  {% if confirmed_memberships %}
+                                                    {% for m in confirmed_memberships %}
+                                                      <tr>
+                                                        <td>{{ m.university.name }} :</td>
+                                                        <td>{{ m.get_role_display }}</td>
+                                                      </tr>
+                                                    {% endfor %}
+                                                  {% else %}
+                                                    <tr>
+                                                      <td>نقش :</td>
+                                                      <td>مشتری</td>
+                                                    </tr>
+                                                  {% endif %}
+                                                </tbody>
+                                              </table>
+                                            </div>
+
+                                            <div class="mb-4">
+                                              <a href="{% url 'request_role' %}" class="btn btn-primary">
+                                                درخواست نقش
+                                              </a>
+                                            </div>
+                                            <div class="dashboard-title mb-3">
+                                                <h3>اطلاعات کامل</h3>
+                                            </div>
+                                            <div class="table-responsive">
+                                              <table class="table">
+                                                <tbody>
+                                                  <tr>
+                                                    <td>نام کاربری :</td>
+                                                    <td>{{ user.username }}</td>
+                                                  </tr>
+                                                  <tr>
+                                                    <td>کد ملی :</td>
+                                                    <td>{{ national_code }}</td>
+                                                  </tr>
+                                                  <tr>
+                                                    <td>تاریخ تولد :</td>
+                                                    <td>
+                                                      {% if birthday %}
+                                                        {{ birthday|date:"Y/m/d" }}
+                                                      {% else %}
+                                                        —
+                                                      {% endif %}
+                                                    </td>
+                                                  </tr>
+                                                  <tr>
+                                                    <td>شماره تماس :</td>
+                                                    <td>
+                                                      {% if phone %}
+                                                        <a href="tel:{{ phone }}">{{ phone }}</a>
+                                                      {% else %}
+                                                        —
+                                                      {% endif %}
+                                                    </td>
+                                                  </tr>
+                                                  <tr>
+                                                    <td>آدرس :</td>
+                                                    <td>{{ address|default:"—" }}</td>
+                                                  </tr>
+                                                  <tr>
+                                                    <td>استان و شهر :</td>
+                                                    <td>{{ location|default:"—" }}</td>
+                                                  </tr>
+                                                  <tr>
+                                                    <td>کد پستی :</td>
+                                                    <td>{{ postal_code|default:"—" }}</td>
+                                                  </tr>
+                                                </tbody>
+                                              </table>
+                                            </div>
+                                            <div class="dashboard-title mb-3">
+                                                <h3>اطلاعات ورود</h3>
+                                            </div>
+
+                                            <div class="table-responsive">
+                                              <table class="table">
+                                                <tbody>
+                                                  <tr>
+                                                    <td>ایمیل :</td>
+                                                    <td>
+                                                      <a href="javascript:void(0)"
+                                                         data-bs-toggle="modal"
+                                                         data-bs-target="#editProfile">
+                                                        {{ email }}
+                                                        <span>ویرایش</span>
+                                                      </a>
+                                                    </td>
+                                                  </tr>
+                                                  <tr>
+                                                    <td>رمز ورود :</td>
+                                                    <td>
+                                                      <a href="javascript:void(0)"
+                                                         data-bs-toggle="modal"
+                                                         data-bs-target="#editProfile">
+                                                        ●●●●●●
+                                                        <span>ویرایش</span>
+                                                      </a>
+                                                    </td>
+                                                  </tr>
+                                                </tbody>
+                                              </table>
+                                            </div>
+                                        </div>
+                                        <div class="col-xxl-5">
+                                            <div class="profile-image">
+                                                <img src="{% static 'images/inner-page/dashboard-profile.png' %}"
+                                                    class="img-fluid blur-up lazyload" alt="">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="pills-download" role="tabpanel">
+                            <div class="dashboard-download">
+                                <div class="title">
+                                    <h2>دانلود ها</h2>
+                                    <span class="title-leaf">
+                                        <svg class="icon-width bg-gray">
+                                            <use xlink:href="svg/leaf.svg#leaf"></use>
+                                        </svg>
+                                    </span>
+                                </div>
+
+                                <div class="download-detail dashboard-bg-box">
+                                    <form>
+                                        <div class="input-group download-form">
+                                            <input type="text" class="form-control"
+                                                placeholder="جستجو در دانلود ها">
+                                            <button class="btn theme-bg-color text-light" type="button"
+                                                id="button-addon2">جستجو</button>
+                                        </div>
+                                    </form>
+
+                                    <div class="select-filter-box">
+                                        <select class="form-select">
+                                            <option selected="">انتخاب فروشنده</option>
+                                            <option value="1">یک</option>
+                                            <option value="2">دو</option>
+                                            <option value="3">سه</option>
+                                        </select>
+
+
+                                        <ul class="nav nav-pills filter-box" id="pills-tab" role="tablist">
+                                            <li class="nav-item" role="presentation">
+                                                <button class="nav-link active" id="pills-data-tab"
+                                                    data-bs-toggle="pill" data-bs-target="#pills-data"
+                                                    type="button">محصولات خریداری شده</button>
+                                            </li>
+                                            <li class="nav-item" role="presentation">
+                                                <button class="nav-link" id="pills-title-tab" data-bs-toggle="pill"
+                                                    data-bs-target="#pills-title" type="button">عنوان</button>
+                                            </li>
+                                            <li class="nav-item" role="presentation">
+                                                <button class="nav-link" id="pills-rating-tab" data-bs-toggle="pill"
+                                                    data-bs-target="#pills-rating" type="button">امتیاز</button>
+                                            </li>
+                                            <li class="nav-item" role="presentation">
+                                                <button class="nav-link" id="pills-recent-tab" data-bs-toggle="pill"
+                                                    data-bs-target="#pills-recent" type="button">آخرین بروزرسانی</button>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <div class="tab-content" id="pills-tabContent">
+                                        <div class="tab-pane fade show active" id="pills-data" role="tabpanel">
+                                            <div class="download-table">
+                                                <div class="table-responsive">
+                                                    <table class="table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>ردیف</th>
+                                                                <th>تصویر</th>
+                                                                <th>نام</th>
+                                                                <th></th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>1</td>
+                                                                <td>
+                                                                    <img src="{% static 'images/theme-icon/1.png' %}"
+                                                                        class="img-fluid" alt="">
+                                                                </td>
+                                                                <td>قالب فروش فایل فست کارت</td>
+                                                                <td>
+                                                                    <div class="dropdown download-dropdown">
+                                                                        <button class="btn dropdown-toggle"
+                                                                            type="button"
+                                                                            data-bs-toggle="dropdown">دانلود</button>
+                                                                        <ul class="dropdown-menu">
+                                                                            <li>
+                                                                                <a class="dropdown-item"
+                                                                                    href="#">تمام فایل به همراه راهنما</a>
+                                                                            </li>
+                                                                            <li>
+                                                                                <a class="dropdown-item"
+                                                                                    href="#">لایسنس به همراه راهنمای استفاده</a>
+                                                                            </li>
+                                                                            <li>
+                                                                                <a class="dropdown-item"
+                                                                                    href="#">فایل لایسنس عمومی</a>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>2</td>
+                                                                <td>
+                                                                    <img src="{% static 'images/theme-icon/2.png' %}"
+                                                                        class="img-fluid" alt="">
+                                                                </td>
+                                                                <td>اسلوا - افزونه مشابه افزونه دکان</td>
+                                                                <td>
+                                                                    <div class="dropdown download-dropdown">
+                                                                        <button class="btn dropdown-toggle"
+                                                                            type="button"
+                                                                            data-bs-toggle="dropdown">دانلود</button>
+                                                                        <ul class="dropdown-menu">
+                                                                            <li>
+                                                                                <a class="dropdown-item"
+                                                                                    href="#">تمام فایل به همراه راهنما</a>
+                                                                            </li>
+                                                                            <li>
+                                                                                <a class="dropdown-item"
+                                                                                    href="#">لایسنس به همراه راهنمای استفاده</a>
+                                                                            </li>
+                                                                            <li>
+                                                                                <a class="dropdown-item"
+                                                                                    href="#">فایل لایسنس عمومی</a>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>3</td>
+                                                                <td>
+                                                                    <img src="{% static 'images/theme-icon/3.png' %}"
+                                                                        class="img-fluid" alt="">
+                                                                </td>
+                                                                <td>ماهور - قالب فروشگاهی ورزشی</td>
+                                                                <td>
+                                                                    <div class="dropdown download-dropdown">
+                                                                        <button class="btn dropdown-toggle"
+                                                                            type="button"
+                                                                            data-bs-toggle="dropdown">دانلود</button>
+                                                                        <ul class="dropdown-menu">
+                                                                            <li>
+                                                                                <a class="dropdown-item"
+                                                                                    href="#">تمام فایل به همراه راهنما</a>
+                                                                            </li>
+                                                                            <li>
+                                                                                <a class="dropdown-item"
+                                                                                    href="#">لایسنس به همراه راهنمای استفاده</a>
+                                                                            </li>
+                                                                            <li>
+                                                                                <a class="dropdown-item"
+                                                                                    href="#">فایل لایسنس عمومی</a>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane fade" id="pills-title">
+                                            <div class="download-table">
+                                                <div class="table-responsive">
+                                                    <table class="table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>ردیف</th>
+                                                                <th>تصویر</th>
+                                                                <th>نام</th>
+                                                                <th></th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>1</td>
+                                                                <td>
+                                                                    <img src="{% static 'images/theme-icon/1.png' %}"
+                                                                        class="img-fluid" alt="">
+                                                                </td>
+                                                                <td>قالب فروش فایل فست کارت</td>
+                                                                <td>
+                                                                    <div class="dropdown download-dropdown">
+                                                                        <button class="btn dropdown-toggle"
+                                                                            type="button"
+                                                                            data-bs-toggle="dropdown">دانلود</button>
+                                                                        <ul class="dropdown-menu">
+                                                                            <li>
+                                                                                <a class="dropdown-item"
+                                                                                    href="#">تمام فایل به همراه راهنما</a>
+                                                                            </li>
+                                                                            <li>
+                                                                                <a class="dropdown-item"
+                                                                                    href="#">لایسنس به همراه راهنمای استفاده</a>
+                                                                            </li>
+                                                                            <li>
+                                                                                <a class="dropdown-item"
+                                                                                    href="#">فایل لایسنس عمومی</a>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>2</td>
+                                                                <td>
+                                                                    <img src="{% static 'images/theme-icon/2.png' %}"
+                                                                        class="img-fluid" alt="">
+                                                                </td>
+                                                                <td>اسلوا - افزونه مشابه افزونه دکان</td>
+                                                                <td>
+                                                                    <div class="dropdown download-dropdown">
+                                                                        <button class="btn dropdown-toggle"
+                                                                            type="button"
+                                                                            data-bs-toggle="dropdown">دانلود</button>
+                                                                        <ul class="dropdown-menu">
+                                                                            <li>
+                                                                                <a class="dropdown-item"
+                                                                                    href="#">تمام فایل به همراه راهنما</a>
+                                                                            </li>
+                                                                            <li>
+                                                                                <a class="dropdown-item"
+                                                                                    href="#">لایسنس به همراه راهنمای استفاده</a>
+                                                                            </li>
+                                                                            <li>
+                                                                                <a class="dropdown-item"
+                                                                                    href="#">فایل لایسنس عمومی</a>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>3</td>
+                                                                <td>
+                                                                    <img src="{% static 'images/theme-icon/3.png' %}"
+                                                                        class="img-fluid" alt="">
+                                                                </td>
+                                                                <td>ماهور - قالب فروشگاهی ورزشی</td>
+                                                                <td>
+                                                                    <div class="dropdown download-dropdown">
+                                                                        <button class="btn dropdown-toggle"
+                                                                            type="button"
+                                                                            data-bs-toggle="dropdown">دانلود</button>
+                                                                        <ul class="dropdown-menu">
+                                                                            <li>
+                                                                                <a class="dropdown-item"
+                                                                                    href="#">تمام فایل به همراه راهنما</a>
+                                                                            </li>
+                                                                            <li>
+                                                                                <a class="dropdown-item"
+                                                                                    href="#">لایسنس به همراه راهنمای استفاده</a>
+                                                                            </li>
+                                                                            <li>
+                                                                                <a class="dropdown-item"
+                                                                                    href="#">فایل لایسنس عمومی</a>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane fade" id="pills-rating">
+                                            <div class="download-table">
+                                                <div class="table-responsive">
+                                                    <table class="table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>ردیف</th>
+                                                                <th>تصویر</th>
+                                                                <th>نام</th>
+                                                                <th></th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>1</td>
+                                                                <td>
+                                                                    <img src="{% static 'images/theme-icon/1.png' %}"
+                                                                        class="img-fluid" alt="">
+                                                                </td>
+                                                                <td>قالب فروش فایل فست کارت</td>
+                                                                <td>
+                                                                    <div class="dropdown download-dropdown">
+                                                                        <button class="btn dropdown-toggle"
+                                                                            type="button"
+                                                                            data-bs-toggle="dropdown">دانلود</button>
+                                                                        <ul class="dropdown-menu">
+                                                                            <li>
+                                                                                <a class="dropdown-item"
+                                                                                    href="#">تمام فایل به همراه راهنما</a>
+                                                                            </li>
+                                                                            <li>
+                                                                                <a class="dropdown-item"
+                                                                                    href="#">لایسنس به همراه راهنمای استفاده</a>
+                                                                            </li>
+                                                                            <li>
+                                                                                <a class="dropdown-item"
+                                                                                    href="#">فایل لایسنس عمومی</a>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>2</td>
+                                                                <td>
+                                                                    <img src="{% static 'images/theme-icon/2.png' %}"
+                                                                        class="img-fluid" alt="">
+                                                                </td>
+                                                                <td>اسلوا - افزونه مشابه افزونه دکان</td>
+                                                                <td>
+                                                                    <div class="dropdown download-dropdown">
+                                                                        <button class="btn dropdown-toggle"
+                                                                            type="button"
+                                                                            data-bs-toggle="dropdown">دانلود</button>
+                                                                        <ul class="dropdown-menu">
+                                                                            <li>
+                                                                                <a class="dropdown-item"
+                                                                                    href="#">تمام فایل به همراه راهنما</a>
+                                                                            </li>
+                                                                            <li>
+                                                                                <a class="dropdown-item"
+                                                                                    href="#">لایسنس به همراه راهنمای استفاده</a>
+                                                                            </li>
+                                                                            <li>
+                                                                                <a class="dropdown-item"
+                                                                                    href="#">فایل لایسنس عمومی</a>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>3</td>
+                                                                <td>
+                                                                    <img src="{% static 'images/theme-icon/3.png' %}"
+                                                                        class="img-fluid" alt="">
+                                                                </td>
+                                                                <td>ماهور - قالب فروشگاهی ورزشی</td>
+                                                                <td>
+                                                                    <div class="dropdown download-dropdown">
+                                                                        <button class="btn dropdown-toggle"
+                                                                            type="button"
+                                                                            data-bs-toggle="dropdown">دانلود</button>
+                                                                        <ul class="dropdown-menu">
+                                                                            <li>
+                                                                                <a class="dropdown-item"
+                                                                                    href="#">تمام فایل به همراه راهنما</a>
+                                                                            </li>
+                                                                            <li>
+                                                                                <a class="dropdown-item"
+                                                                                    href="#">لایسنس به همراه راهنمای استفاده</a>
+                                                                            </li>
+                                                                            <li>
+                                                                                <a class="dropdown-item"
+                                                                                    href="#">فایل لایسنس عمومی</a>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane fade" id="pills-recent">
+                                            <div class="download-table">
+                                                <div class="table-responsive">
+                                                    <table class="table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>ردیف</th>
+                                                                <th>تصویر</th>
+                                                                <th>نام</th>
+                                                                <th></th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>1</td>
+                                                                <td>
+                                                                    <img src="{% static 'images/theme-icon/1.png' %}"
+                                                                        class="img-fluid" alt="">
+                                                                </td>
+                                                                <td>قالب فروش فایل فست کارت</td>
+                                                                <td>
+                                                                    <div class="dropdown download-dropdown">
+                                                                        <button class="btn dropdown-toggle"
+                                                                            type="button"
+                                                                            data-bs-toggle="dropdown">دانلود</button>
+                                                                        <ul class="dropdown-menu">
+                                                                            <li>
+                                                                                <a class="dropdown-item"
+                                                                                    href="#">تمام فایل به همراه راهنما</a>
+                                                                            </li>
+                                                                            <li>
+                                                                                <a class="dropdown-item"
+                                                                                    href="#">لایسنس به همراه راهنمای استفاده</a>
+                                                                            </li>
+                                                                            <li>
+                                                                                <a class="dropdown-item"
+                                                                                    href="#">فایل لایسنس عمومی</a>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>2</td>
+                                                                <td>
+                                                                    <img src="{% static 'images/theme-icon/2.png' %}"
+                                                                        class="img-fluid" alt="">
+                                                                </td>
+                                                                <td>اسلوا - افزونه مشابه افزونه دکان</td>
+                                                                <td>
+                                                                    <div class="dropdown download-dropdown">
+                                                                        <button class="btn dropdown-toggle"
+                                                                            type="button"
+                                                                            data-bs-toggle="dropdown">دانلود</button>
+                                                                        <ul class="dropdown-menu">
+                                                                            <li>
+                                                                                <a class="dropdown-item"
+                                                                                    href="#">تمام فایل به همراه راهنما</a>
+                                                                            </li>
+                                                                            <li>
+                                                                                <a class="dropdown-item"
+                                                                                    href="#">لایسنس به همراه راهنمای استفاده</a>
+                                                                            </li>
+                                                                            <li>
+                                                                                <a class="dropdown-item"
+                                                                                    href="#">فایل لایسنس عمومی</a>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>3</td>
+                                                                <td>
+                                                                    <img src="{% static 'images/theme-icon/3.png' %}"
+                                                                        class="img-fluid" alt="">
+                                                                </td>
+                                                                <td>ماهور - قالب فروشگاهی ورزشی</td>
+                                                                <td>
+                                                                    <div class="dropdown download-dropdown">
+                                                                        <button class="btn dropdown-toggle"
+                                                                            type="button"
+                                                                            data-bs-toggle="dropdown">دانلود</button>
+                                                                        <ul class="dropdown-menu">
+                                                                            <li>
+                                                                                <a class="dropdown-item"
+                                                                                    href="#">تمام فایل به همراه راهنما</a>
+                                                                            </li>
+                                                                            <li>
+                                                                                <a class="dropdown-item"
+                                                                                    href="#">لایسنس به همراه راهنمای استفاده</a>
+                                                                            </li>
+                                                                            <li>
+                                                                                <a class="dropdown-item"
+                                                                                    href="#">فایل لایسنس عمومی</a>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="pills-security" role="tabpanel">
+                            <div class="dashboard-privacy">
+                                <div class="dashboard-bg-box">
+                                    <div class="dashboard-title mb-4">
+                                        <h3>حریم خصوصی</h3>
+                                    </div>
+
+                                    <div class="privacy-box">
+                                        <div class="d-flex align-items-start">
+                                            <h6>به دیگران اجازه میدهم حساب من را مشاهده کنند.</h6>
+                                            <div class="form-check form-switch switch-radio ms-auto">
+                                                <input class="form-check-input" type="checkbox" role="switch"
+                                                    id="redio">
+                                                <label class="form-check-label" for="redio"></label>
+                                            </div>
+                                        </div>
+
+                                        <p class="text-content">همه مردم می توانند پروفایل من را ببینند</p>
+                                    </div>
+
+                                    <div class="privacy-box">
+                                        <div class="d-flex align-items-start">
+                                            <h6>ایمیل من در دیدگاه قابل مشاهده باشد</h6>
+                                            <div class="form-check form-switch switch-radio ms-auto">
+                                                <input class="form-check-input" type="checkbox" role="switch"
+                                                    id="redio2">
+                                                <label class="form-check-label" for="redio2"></label>
+                                            </div>
+                                        </div>
+
+                                        <p class="text-content">با فعال سازی این گزینه به دیگران اجازه میدهید ایمیل شما را مشاهده کنند.</p>
+                                    </div>
+
+                                    <button class="btn theme-bg-color btn-md fw-bold mt-4 text-white">ذخیره تغییرات</button>
+                                </div>
+
+                                <div class="dashboard-bg-box mt-4">
+                                    <div class="dashboard-title mb-4">
+                                        <h3>تنظیمات حساب</h3>
+                                    </div>
+
+                                    <div class="privacy-box">
+                                        <div class="d-flex align-items-start">
+                                            <h6>حساب کاربریم را پس از خارج شدن من حذف کن!!</h6>
+                                            <div class="form-check form-switch switch-radio ms-auto">
+                                                <input class="form-check-input" type="checkbox" role="switch"
+                                                    id="redio3">
+                                                <label class="form-check-label" for="redio3"></label>
+                                            </div>
+                                        </div>
+                                        <p class="text-content">حساب کاربری شما پس از خروج شما حذف خواهد (این فرآیند قابل بازیابی نیست!)</p>
+                                    </div>
+
+                                    <div class="privacy-box">
+                                        <div class="d-flex align-items-start">
+                                            <h6>تصویر پروفایل من را نمایش دهید</h6>
+                                            <div class="form-check form-switch switch-radio ms-auto">
+                                                <input class="form-check-input" type="checkbox" role="switch"
+                                                    id="redio4">
+                                                <label class="form-check-label" for="redio4"></label>
+                                            </div>
+                                        </div>
+
+                                        <p class="text-content">با فعال سازی این گزینه امکان دنلود تصویر پروفایل شما توسط دیگران وجود دارد. لطفا پ از فعال سازی این گرینه از تصویر خود برا پروفایل استفاده نفرمایید.</p>
+                                    </div>
+
+                                    <button class="btn theme-bg-color btn-md fw-bold mt-4 text-white">حذف حساب کاربری</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- User Dashboard Section End -->
+
+<!-- Add address modal box start -->
+<div class="modal fade theme-modal" id="add-address" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">افزودن آدرس جدید</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form method="post" action="{% url 'address_add' %}">
+          {% csrf_token %}
+
+          <div class="form-floating mb-4 theme-form-floating">
+            {{ address_form.name }}
+            <label for="{{ address_form.name.id_for_label }}">عنوان نشانی</label>
+            {{ address_form.name.errors }}
+          </div>
+
+          <div class="form-floating mb-4 theme-form-floating">
+            {{ address_form.category }}
+            <label for="{{ address_form.category.id_for_label }}">دسته‌بندی</label>
+            {{ address_form.category.errors }}
+          </div>
+
+          <div class="form-floating mb-4 theme-form-floating">
+            {{ address_form.address }}
+            <label for="{{ address_form.address.id_for_label }}">آدرس کامل</label>
+            {{ address_form.address.errors }}
+          </div>
+
+          <div class="form-floating mb-4 theme-form-floating">
+            {{ address_form.postal_code }}
+            <label for="{{ address_form.postal_code.id_for_label }}">کد پستی</label>
+            {{ address_form.postal_code.errors }}
+          </div>
+
+          <div class="form-floating mb-4 theme-form-floating">
+            {{ address_form.telephone }}
+            <label for="{{ address_form.telephone.id_for_label }}">تلفن</label>
+            {{ address_form.telephone.errors }}
+          </div>
+
+          <div class="form-floating mb-4 theme-form-floating">
+            {{ address_form.province }}
+            <label for="{{ address_form.province.id_for_label }}">استان</label>
+            {{ address_form.province.errors }}
+          </div>
+
+          <div class="form-floating mb-4 theme-form-floating">
+            {{ address_form.city }}
+            <label for="{{ address_form.city.id_for_label }}">شهر</label>
+            {{ address_form.city.errors }}
+          </div>
+
+          <div class="form-check mb-4">
+            {{ address_form.active }}
+            <label class="form-check-label"
+                   for="{{ address_form.active.id_for_label }}">
+              نشانی پیش‌فرض
+            </label>
+            {{ address_form.active.errors }}
+          </div>
+
+          <div class="modal-footer w-100">
+            <button type="button"
+                    class="btn btn-secondary btn-md"
+                    data-bs-dismiss="modal">بستن</button>
+            <button type="submit"
+                    class="btn theme-bg-color btn-md text-white">
+              ذخیره تغییرات
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Add address modal box end -->
+
+<!-- Edit Profile Start -->
+<div class="modal fade theme-modal" id="editProfile" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-fullscreen-sm-down">
+        <div class="modal-content">
+            {% if messages %}
+                <div class="col-12">
+                  {% for message in messages %}
+                  <div class="alert alert-{% if message.tags %}{{ message.tags }}{% endif %}">
+                    {{ message }}
+                  </div>
+                  {% endfor %}
+                </div>
+            {% endif %}
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          {{ form.non_field_errors }}
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel2">ویرایش پروفایل</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="row g-4">
+
+              <div class="col-xxl-6">
+                <div class="form-floating theme-form-floating">
+                  {{ form.first_name }}
+                  <label for="{{ form.first_name.id_for_label }}">نام</label>
+                  {{ form.first_name.errors }}
+                </div>
+              </div>
+
+              <div class="col-xxl-6">
+                <div class="form-floating theme-form-floating">
+                  {{ form.last_name }}
+                  <label for="{{ form.last_name.id_for_label }}">نام خانوادگی</label>
+                  {{ form.last_name.errors }}
+                </div>
+              </div>
+
+              <div class="col-xxl-6">
+                <div class="form-floating theme-form-floating">
+                  {{ form.email }}
+                  <label for="{{ form.email.id_for_label }}">آدرس ایمیل</label>
+                  {{ form.email.errors }}
+                </div>
+              </div>
+
+              <div class="col-xxl-6">
+                <div class="form-floating theme-form-floating">
+                  {{ form.mobile }}
+                  <label for="{{ form.mobile.id_for_label }}">شماره تماس</label>
+                  {{ form.mobile.errors }}
+                </div>
+              </div>
+
+              <div class="col-xxl-6">
+                <div class="form-floating theme-form-floating">
+                  {{ form.national_code }}
+                  <label for="{{ form.national_code.id_for_label }}">کد ملی</label>
+                  {{ form.national_code.errors }}
+                </div>
+              </div>
+
+              <div class="col-xxl-6">
+                <div class="form-floating theme-form-floating">
+                  {{ form.birthday }}
+                  <label for="{{ form.birthday.id_for_label }}">تاریخ تولد</label>
+                  {{ form.birthday.errors }}
+                </div>
+              </div>
+
+              <div class="col-xxl-12">
+                <div class="mb-3">
+                  <label for="{{ form.avatar.id_for_label }}" class="form-label">{{ form.avatar.label }}</label>
+                  {{ form.avatar }}
+                  {{ form.avatar.errors }}
+                </div>
+              </div>
+                <div class="col-xxl-4">
+                <div class="form-floating theme-form-floating">
+                  {{ form.postal_code }}
+                  <label for="{{ form.postal_code.id_for_label }}">کد پستی</label>
+                  {{ form.postal_code.errors }}
+                </div>
+              </div>
+              <div class="col-xxl-4">
+                <div class="form-floating theme-form-floating">
+                  {{ form.province }}
+                  <label for="{{ form.province.id_for_label }}">استان</label>
+                  {{ form.province.errors }}
+                </div>
+              </div>
+
+              <div class="col-xxl-4">
+                <div class="form-floating theme-form-floating">
+                  {{ form.city }}
+                  <label for="{{ form.city.id_for_label }}">شهر</label>
+                  {{ form.city.errors }}
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="form-floating theme-form-floating">
+                  {{ form.address }}
+                  <label for="{{ form.address.id_for_label }}">آدرس دقیق</label>
+                  {{ form.address.errors }}
+                </div>
+              </div>
+
+
+
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button"
+                    class="btn btn-animation btn-md fw-bold"
+                    data-bs-dismiss="modal">بستن</button>
+            <button type="submit"
+                    class="btn theme-bg-color btn-md fw-bold text-light">ذخیره تغییرات</button>
+          </div>
+        </form>
+
+        </div>
+    </div>
+</div>
+<!-- Edit Profile End -->
+    
+<!-- Edit Card Start -->
+<div class="modal fade theme-modal" id="editCard" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-fullscreen-sm-down">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel8">ویرایش حساب</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-4">
+                    <div class="col-xxl-6">
+                        <form>
+                            <div class="form-floating theme-form-floating">
+                                <input type="text" class="form-control" id="finame" value="Mark">
+                                <label for="finame">نام</label>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="col-xxl-6">
+                        <form>
+                            <div class="form-floating theme-form-floating">
+                                <input type="text" class="form-control" id="laname" value="Jecno">
+                                <label for="laname">نام خانوادگی</label>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="col-xxl-4">
+                        <form>
+                            <div class="form-floating theme-form-floating">
+                                <select class="form-select" id="floatingSelect12"
+                                    aria-label="Floating label select example">
+                                    <option selected>نام بانک</option>
+                                    <option value="kindom">ملی</option>
+                                    <option value="states">مسکن</option>
+                                    <option value="fra">کشاورزی</option>
+                                    <option value="china">تجارت</option>
+                                    <option value="spain">ملت</option>
+                                </select>
+                                <label for="floatingSelect12">نام بانک</label>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-animation btn-md fw-bold"
+                    data-bs-dismiss="modal">لغو</button>
+                <button type="button" class="btn theme-bg-color btn-md fw-bold text-light">بروزرسانی حسابd</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Edit Card End -->
+
+<!-- Remove Profile Modal Start -->
+<div class="modal fade theme-modal remove-profile" id="removeProfile" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
+        <div class="modal-content">
+            <div class="modal-header d-block text-center">
+                <h5 class="modal-title w-100" id="exampleModalLabel22">هشدار</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="remove-box">
+                    <p>پس از حذف حساب امکان بازگردانی حساب وجود ندارد. آیا ادامه میدهید ؟</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-animation btn-md fw-bold" data-bs-dismiss="modal">No</button>
+                <button type="button" class="btn theme-bg-color btn-md fw-bold text-light"
+                    data-bs-target="#removeAddress" data-bs-toggle="modal">بله</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade theme-modal remove-profile" id="removeAddress" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-center" id="exampleModalLabel12">تمام!</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="remove-box text-center">
+                    <h4 class="text-content">حساب با موفقیت حذف شد.</h4>
+                </div>
+            </div>
+            <div class="modal-footer pt-0">
+                <button type="button" class="btn theme-bg-color btn-md fw-bold text-light"
+                    data-bs-dismiss="modal">بستن</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Remove Profile Modal End -->
+
+{% endblock %}

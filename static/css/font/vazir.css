@@ -1,0 +1,58 @@
+@font-face {
+	font-family: vazir;
+	font-style: normal;
+	font-weight: 100;
+	src: url('../../fonts/vazir/Vazir-Thin.eot');
+	src: url('../../fonts/vazir/Vazir-Thin.eot?#iefix') format('embedded-opentype'),  /* IE6-8 */
+		 url('../../fonts/vazir/Vazir-Thin.woff2') format('woff2'),  /* FF39+,Chrome36+, Opera24+*/
+		 url('../../fonts/vazir/Vazir-Thin.woff') format('woff'),  /* FF3.6+, IE9, Chrome6+, Saf5.1+*/
+		 url('../../fonts/vazir/Vazir-Thin.ttf') format('truetype');
+}
+@font-face {
+	font-family: vazir;
+	font-style: normal;
+	font-weight: 300;
+	src: url('../../fonts/vazir/Vazir-light.eot');
+	src: url('../../fonts/vazir/Vazir-light.eot?#iefix') format('embedded-opentype'),  /* IE6-8 */
+		 url('../../fonts/vazir/Vazir-light.woff2') format('woff2'),  /* FF39+,Chrome36+, Opera24+*/
+		 url('../../fonts/vazir/Vazir-light.woff') format('woff'),  /* FF3.6+, IE9, Chrome6+, Saf5.1+*/
+		 url('../../fonts/vazir/Vazir-light.ttf') format('truetype');
+}
+@font-face {
+	font-family: vazir;
+	font-style: normal;
+	font-weight: normal;
+	src: url('../../fonts/vazir/Vazir.eot');
+	src: url('../../fonts/vazir/Vazir.eot?#iefix') format('embedded-opentype'),  /* IE6-8 */
+		 url('../../fonts/vazir/Vazir.woff2') format('woff2'),  /* FF39+,Chrome36+, Opera24+*/
+		 url('../../fonts/vazir/Vazir.woff') format('woff'),  /* FF3.6+, IE9, Chrome6+, Saf5.1+*/
+		 url('../../fonts/vazir/Vazir.ttf') format('truetype');
+}
+@font-face {
+	font-family: vazir;
+	font-style: normal;
+	font-weight: 500;
+	src: url('../../fonts/vazir/Vazir-Medium.eot');
+	src: url('../../fonts/vazir/Vazir-Medium.eot?#iefix') format('embedded-opentype'),  /* IE6-8 */
+		 url('../../fonts/vazir/Vazir-Medium.woff2') format('woff2'),  /* FF39+,Chrome36+, Opera24+*/
+		 url('../../fonts/vazir/Vazir-Medium.woff') format('woff'),  /* FF3.6+, IE9, Chrome6+, Saf5.1+*/
+		 url('../../fonts/vazir/Vazir-Medium.ttf') format('truetype');
+}
+@font-face {
+	font-family: vazir;
+	font-style: normal;
+	font-weight: 700;
+	src: url('../../fonts/vazir/Vazir-Bold.eot');
+	src: url('../../fonts/vazir/Vazir-Bold.eot?#iefix') format('embedded-opentype'),  /* IE6-8 */
+		 url('../../fonts/vazir/Vazir-Bold.woff2') format('woff2'),  /* FF39+,Chrome36+, Opera24+*/
+		 url('../../fonts/vazir/Vazir-Bold.woff') format('woff'),  /* FF3.6+, IE9, Chrome6+, Saf5.1+*/
+		 url('../../fonts/vazir/Vazir-Bold.ttf') format('truetype');
+}
+
+body , .home-search-full.gradient-home .home-contain .home-detail h3 , button, input, optgroup, select, textarea , .text-exo, .breadscrumb-section .breadscrumb-contain, .section-404 .contain-404,
+.product-image li, .footer-section-2 .main-footer .footer-title , .breadcrumb-section .breadcrumb-contain h2 , [dir=rtl] .breadcrumb-section .breadcrumb-contain nav .breadcrumb .breadcrumb-item+.breadcrumb-item {
+    font-family: vazir !important;
+}
+.banner-contain .banner-details h4, .text-kaushan{
+	font-family: vazir !important;
+}

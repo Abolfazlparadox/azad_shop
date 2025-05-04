@@ -1,0 +1,35 @@
+{% load static %}
+<section class="breadcrumb-section pt-0">
+  <div class="container-fluid-lg">
+    <div class="row">
+      <div class="col-12">
+        <div class="breadcrumb-contain">
+          {# Page title #}
+          <h2>{{ breadcrumb_title }}</h2>
+
+          <nav>
+            <ol class="breadcrumb mb-0">
+              {# Home icon #}
+              <li class="breadcrumb-item">
+                <a href="{% url 'home' %}">
+                  <i class="fa-solid fa-house"></i>
+                </a>
+              </li>
+
+              {# Loop through the trail #}
+              {% for item in breadcrumb %}
+                {% if forloop.last %}
+                  <li class="breadcrumb-item active">{{ item.name }}</li>
+                {% else %}
+                  <li class="breadcrumb-item">
+                    <a href="{{ item.url }}">{{ item.name }}</a>
+                  </li>
+                {% endif %}
+              {% endfor %}
+            </ol>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

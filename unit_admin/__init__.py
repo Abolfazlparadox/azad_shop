@@ -1,0 +1,1 @@
+default_app_config = 'unit_admin.apps.UnitAdminConfig'

@@ -1,0 +1,1044 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+	محصول
+{% endblock %}
+{% block body %}
+{% include 'components/breadcrumb.html' %}
+
+<!-- Product Left Sidebar Start -->
+<section class="product-section">
+    <div class="container-fluid-lg">
+        <div class="row">
+            <div class="col-xxl-9 col-xl-8 col-lg-7 wow fadeInUp">
+                <div class="row g-4">
+                    <div class="col-xl-6 wow fadeInUp">
+                        <div class="product-left-box">
+                            <div class="row g-sm-4 g-2">
+                                <div class="col-12">
+                                    <div class="product-main no-arrow">
+                                        {% for image in product.images.all %}
+                                        <div>
+                                            <div class="slider-image">
+                                                <img src="{{ image.image.url }}" id="img-{{ forloop.counter0 }}"
+                                                     data-zoom-image="{{ image.image.url }}"
+                                                     class="img-fluid image_zoom_cls-{{ forloop.counter0 }} blur-up lazyload" alt="{{ product.title }}">
+                                            </div>
+                                        </div>
+                                        {% empty %}
+                                        <div>
+                                            <div class="slider-image">
+                                                <img src="{{ product.main_image.url }}" id="img-1"
+                                                     data-zoom-image="{{ product.main_image.url }}"
+                                                     class="img-fluid image_zoom_cls-0 blur-up lazyload" alt="{{ product.title }}">
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="left-slider-image left-slider no-arrow slick-top">
+                                        {% for image in product.images.all %}
+                                        <div>
+                                            <div class="sidebar-image">
+                                                <img src="{{ image.image.url }}" class="img-fluid blur-up lazyload" alt="{{ product.title }}">
+                                            </div>
+                                        </div>
+                                        {% empty %}
+                                        <div>
+                                            <div class="sidebar-image">
+                                                <img src="{{ product.main_image.url }}" class="img-fluid blur-up lazyload" alt="{{ product.title }}">
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-6 wow fadeInUp">
+                        <div class="right-box-contain">
+                            <!-- Discount Offer -->
+                            <h6 class="offer-top">{{ discount_percentage }}% تخفیف</h6>
+
+                            <!-- Product Name -->
+                            <h2 class="name">{{ product.title }}</h2>
+
+                            <!-- Price and Rating -->
+                            <div class="price-rating">
+                                <h3 class="theme-color price">
+                                    {% if product.old_price and product.old_price > product.price %}
+                                        <del class="text-content">{{ product.old_price|floatformat:2 }} تومان</del>
+                                    {% endif %}
+                                    {{ product.price|floatformat:2 }} تومان
+                                    {% if discount_percentage %}
+                                        <span class="offer theme-color">({{ discount_percentage }}% تخفیف)</span>
+                                    {% endif %}
+                                </h3>
+                                <div class="product-rating custom-rate">
+                                    <ul class="rating">
+                                        {% for i in "12345"|make_list %}
+                                            <li>
+                                                <i data-feather="star" class="{% if forloop.counter <= avg_rating|floatformat:0 %}fill{% endif %}"></i>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                    <span class="review">{{ review_count }} بازخورد</span>
+                                </div>
+                            </div>
+
+                            <!-- Product Description -->
+                            <div class="product-contain">
+                                <p class="w-100 ">{{ product.description }}</p>
+                            </div>
+
+                            <!-- Product Package / Volume Options -->
+                            <div class="product-package">
+                                <div class="product-title">
+                                    <h4>وزن </h4>
+                                </div>
+                                <div class="select-package">
+                                    <select class="form-control form-select">
+                                        <option selected>نمایش حجم</option>
+                                        <option value="0">5 لیتر</option>
+                                        <option value="1">10 لیتر</option>
+                                        <option value="2">15 لیتر</option>
+                                        <option value="3">25 لیتر</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Deal Timer -->
+                            <div class="time deal-timer product-deal-timer mx-md-0 mx-auto" id="clockdiv-1" data-hours="1" data-minutes="2" data-seconds="3">
+                                <div class="product-title">
+                                    <h4>عجله کنید! زمان محدود است</h4>
+                                </div>
+                                <ul>
+                                    <li>
+                                        <div class="counter d-block">
+                                            <div class="seconds d-block">
+                                                <h5></h5>
+                                            </div>
+                                            <h6>ثانیه</h6>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="counter d-block">
+                                            <div class="minutes d-block">
+                                                <h5></h5>
+                                            </div>
+                                            <h6>دقیقه</h6>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="counter d-block">
+                                            <div class="hours d-block">
+                                                <h5></h5>
+                                            </div>
+                                            <h6>ساعت</h6>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="counter d-block">
+                                            <div class="days d-block">
+                                                <h5></h5>
+                                            </div>
+                                            <h6>روز</h6>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <!-- Quantity and Add to Cart -->
+                            <div class="note-box product-package">
+                                <div class="cart_qty qty-box product-qty">
+                                    <div class="input-group">
+                                        <button type="button" class="qty-left-minus" data-type="minus" data-field="">
+                                            <i class="fa fa-minus"></i>
+                                        </button>
+                                        <input class="form-control input-number qty-input" type="text" name="quantity" value="1">
+                                        <button type="button" class="qty-right-plus" data-type="plus" data-field="">
+                                            <i class="fa fa-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <button onclick="location.href = '';" class="btn btn-md bg-dark cart-button text-white w-100">افزودن به سبد خرید</button>
+{#                                {% url 'cart' %}#}
+                            </div>
+
+                            <!-- Buy Options: Wishlist & Compare -->
+                            <div class="buy-box">
+                                <a href="">
+{#                                    {% url 'toggle-wishlist' product.slug %}#}
+                                    <i data-feather="heart"></i>
+                                    <span>علاقه‌مندی‌ها</span>
+                                </a>
+                                <a href="">
+{#                                    {% url 'compare' product.slug %}#}
+                                    <i data-feather="shuffle"></i>
+                                    <span>مقایسه</span>
+                                </a>
+                            </div>
+
+                            <!-- Store Information -->
+                            <div class="pickup-box">
+                                <div class="product-title">
+                                    <h4>اطلاعات فروشگاه</h4>
+                                </div>
+                                <div class="pickup-detail">
+                                    <h4 class="text-content w-100">{{ product_info.type }} - {{ product.brand.title }}</h4>
+                                </div>
+                                <div class="product-info">
+                                    <ul class="product-info-list product-info-list-2">
+                                        <li>نوع : <a href="javascript:void(0)">{{ product_info.type }}</a></li>
+                                        <li>کد محصول : <a href="javascript:void(0)">{{ product_info.sku }}</a></li>
+                                        <li>تاریخ ثبت : <a href="javascript:void(0)">{{ product_info.created_at|date:"j F Y" }}</a></li>
+                                        <li>موجود در انبار : <a href="javascript:void(0)">{{ product_info.stock }}</a></li>
+                                        <li>برچسب ها : <a href="javascript:void(0)">{{ product_info.tags }}</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- Payment Options -->
+                            <div class="payment-option">
+                                <div class="product-title">
+                                    <h4>پرداخت ایمن با : </h4>
+                                </div>
+                                <ul>
+                                    <li>
+                                        <a href="javascript:void(0)">
+                                            <img src="{% static 'images/product/payment/1.svg' %}" class="blur-up lazyload" alt="">
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="javascript:void(0)">
+                                            <img src="{% static 'images/product/payment/2.svg' %}" class="blur-up lazyload" alt="">
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="javascript:void(0)">
+                                            <img src="{% static 'images/product/payment/3.svg' %}" class="blur-up lazyload" alt="">
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="javascript:void(0)">
+                                            <img src="{% static 'images/product/payment/4.svg' %}" class="blur-up lazyload" alt="">
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="javascript:void(0)">
+                                            <img src="{% static 'images/product/payment/5.svg' %}" class="blur-up lazyload" alt="">
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xxl-3 col-xl-4 col-lg-5 d-none d-lg-block wow fadeInUp">
+                <div class="right-sidebar-box">
+                    <div class="vendor-box">
+                        <div class="vendor-contain">
+                            <div class="vendor-image">
+                                <img src="{% static 'images/product/vendor.png' %}" class="blur-up lazyload" alt="">
+                            </div>
+
+                            <div class="vendor-name">
+                                <h5 class="fw-500">فارس کد</h5>
+
+                                <div class="product-rating mt-1">
+                                    <ul class="rating">
+                                        <li>
+                                            <i data-feather="star" class="fill"></i>
+                                        </li>
+                                        <li>
+                                            <i data-feather="star" class="fill"></i>
+                                        </li>
+                                        <li>
+                                            <i data-feather="star" class="fill"></i>
+                                        </li>
+                                        <li>
+                                            <i data-feather="star" class="fill"></i>
+                                        </li>
+                                        <li>
+                                            <i data-feather="star"></i>
+                                        </li>
+                                    </ul>
+                                    <span>(36 دیدگاه)</span>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <p class="vendor-detail">لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است.</p>
+
+                        <div class="vendor-list">
+                            <ul>
+                                <li>
+                                    <div class="address-contact">
+                                        <i data-feather="map-pin"></i>
+                                        <h5>آدرس : <span class="text-content">تهران برج میلاد</span></h5>
+                                    </div>
+                                </li>
+
+                                <li>
+                                    <div class="address-contact">
+                                        <i data-feather="headphones"></i>
+                                        <h5>شماره تماس : <span class="text-content">(+1)-123-456-789</span></h5>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="pt-25">
+                        <div class="hot-line-number">
+                            <h5>برقراری اتباط با تولید کننده :</h5>
+                            <h6>شنبه - جمعه: 07:00 صبح - 08 عصر</h6>
+                            <h3>(+1) 123 456 789</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Product Left Sidebar End -->
+
+<!-- Nav Tab Section Start -->
+<section>
+    <div class="container-fluid-lg">
+        <div class="row">
+            <div class="col-12">
+                <div class="product-section-box m-0">
+                    <ul class="nav nav-tabs custom-nav" id="myTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="description-tab" data-bs-toggle="tab"
+                                data-bs-target="#description" type="button" role="tab">توضیحات</button>
+                        </li>
+
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="info-tab" data-bs-toggle="tab" data-bs-target="#info"
+                                type="button" role="tab">اطلاعات محصول</button>
+                        </li>
+
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="care-tab" data-bs-toggle="tab" data-bs-target="#care"
+                                type="button" role="tab">ویژگی محصول</button>
+                        </li>
+
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="review-tab" data-bs-toggle="tab" data-bs-target="#review"
+                                type="button" role="tab">بازخورد</button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content custom-tab" id="myTabContent">
+                        <div class="tab-pane fade show active" id="description" role="tabpanel">
+                            <div class="product-description">
+                                <div class="nav-desh">
+                                    <p>کیک هویج ژله ای کیک بیسکویت جو دوسر کیک گومی خرس تارت. پودینگ کیک هویج
+                                         قطره لیمو خرس شیرین گومی. شکلات تارت کیک شکلاتی کیک کیک دونات شیرین بیان آلو
+                                        شکر. لوبیا ژله تیرامیسو کارامل عناب بیسکویت شیرین بیان شکلات. پودینگ تافی
+                                        عناب کیک جو دوسر رول شیرین. رویه حلوای براونی رول کروسان دسر قطره لیمو.
+                                         آب نبات پودر گل ختمی، کنجد، ژله لوبیا، نبات، پای شیرینی زنجبیلی.</p>
+                                </div>
+
+                                <div class="nav-desh">
+                                    <div class="desh-title">
+                                        <h5>اورگانیک :</h5>
+                                    </div>
+                                    <p>لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از
+                                         طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است
+                                        و برای شرایط فعلی تکنولوژی مورد نیاز و کاربردهای متنوع با هدف بهبود ابزارهای
+                                         کاربردی می باشد. کتابهای زیادی در شصت و سه درصد گذشته، حال و آینده شناخت فراوان جامعه
+                                        و متخصصان را می طلبد تا با نرم افزارها شناخت بیشتری را برای طراحان رایانه ای علی
+                                         الخصوص طراحان خلاقی و فرهنگ پیشرو در زبان فارسی ایجاد کرد. در این صورت می توان
+                                        امید داشت که تمام و دشواری موجود در ارائه راهکارها و شرایط سخت تایپ به
+                                         پایان رسد وزمان مورد نیاز شامل حروفچینی دستاوردهای اصلی و جوابگوی
+                                         سوالات پیوسته اهل دنیای موجود طراحی اساسا مورد استفاده قرار گیرد.</p>
+                                </div>
+
+                                <div class="banner-contain nav-desh">
+                                    <img src="{% static 'images/vegetable/banner/14.jpg' %}"
+                                        class="bg-img blur-up lazyload" alt="">
+                                    <div class="banner-details p-center banner-b-space w-100 text-center">
+                                        <div>
+                                            <h6 class="ls-expanded theme-color mb-sm-3 mb-1">تابستان</h6>
+                                            <h2>هیجان انگیز</h2>
+                                            <p class="mx-auto mt-1">تا 5% تخفیف ویژه</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="nav-desh">
+                                    <div class="desh-title">
+                                        <h5>سازنده محصول کیست :</h5>
+                                    </div>
+                                    <p>لورم ایپسوم متن ساختگی با
+                                        تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است. چاپگرها
+                                        و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است و برای شرایط
+                                        فعلی تکنولوژی مورد نیاز و کاربردهای متنوع با هدف بهبود ابزارهای کاربردی
+                                        می باشد. کتابهای زیادی در شصت و سه درصد گذشته، حال و آینده شناخت فراوان
+                                        جامعه و متخصصان را می طلبد تا با نرم افزارها شناخت بیشتری را برای طراحان
+                                        رایانه ای علی الخصوص طراحان خلاقی و فرهنگ پیشرو در زبان فارسی ایجاد کرد.</p>
+
+                                    <p>لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ
+                                        و با استفاده از طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله
+                                         در ستون و سطرآنچنان که لازم است و برای شرایط فعلی تکنولوژی مورد نیاز و
+                                         کاربردهای متنوع با هدف بهبود ابزارهای کاربردی می باشد. کتابهای زیادی
+                                        در شصت و سه درصد گذشته، حال و آینده شناخت فراوان جامعه و متخصصان
+                                         را می طلبد تا با نرم افزارها شناخت بیشتری را برای طراحان رایانه
+                                         ای علی الخصوص طراحان خلاقی و فرهنگ پیشرو در زبان فارسی ایجاد کرد.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="info" role="tabpanel">
+                            <div class="table-responsive">
+                                <table class="table info-table">
+                                    <tbody>
+                                        <tr>
+                                            <td>سازنده</td>
+                                            <td>امین احمدی</td>
+                                        </tr>
+                                        <tr>
+                                            <td>میزان قند</td>
+                                            <td>100 گرم</td>
+                                        </tr>
+                                        <tr>
+                                            <td>نوشته روی کیک</td>
+                                            <td>امین تولدت مبارک</td>
+                                        </tr>
+                                        <tr>
+                                            <td>میزان چربی</td>
+                                            <td>120 گرم</td>
+                                        </tr>
+                                        <tr>
+                                            <td>نوع خمیر</td>
+                                            <td>تهیه شده با آرد معمولی</td>
+                                        </tr>
+                                        <tr>
+                                            <td>نوع خامه</td>
+                                            <td>شکلاتی</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="care" role="tabpanel">
+                            <div class="information-box">
+                                <ul>
+                                    <li>کیک های خامه ای را در یخچال نگهداری کنید. کیک های فوندانت باید در محیطی با تهویه مطبوع نگهداری شوند.</li>
+
+                                    <li>کیک را برش بزنید و در دمای اتاق سرو کنید و مطمئن شوید که در معرض حرارت نباشد.</li>
+
+                                    <li>از یک چاقوی دندانه دار برای برش کیک فوندانت استفاده کنید.</li>
+
+                                    <li>عناصر مجسمه سازی و مجسمه ها ممکن است حاوی تکیه گاه های سیمی یا خلال دندان یا سیخ های چوبی برای حمایت باشند.</li>
+
+                                    <li>لطفاً محل قرارگیری این اقلام را قبل از ارائه به کودکان کوچک بررسی کنید.</li>
+
+                                    <li>کیک باید ظرف 24 ساعت مصرف شود.</li>
+
+                                     <li>از کیک خود لذت ببرید!</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="review" role="tabpanel">
+                            <div class="review-box">
+                                <div class="row">
+                                    <div class="col-xl-5">
+                                        <div class="product-rating-box">
+                                            <div class="row">
+                                                <div class="col-xl-12">
+                                                    <div class="product-main-rating">
+                                                        <h2>3.40
+                                                            <i data-feather="star"></i>
+                                                        </h2>
+
+                                                        <h5>از 5</h5>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-xl-12">
+                                                    <ul class="product-rating-list">
+                                                        <li>
+                                                            <div class="rating-product">
+                                                                <h5>5<i data-feather="star"></i></h5>
+                                                                <div class="progress">
+                                                                    <div class="progress-bar" style="width: 40%;">
+                                                                    </div>
+                                                                </div>
+                                                                <h5 class="total">2</h5>
+                                                            </div>
+                                                        </li>
+                                                        <li>
+                                                            <div class="rating-product">
+                                                                <h5>4<i data-feather="star"></i></h5>
+                                                                <div class="progress">
+                                                                    <div class="progress-bar" style="width: 20%;">
+                                                                    </div>
+                                                                </div>
+                                                                <h5 class="total">1</h5>
+                                                            </div>
+                                                        </li>
+                                                        <li>
+                                                            <div class="rating-product">
+                                                                <h5>3<i data-feather="star"></i></h5>
+                                                                <div class="progress">
+                                                                    <div class="progress-bar" style="width: 0%;">
+                                                                    </div>
+                                                                </div>
+                                                                <h5 class="total">0</h5>
+                                                            </div>
+                                                        </li>
+                                                        <li>
+                                                            <div class="rating-product">
+                                                                <h5>2<i data-feather="star"></i></h5>
+                                                                <div class="progress">
+                                                                    <div class="progress-bar" style="width: 20%;">
+                                                                    </div>
+                                                                </div>
+                                                                <h5 class="total">1</h5>
+                                                            </div>
+                                                        </li>
+                                                        <li>
+                                                            <div class="rating-product">
+                                                                <h5>1<i data-feather="star"></i></h5>
+                                                                <div class="progress">
+                                                                    <div class="progress-bar" style="width: 20%;">
+                                                                    </div>
+                                                                </div>
+                                                                <h5 class="total">1</h5>
+                                                            </div>
+                                                        </li>
+
+                                                    </ul>
+
+                                                    <div class="review-title-2">
+                                                        <h4 class="fw-bold">بازخورد این محصول</h4>
+                                                        <p>با ثبت بازخورد خود در خرید دیگران راهنمایی خوبی باشید</p>
+                                                        <button class="btn" type="button" data-bs-toggle="modal"
+                                                            data-bs-target="#writereview">ثبت دیدگاه جدید</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xl-7">
+                                        <div class="review-people">
+                                            <ul class="review-list">
+                                                <li>
+                                                    <div class="people-box">
+                                                        <div>
+                                                            <div class="people-image people-text">
+                                                                <img alt="user" class="img-fluid "
+                                                                    src="{% static 'images/review/1.jpg' %}">
+                                                            </div>
+                                                        </div>
+                                                        <div class="people-comment">
+                                                            <div class="people-name"><a
+                                                                    href="javascript:void(0)"
+                                                                    class="name">جک داو</a>
+                                                                <div class="date-time">
+                                                                    <h6 class="text-content"> 29 اردیبهشت 1403
+                                                                        06:40 : عصر
+                                                                    </h6>
+                                                                    <div class="product-rating">
+                                                                        <ul class="rating">
+                                                                            <li>
+                                                                                <i data-feather="star"
+                                                                                    class="fill"></i>
+                                                                            </li>
+                                                                            <li>
+                                                                                <i data-feather="star"
+                                                                                    class="fill"></i>
+                                                                            </li>
+                                                                            <li>
+                                                                                <i data-feather="star"
+                                                                                    class="fill"></i>
+                                                                            </li>
+                                                                            <li>
+                                                                                <i data-feather="star"
+                                                                                    class="fill"></i>
+                                                                            </li>
+                                                                            <li>
+                                                                                <i data-feather="star"></i>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="reply">
+                                                                <p>لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <div class="people-box">
+                                                        <div>
+                                                            <div class="people-image people-text">
+                                                                <img alt="user" class="img-fluid "
+                                                                    src="{% static 'images/review/2.jpg' %}">
+                                                            </div>
+                                                        </div>
+                                                        <div class="people-comment">
+                                                            <div class="people-name"><a
+                                                                    href="javascript:void(0)"
+                                                                    class="name">جیسیکا میلر</a>
+                                                                <div class="date-time">
+                                                                    <h6 class="text-content"> 29 اردیبهشت 1403
+                                                                        06:34 : عصر
+                                                                    </h6>
+                                                                    <div class="product-rating">
+                                                                        <div class="product-rating">
+                                                                            <ul class="rating">
+                                                                                <li>
+                                                                                    <i data-feather="star"
+                                                                                        class="fill"></i>
+                                                                                </li>
+                                                                                <li>
+                                                                                    <i data-feather="star"
+                                                                                        class="fill"></i>
+                                                                                </li>
+                                                                                <li>
+                                                                                    <i data-feather="star"
+                                                                                        class="fill"></i>
+                                                                                </li>
+                                                                                <li>
+                                                                                    <i data-feather="star"
+                                                                                        class="fill"></i>
+                                                                                </li>
+                                                                                <li>
+                                                                                    <i
+                                                                                        data-feather="star"></i>
+                                                                                </li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="reply">
+                                                                <p>کتابهای زیادی در شصت و سه درصد گذشته، حال و آینده شناخت فراوان جامعه و متخصصان را می طلبد تا با نرم افزارها شناخت بیشتری را برای طراحان رایانه ای علی الخصوص طراحان خلاقی و فرهنگ پیشرو در زبان فارسی ایجاد کرد.</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <div class="people-box">
+                                                        <div>
+                                                            <div class="people-image people-text">
+                                                                <img alt="user" class="img-fluid "
+                                                                    src="{% static 'images/review/3.jpg' %}">
+                                                            </div>
+                                                        </div>
+                                                        <div class="people-comment">
+                                                            <div class="people-name"><a
+                                                                    href="javascript:void(0)"
+                                                                    class="name">امین احمدی</a>
+                                                                <div class="date-time">
+                                                                    <h6 class="text-content"> 29 فروردین 1403
+                                                                        06:18 : صبح
+                                                                    </h6>
+                                                                    <div class="product-rating">
+                                                                        <ul class="rating">
+                                                                            <li>
+                                                                                <i data-feather="star"
+                                                                                    class="fill"></i>
+                                                                            </li>
+                                                                            <li>
+                                                                                <i data-feather="star"
+                                                                                    class="fill"></i>
+                                                                            </li>
+                                                                            <li>
+                                                                                <i data-feather="star"
+                                                                                    class="fill"></i>
+                                                                            </li>
+                                                                            <li>
+                                                                                <i data-feather="star"
+                                                                                    class="fill"></i>
+                                                                            </li>
+                                                                            <li>
+                                                                                <i data-feather="star"></i>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="reply">
+                                                                <p>لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است و برای شرایط فعلی تکنولوژی مورد نیاز و کاربردهای متنوع با هدف بهبود ابزارهای کاربردی می باشد.</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <div class="people-box">
+                                                        <div>
+                                                            <div class="people-image people-text">
+                                                                <img alt="user" class="img-fluid "
+                                                                    src="{% static 'images/review/4.jpg' %}">
+                                                            </div>
+                                                        </div>
+                                                        <div class="people-comment">
+                                                            <div class="people-name"><a
+                                                                    href="javascript:void(0)"
+                                                                    class="name">علی صادقی</a>
+                                                                <div class="date-time">
+                                                                    <h6 class="text-content"> 5 مهر 1403
+                                                                        05:58 : عصر
+                                                                    </h6>
+                                                                    <div class="product-rating">
+                                                                        <ul class="rating">
+                                                                            <li>
+                                                                                <i data-feather="star"
+                                                                                    class="fill"></i>
+                                                                            </li>
+                                                                            <li>
+                                                                                <i data-feather="star"
+                                                                                    class="fill"></i>
+                                                                            </li>
+                                                                            <li>
+                                                                                <i data-feather="star"
+                                                                                    class="fill"></i>
+                                                                            </li>
+                                                                            <li>
+                                                                                <i data-feather="star"
+                                                                                    class="fill"></i>
+                                                                            </li>
+                                                                            <li>
+                                                                                <i data-feather="star"></i>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="reply">
+                                                                <p>لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است.</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <div class="people-box">
+                                                        <div>
+                                                            <div class="people-image people-text">
+                                                                <img alt="user" class="img-fluid "
+                                                                    src="{% static 'images/review/5.jpg' %}">
+                                                            </div>
+                                                        </div>
+                                                        <div class="people-comment">
+                                                            <div class="people-name"><a
+                                                                    href="javascript:void(0)"
+                                                                    class="name">امین احمدی</a>
+                                                                <div class="date-time">
+                                                                    <h6 class="text-content"> 29 مهر 1402
+                                                                        05:22 : عصر
+                                                                    </h6>
+                                                                    <div class="product-rating">
+                                                                        <ul class="rating">
+                                                                            <li>
+                                                                                <i data-feather="star"
+                                                                                    class="fill"></i>
+                                                                            </li>
+                                                                            <li>
+                                                                                <i data-feather="star"
+                                                                                    class="fill"></i>
+                                                                            </li>
+                                                                            <li>
+                                                                                <i data-feather="star"
+                                                                                    class="fill"></i>
+                                                                            </li>
+                                                                            <li>
+                                                                                <i data-feather="star"
+                                                                                    class="fill"></i>
+                                                                            </li>
+                                                                            <li>
+                                                                                <i data-feather="star"></i>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="reply">
+                                                                <p>لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است.</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Nav Tab Section End -->
+
+<!-- Related Product Section Start -->
+<section class="product-list-section section-b-space">
+    <div class="container-fluid-lg">
+        <div class="title">
+            <h2>محصولات مرتبط</h2>
+            <span class="title-leaf">
+                <svg class="icon-width">
+{#                    <use xlink:href="svg/leaf.svg#leaf"></use>#}
+                </svg>
+            </span>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="slider-6_1 product-wrapper">
+                 {% for product in related_products %}
+                    <div>
+                        <div class="product-box-3 wow fadeInUp" data-wow-delay="{{ forloop.counter0|floatformat:2 }}s">
+                            <div class="product-header">
+                                <div class="product-image">
+                                    <a href="{{ product.get_absolute_url }}">
+                                        {% if product.main_image %}
+                                        <img src="{{ product.main_image.url }}" class="img-fluid blur-up lazyload" alt="{{ product.title }}">
+                                        {% else %}
+                                        <img src="{% static 'images/appstore.svg' %}" class="img-fluid blur-up lazyload" alt="{{ product.title }}">
+                                        {% endif %}
+                                    </a>
+                                    <ul class="product-option">
+                                        <li data-bs-toggle="tooltip" data-bs-placement="top" title="نمایش">
+                                            <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#view-{{ product.pk }}">
+                                                <i data-feather="eye"></i>
+                                            </a>
+                                        </li>
+                                        <li data-bs-toggle="tooltip" data-bs-placement="top" title="مقایسه">
+                                            <a href="">
+{#                                                {% url 'compare' product.slug %}#}
+                                                <i data-feather="refresh-cw"></i>
+                                            </a>
+                                        </li>
+                                        <li data-bs-toggle="tooltip" data-bs-placement="top" title="لیست علاقه‌مندی">
+                                            <a href="" class="notifi-wishlist">
+{#                                                {% url 'wishlist' product.slug %}#}
+                                                <i data-feather="heart"></i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="product-footer">
+                                <div class="product-detail">
+                                    <span class="span-name">
+                                        {% if product.categories.all %}
+                                            {{ product.categories.all.0.title }}
+                                        {% else %}
+                                            بدون دسته‌بندی
+                                        {% endif %}
+                                    </span>
+                                    <a href="{{ product.get_absolute_url }}">
+                                        <h5 class="name">{{ product.title }}</h5>
+                                    </a>
+                                    <div class="product-rating mt-2">
+                                        <ul class="rating">
+                                            {% for i in "12345"|make_list %}
+                                            <li>
+                                                <i data-feather="star" class="{% if forloop.counter <= product.rating|default:4 %}fill{% endif %}"></i>
+                                            </li>
+                                            {% endfor %}
+                                        </ul>
+                                        <span>({{ product.rating|default:"4.0" }})</span>
+                                    </div>
+                                    <h6 class="unit">{{ product.unit|default:"واحد" }}</h6>
+                                    <h5 class="price">
+                                        <span class="theme-color">{{ product.price|floatformat:2 }} تومان</span>
+                                        {% if product.old_price and product.old_price > product.price %}
+                                        <del>{{ product.old_price|floatformat:2 }} تومان</del>
+                                        {% endif %}
+                                    </h5>
+                                    <div class="add-to-cart-box bg-white">
+                                        <button class="btn btn-add-cart addcart-button">افزودن
+                                            <span class="add-icon bg-light-gray">
+                                                <i class="fa-solid fa-plus"></i>
+                                            </span>
+                                        </button>
+                                        <div class="cart_qty qty-box">
+                                            <div class="input-group bg-white">
+                                                <button type="button" class="qty-left-minus bg-gray" data-type="minus" data-field="">
+                                                    <i class="fa fa-minus"></i>
+                                                </button>
+                                                <input class="form-control input-number qty-input" type="text" name="quantity" value="0">
+                                                <button type="button" class="qty-right-plus bg-gray" data-type="plus" data-field="">
+                                                    <i class="fa fa-plus"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p>هیچ محصول مرتبطی یافت نشد.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Related Product Section End -->
+
+{% include 'components/quick_view_modal_box.html' %}
+
+{% include 'product/includes/add-to-cart.html' %}
+
+<!-- Sticky Cart Box Start -->
+<div class="sticky-bottom-cart">
+    <div class="container-fluid-lg">
+        <div class="row">
+            <div class="col-12">
+                <div class="cart-content">
+                    <!-- Product Image and Info -->
+                    <div class="product-image">
+                        {% if product.main_image %}
+                        <img src="{{ product.main_image.url }}" class="img-fluid blur-up lazyload" alt="{{ product.title }}">
+                        {% else %}
+                        <img src="{% static 'images/appstore.svg' %}" class="img-fluid blur-up lazyload" alt="{{ product.title }}">
+                        {% endif %}
+                        <div class="content">
+                            <h5>{{ product.title }}</h5>
+                            <h6>
+                                {% if product.old_price and product.old_price > product.price %}
+                                    {{ product.price|floatformat:2 }} تومان
+                                    <del class="text-danger">{{ product.old_price|floatformat:2 }} تومان</del>
+                                    <span>{{ discount_percentage }}% تخفیف</span>
+                                {% else %}
+                                    {{ product.price|floatformat:2 }} تومان
+                                {% endif %}
+                            </h6>
+                        </div>
+                    </div>
+
+                    <!-- Weight Selection and Quantity -->
+                    <div class="selection-section">
+                        <div class="form-group mb-0">
+                            <select id="input-state" class="form-control form-select">
+                                <option selected disabled>انتخاب وزن ...</option>
+                                {# If you have a related manager for weight options, use it. Otherwise, fallback to static options #}
+                                {% if product.weight_options %}
+                                    {% for option in product.weight_options.all %}
+                                        <option value="{{ option.id }}">{{ option.value }}</option>
+                                    {% endfor %}
+                                {% else %}
+                                    <option>1/2 کیلوگرم</option>
+                                    <option>1 کیلوگرم</option>
+                                    <option>1.5 کیلوگرم</option>
+                                {% endif %}
+                            </select>
+                        </div>
+                        <div class="cart_qty qty-box product-qty m-0">
+                            <div class="input-group h-100">
+                                <button type="button" class="qty-left-minus" data-type="minus" data-field="">
+                                    <i class="fa fa-minus"></i>
+                                </button>
+                                <input class="form-control input-number qty-input" type="text" name="quantity" value="1">
+                                <button type="button" class="qty-right-plus" data-type="plus" data-field="">
+                                    <i class="fa fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="add-btn">
+                        <a class="btn theme-bg-color text-white wishlist-btn" href="">
+{#                            {% url 'wishlist' product.slug %}#}
+                            <i class="fa fa-bookmark"></i> لیست علاقه‌مندی
+                        </a>
+                        <a class="btn theme-bg-color text-white" href="">
+{#                            {% url 'cart-add' product.slug %}#}
+                            <i class="fas fa-shopping-cart"></i> افزودن به سبد خرید
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Sticky Cart Box End -->
+
+<!-- Review Modal Start -->
+<div class="modal fade theme-modal question-modal" id="writereview" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">دیدگاه خود را بنویسید</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="modal-body pt-0">
+                <form class="product-review-form">
+                    <div class="product-wrapper">
+                        <div class="product-image">
+                            <img class="img-fluid" alt="Solid Collared Tshirts"
+                                src="{% static 'images/fashion/product/26.jpg' %}">
+                        </div>
+                        <div class="product-content">
+                            <h5 class="name">مانتو مجلسی طرح 025</h5>
+                            <div class="product-review-rating">
+                                <div class="product-rating">
+                                    <h6 class="price-number">16.000 تومان</h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="review-box">
+                        <div class="product-review-rating">
+                            <label>امیتاز</label>
+                            <div class="product-rating">
+                                <ul class="rating">
+                                    <li>
+                                        <i data-feather="star" class="fill"></i>
+                                    </li>
+                                    <li>
+                                        <i data-feather="star" class="fill"></i>
+                                    </li>
+                                    <li>
+                                        <i data-feather="star" class="fill"></i>
+                                    </li>
+                                    <li>
+                                        <i data-feather="star" class="fill"></i>
+                                    </li>
+                                    <li>
+                                        <i data-feather="star"></i>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="review-box">
+                        <label for="content" class="form-label">دیدگاه شما *</label>
+                        <textarea id="content" rows="3" class="form-control" placeholder="دیدگاه خود را تایپ کنید"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-md btn-theme-outline fw-bold"
+                    data-bs-dismiss="modal">بستن</button>
+                <button type="button" class="btn btn-md fw-bold text-light theme-bg-color">ذخیره تغییرات</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Review Modal End -->
+
+{% endblock %}

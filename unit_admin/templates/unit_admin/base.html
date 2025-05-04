@@ -1,0 +1,284 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Fastkart admin is super flexible, powerful, clean &amp; modern responsive bootstrap 5 admin template with unlimited possibilities.">
+    <meta name="keywords"
+        content="admin template, Fastkart admin template, dashboard template, flat admin template, responsive admin template, web app">
+    <meta name="author" content="pixelstrap">
+    <link rel="icon" href="{% static 'admin/images/64px-Azad_University_logo.png' %}" type="image/x-icon">
+    <link rel="shortcut icon" href="{% static 'admin/images/64px-Azad_University_logo.png' %}" type="image/x-icon">
+    <title>{% block title %}{% endblock %}</title>
+    {% block head %}
+    <!-- Google font-->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+
+    <!-- Linear Icon css -->
+    <link rel="stylesheet" href="{% static 'admin/css/linearicon.css' %}">
+
+    <!-- fontawesome css -->
+    <link rel="stylesheet" type="text/css" href="{% static 'admin/css/vendors/font-awesome.css' %}">
+
+    <!-- Themify icon css-->
+    <link rel="stylesheet" type="text/css" href="{% static 'admin/css/vendors/themify.css' %}">
+
+    <!-- ratio css -->
+    <link rel="stylesheet" type="text/css" href="{% static 'admin/css/ratio.css' %}">
+
+    <!-- remixicon css -->
+    <link rel="stylesheet" type="text/css" href="{% static 'admin/css/remixicon.css' %}">
+
+    <!-- Feather icon css-->
+    <link rel="stylesheet" type="text/css" href="{% static 'admin/css/vendors/feather-icon.css' %}">
+
+    <!-- Plugins css -->
+    <link rel="stylesheet" type="text/css" href="{% static 'admin/css/vendors/scrollbar.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'admin/css/vendors/animate.css' %}">
+
+    <!-- Bootstrap css-->
+    <link rel="stylesheet" type="text/css" href="{% static 'admin/css/vendors/bootstrap.css' %}">
+
+    <!-- vector map css -->
+    <link rel="stylesheet" type="text/css" href="{% static 'admin/css/vector-map.css' %}">
+
+    <!-- Slick Slider Css -->
+    <link rel="stylesheet" href="{% static 'admin/css/vendors/slick.css' %}">
+
+    <!-- App css -->
+    <link rel="stylesheet" type="text/css" href="{% static 'admin/css/style.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'admin/css/font.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'admin/css/custom.css' %}">
+    {% endblock %}
+</head>
+<body>
+<!-- tap on top start -->
+<div class="tap-top">
+    <span class="lnr lnr-chevron-up"></span>
+</div>
+<!-- tap on tap end -->
+<!-- page-wrapper Start-->
+<div class="page-wrapper compact-wrapper" id="pageWrapper">
+    <!-- Page Header Start-->
+    <div class="page-header">
+        <div class="header-wrapper m-0">
+            <div class="header-logo-wrapper p-0">
+                <div class="logo-wrapper">
+                    <a href="index.html">
+                        <img class="img-fluid main-logo" src="{% static 'admin/images/logo/1.png' %}" alt="logo">
+                        <img class="img-fluid white-logo" src="{% static 'admin/images/logo/1-white.png' %}" alt="logo">
+                    </a>
+                </div>
+                <div class="toggle-sidebar">
+                    <i class="status_toggle middle sidebar-toggle" data-feather="align-center"></i>
+                    <a href="index.html">
+                        <img src="{% static 'admin/images/logo/1.png' %}" class="img-fluid" alt="">
+                    </a>
+                </div>
+            </div>
+
+            <form class="form-inline search-full" action="javascript:void(0)" method="get">
+                <div class="form-group w-100">
+                    <div class="Typeahead Typeahead--twitterUsers">
+                        <div class="u-posRelative">
+                            <input class="demo-input Typeahead-input form-control-plaintext w-100" type="text"
+                                placeholder="جستجو کنید ..." name="q" title="" autofocus>
+                            <i class="close-search" data-feather="x"></i>
+                            <div class="spinner-border Typeahead-spinner" role="status">
+                                <span class="sr-only">لطفا صبر کنید ...</span>
+                            </div>
+                        </div>
+                        <div class="Typeahead-menu"></div>
+                    </div>
+                </div>
+            </form>
+            <div class="nav-right col-6 pull-right right-header p-0">
+                <ul class="nav-menus">
+                    <li>
+                        <span class="header-search">
+                            <i class="ri-search-line"></i>
+                        </span>
+                    </li>
+                    <li class="onhover-dropdown">
+                        <div class="notification-box">
+                            <i class="ri-notification-line"></i>
+                            <span class="badge rounded-pill badge-theme">4</span>
+                        </div>
+                        <ul class="notification-dropdown onhover-show-div">
+                            <li>
+                                <i class="ri-notification-line"></i>
+                                <h6 class="f-18 mb-0">پیام ها</h6>
+                            </li>
+                            <li>
+                                <p>
+                                    <i class="fa fa-circle me-2 font-primary"></i>پردازش محصولات<span
+                                        class="pull-right">10 دقیقه</span>
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <i class="fa fa-circle me-2 font-success"></i>تکمیل سفارش<span
+                                        class="pull-right">1 ساعت</span>
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <i class="fa fa-circle me-2 font-info"></i>بلیط های تولید شده<span
+                                        class="pull-right">3 ساعت</span>
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <i class="fa fa-circle me-2 font-danger"></i>تحویل کامل<span
+                                        class="pull-right">6 ساعت</span>
+                                </p>
+                            </li>
+                            <li>
+                                <a class="btn btn-primary" href="javascript:void(0)">نمایش تمام پیام ها</a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <div class="mode">
+                            <i class="ri-moon-line"></i>
+                        </div>
+                    </li>
+                    <li class="profile-nav onhover-dropdown pe-0 me-0">
+                        <div class="media profile-media">
+                            <img class="user-profile rounded-circle" src="{{ user.avatar.url }}" alt="پروفایل {{ user.get_full_name }}">
+                            <div class="user-name-hide media-body">
+                                <span>{{ user.get_full_name|default:user.username }}</span>
+                                <p class="mb-0 font-roboto">{{ user.memberships.first.get_role_display }}<i class="middle ri-arrow-down-s-line"></i></p>
+                            </div>
+                        </div>
+                        <ul class="profile-dropdown onhover-show-div">
+                            <li>
+                                <a href="all-users.html">
+                                    <i data-feather="users"></i>
+                                    <span>کاربران</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="order-list.html">
+                                    <i data-feather="archive"></i>
+                                    <span>سفارشات</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="support-ticket.html">
+                                    <i data-feather="phone"></i>
+                                    <span>تیکت پشتیبانی</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="">
+                                    <i data-feather="settings"></i>
+                                    <span>تنظیمات</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#"
+                                   data-bs-toggle="modal"
+                                   data-bs-target="#logoutModal"
+                                   role="button">
+                                    <i class="ri-logout-box-r-line"></i>
+                                    <span>خروج</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!-- Page Header Ends-->
+
+    <!-- Page Body Start-->
+    <div class="page-body-wrapper">
+        {% include 'unit_admin/sidebar.html' %}
+        {% block body %}{% endblock %}
+    </div>
+    <!-- Page Body End -->
+
+    <!-- Modal Start -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold" id="logoutModalLabel">خروج از سیستم</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="بستن"></button>
+                </div>
+                <div class="modal-body pt-1">
+                    <p class="mb-4">آیا مطمئن هستید می‌خواهید خارج شوید؟</p>
+                    <form class="d-flex gap-2 justify-content-end" method="post" action="{% url 'admin:logout' %}">
+                        {% csrf_token %}
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">لغو</button>
+                        <button type="submit" class="btn btn-danger">بله، خارج شوم</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal End -->
+</div>
+{% include 'unit_admin/delete.html' %}
+{% block footer %}
+    <!-- latest js -->
+    <script src="{% static 'admin/js/jquery-3.6.0.min.js' %}"></script>
+    <!-- Bootstrap js -->
+    <script src="{% static 'admin/js/bootstrap/bootstrap.bundle.min.js' %}"></script>
+
+    <!-- feather icon js -->
+    <script src="{% static 'admin/js/icons/feather-icon/feather.min.js' %}"></script>
+    <script src="{% static 'admin/js/icons/feather-icon/feather-icon.js' %}"></script>
+
+    <!-- scrollbar simplebar js -->
+    <script src="{% static 'admin/js/scrollbar/simplebar.js' %}"></script>
+    <script src="{% static 'admin/js/scrollbar/custom.js' %}"></script>
+
+    <!-- Sidebar jquery -->
+    <script src="{% static 'admin/js/config.js' %}"></script>
+
+    <!-- tooltip init js -->
+    <script src="{% static 'admin/js/tooltip-init.js' %}"></script>
+
+    <!-- Plugins JS -->
+    <script src="{% static 'admin/js/sidebar-menu.js' %}"></script>
+    <script src="{% static 'admin/js/notify/bootstrap-notify.min.js' %}"></script>
+    <script src="{% static 'admin/js/notify/index.js' %}"></script>
+
+    <!-- Apexchar js -->
+    <script src="{% static 'admin/js/chart/apex-chart/apex-chart1.js' %}"></script>
+    <script src="{% static 'admin/js/chart/apex-chart/moment.min.js' %}"></script>
+    <script src="{% static 'admin/js/chart/apex-chart/apex-chart.js' %}"></script>
+    <script src="{% static 'admin/js/chart/apex-chart/stock-prices.js' %}"></script>
+    <script src="{% static 'admin/js/chart/apex-chart/chart-custom1.js' %}"></script>
+
+
+    <!-- slick slider js -->
+    <script src="{% static 'admin/js/slick.min.js' %}"></script>
+    <script src="{% static 'admin/js/custom-slick.js' %}"></script>
+
+    <!-- customizer js -->
+    <script src="{% static 'admin/js/customizer.js' %}"></script>
+
+    <!-- ratio js -->
+    <script src="{% static 'admin/js/ratio.js' %}"></script>
+
+    <!-- sidebar effect -->
+    <script src="{% static 'admin/js/sidebareffect.js' %}"></script>
+
+    <!-- Theme js -->
+    <script src="{% static 'admin/js/script.js' %}"></script>
+{% endblock %}
+</body>
+</html>
+
+

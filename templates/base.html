@@ -1,0 +1,70 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %}</title>
+    <style>
+        #darkButton.active, #lightButton.active {
+        box-shadow: inset 0 0 5px rgba(0,0,0,0.3);
+        }
+    </style>
+    {% include 'components/head.html' %}
+    {% block head %}{% endblock %}
+
+</head>
+<body>
+    {% if messages %}
+      <div class="alerts">
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} show" role="alert">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+    {% include 'components/loader.html' %}
+    {% include 'components/header.html' %}
+    {% if breadcrumb %}
+      {% include 'components/breadcrumb.html' %}
+    {% endif %}
+    {% include 'components/mobile_fix_menu.html' %}
+    {% block body %}{% endblock %}
+    {% include 'components/footer.html' %}
+    {% include 'components/location_modal.html' %}
+    {% include 'components/deal_box_modal.html' %}
+    {% include 'components/tap_to_top_and_theme_setting_button.html' %}
+    {% include 'components/bg_overlay.html' %}
+    {% include 'components/foot.html' %}
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.reply-button').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const cid = btn.getAttribute('data-comment-id');
+            const formDiv = document.getElementById('reply-form-' + cid);
+            // toggle between hidden and block
+            formDiv.style.display = formDiv.style.display === 'none' ? 'block' : 'none';
+          });
+        });
+      });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          // Wait 2 seconds, then remove all alerts
+          setTimeout(function() {
+            document.querySelectorAll('.alerts .alert').forEach(function(alert) {
+              // Optionally fade out
+              alert.classList.remove('show');
+              // After fade (0.5s), remove from DOM
+              setTimeout(function() {
+                alert.remove();
+              }, 500);
+            });
+          }, 2000);
+        });
+    </script>
+
+</body>
+</html>

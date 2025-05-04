@@ -1,0 +1,35 @@
+python -m venv env
+env\Scripts\activate
+pip install -r requirements.txt  
+python.exe -m pip install --upgrade pip
+pip install django
+django-admin startproject main .
+pip install mysqlclient
+python manage.py makemigrations
+python manage.py migrate account
+python manage.py makemigrations
+pip install django-iranian-cities
+pip install django-jalali-date
+pip install setuptools
+pip install sorl-thumbnail
+pip install django_render_partial
+python -m pip install Pillow   
+python manage.py generate_city
+python manage.py startapp home
+python manage.py createsuperuser
+python manage.py runserver
+pip install django-ckeditor
+university_project
+pip install django-admin-list-filter-dropdown django-admin-autocomplete-filter
+
+python manage.py migrate iranian_cities
+python manage.py generate_city
+python manage.py flush
+pip install django-phonenumber-field django-timezone-field
+pip install django-iranian-cities django-jalali-date django-phonenumber-field
+pip install django-admin-autocomplete-filter django-admin-list-filter-dropdown
+pip install django-extensions
+python manage.py runserver_plus --nopin
+
+python manage.py check
+pip install django-autoslug

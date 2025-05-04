@@ -1,0 +1,625 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+	محصولات
+{% endblock %}
+{% block body %}
+
+
+<!-- Poster Section Start -->
+<section>
+    <div class="container-fluid-lg">
+        <div class="row">
+            <div class="col-12">
+                <div class="slider-1 slider-animate product-wrapper no-arrow">
+                    {% include 'product/includes/poster_product.html' %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Poster Section End -->
+
+<!-- Shop Section Start -->
+<section class="section-b-space shop-section">
+    <div class="container-fluid-lg">
+        <div class="row">
+            <div class="col-custom-3">
+                <div class="left-box wow fadeInUp">
+                    <div class="shop-left-sidebar">
+                        <div class="back-button">
+                            <h3><i class="fa-solid fa-arrow-left"></i> بازگشت</h3>
+                        </div>
+                      {# Filter header – static for now, or link to reset filters #}
+                        <div class="filter-category">
+                            <div class="filter-title">
+                                <h2>فیلتر</h2>
+                                <a href="{% url 'product:list' %}">حذف فیلتر</a>
+                            </div>
+                            <ul>
+                                <li>
+                                    <a href="javascript:void(0)"></a>
+                                </li>
+                            </ul>
+                        </div>
+                        <form id="filter-form" method="get">
+                            <div class="accordion custom-accordion" id="accordionExample">
+                                 <!-- Search box -->
+                                <div class="accordion-item">
+                                  <h2 class="accordion-header" id="headingSearch">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSearch">
+                                      جستجو
+                                    </button>
+                                  </h2>
+                                  <div id="collapseSearch" class="accordion-collapse collapse show">
+                                    <div class="accordion-body">
+                                      <div class="form-floating theme-form-floating-2 search-box">
+                                        <input type="search"
+                                               name="search"
+                                               class="form-control"
+                                               id="search"
+                                               placeholder="جستجو .."
+                                               value="{{ current_search }}"
+                                               onkeypress="if(event.key==='Enter') document.getElementById('filter-form').submit()">
+                                        <label for="search">جستجو</label>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <!-- Category filter -->
+                                <div class="accordion-item">
+                                  <h2 class="accordion-header" id="headingCat">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCat">
+                                      دسته‌ها
+                                    </button>
+                                  </h2>
+                                  <div id="collapseCat" class="accordion-collapse collapse show">
+                                    <div class="accordion-body">
+                                      <ul class="category-list custom-padding custom-height">
+                                        {% for cat in all_categories %}
+                                          <li>
+                                            <div class="form-check ps-0 m-0 category-list-box">
+                                              <input class="form-check-input"
+                                                     type="checkbox"
+                                                     name="category"
+                                                     value="{{ cat.slug }}"
+                                                     id="cat-{{ forloop.counter }}"
+                                                     {% if cat.slug in current_category %}checked{% endif %}
+                                                     onchange="document.getElementById('filter-form').submit()">
+                                              <label class="form-check-label" for="cat-{{ forloop.counter }}">
+                                                <span class="name">{{ cat.title }}</span>
+                                                <span class="number">({{ cat.products.count }})</span>
+                                              </label>
+                                            </div>
+                                          </li>
+                                        {% endfor %}
+                                      </ul>
+                                    </div>
+                                  </div>
+                                </div>
+                                {# … repeat similar blocks for price, rating, discount, weight … #}
+
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingFour">
+                                        <button class="accordion-button collapsed" type="button"
+                                            data-bs-toggle="collapse" data-bs-target="#collapseFour">
+                                            <span>تخفیف</span>
+                                        </button>
+                                    </h2>
+                                    <div id="collapseFour" class="accordion-collapse collapse show">
+                                        <div class="accordion-body">
+                                            <ul class="category-list custom-padding">
+                                                <li>
+                                                    <div class="form-check ps-0 m-0 category-list-box">
+                                                        <input class="checkbox_animated" type="checkbox" name="discount" value="yes" id="discount_yes"
+                                                               {% if request.GET.discount == "yes" %}checked{% endif %}>
+                                                        <label class="form-check-label" for="discount_yes">
+                                                            <span class="name">تخفیف دارد</span>
+                                                            <span class="number">({{ discounted_products_count }})</span>
+                                                        </label>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <div class="form-check ps-0 m-0 category-list-box">
+                                                        <input class="checkbox_animated" type="checkbox" name="discount" value="no" id="discount_no"
+                                                               {% if request.GET.discount == "no" %}checked{% endif %}>
+                                                        <label class="form-check-label" for="discount_no">
+                                                            <span class="name">تخفیف ندارد</span>
+                                                            <span class="number">({{ non_discounted_products_count }})</span>
+                                                        </label>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingThree">
+                                        <button class="accordion-button collapsed" type="button"
+                                            data-bs-toggle="collapse" data-bs-target="#collapseThree">
+                                            <span>قیمت</span>
+                                        </button>
+                                    </h2>
+                                    <div id="collapseThree" class="accordion-collapse collapse show">
+                                        <div class="accordion-body">
+                                            <div class="range-slider">
+                                                <input type="text" class="js-range-slider" value="">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingSix">
+                                        <button class="accordion-button collapsed" type="button"
+                                            data-bs-toggle="collapse" data-bs-target="#collapseSix">
+                                            <span>امتیاز</span>
+                                        </button>
+                                    </h2>
+                                    <div id="collapseSix" class="accordion-collapse collapse show">
+                                        <div class="accordion-body">
+                                            <ul class="category-list custom-padding">
+                                                <li>
+                                                    <div class="form-check ps-0 m-0 category-list-box">
+                                                        <input class="checkbox_animated" type="checkbox">
+                                                        <div class="form-check-label">
+                                                            <ul class="rating">
+                                                                <li>
+                                                                    <i data-feather="star" class="fill"></i>
+                                                                </li>
+                                                                <li>
+                                                                    <i data-feather="star" class="fill"></i>
+                                                                </li>
+                                                                <li>
+                                                                    <i data-feather="star" class="fill"></i>
+                                                                </li>
+                                                                <li>
+                                                                    <i data-feather="star" class="fill"></i>
+                                                                </li>
+                                                                <li>
+                                                                    <i data-feather="star" class="fill"></i>
+                                                                </li>
+                                                            </ul>
+                                                            <span class="text-content">(5 ستاره)</span>
+                                                        </div>
+                                                    </div>
+                                                </li>
+
+                                                <li>
+                                                    <div class="form-check ps-0 m-0 category-list-box">
+                                                        <input class="checkbox_animated" type="checkbox">
+                                                        <div class="form-check-label">
+                                                            <ul class="rating">
+                                                                <li>
+                                                                    <i data-feather="star" class="fill"></i>
+                                                                </li>
+                                                                <li>
+                                                                    <i data-feather="star" class="fill"></i>
+                                                                </li>
+                                                                <li>
+                                                                    <i data-feather="star" class="fill"></i>
+                                                                </li>
+                                                                <li>
+                                                                    <i data-feather="star" class="fill"></i>
+                                                                </li>
+                                                                <li>
+                                                                    <i data-feather="star"></i>
+                                                                </li>
+                                                            </ul>
+                                                            <span class="text-content">(4 ستاره)</span>
+                                                        </div>
+                                                    </div>
+                                                </li>
+
+                                                <li>
+                                                    <div class="form-check ps-0 m-0 category-list-box">
+                                                        <input class="checkbox_animated" type="checkbox">
+                                                        <div class="form-check-label">
+                                                            <ul class="rating">
+                                                                <li>
+                                                                    <i data-feather="star" class="fill"></i>
+                                                                </li>
+                                                                <li>
+                                                                    <i data-feather="star" class="fill"></i>
+                                                                </li>
+                                                                <li>
+                                                                    <i data-feather="star" class="fill"></i>
+                                                                </li>
+                                                                <li>
+                                                                    <i data-feather="star"></i>
+                                                                </li>
+                                                                <li>
+                                                                    <i data-feather="star"></i>
+                                                                </li>
+                                                            </ul>
+                                                            <span class="text-content">(3 ستاره)</span>
+                                                        </div>
+                                                    </div>
+                                                </li>
+
+                                                <li>
+                                                    <div class="form-check ps-0 m-0 category-list-box">
+                                                        <input class="checkbox_animated" type="checkbox">
+                                                        <div class="form-check-label">
+                                                            <ul class="rating">
+                                                                <li>
+                                                                    <i data-feather="star" class="fill"></i>
+                                                                </li>
+                                                                <li>
+                                                                    <i data-feather="star" class="fill"></i>
+                                                                </li>
+                                                                <li>
+                                                                    <i data-feather="star"></i>
+                                                                </li>
+                                                                <li>
+                                                                    <i data-feather="star"></i>
+                                                                </li>
+                                                                <li>
+                                                                    <i data-feather="star"></i>
+                                                                </li>
+                                                            </ul>
+                                                            <span class="text-content">(2 ستاره)</span>
+                                                        </div>
+                                                    </div>
+                                                </li>
+
+                                                <li>
+                                                    <div class="form-check ps-0 m-0 category-list-box">
+                                                        <input class="checkbox_animated" type="checkbox">
+                                                        <div class="form-check-label">
+                                                            <ul class="rating">
+                                                                <li>
+                                                                    <i data-feather="star" class="fill"></i>
+                                                                </li>
+                                                                <li>
+                                                                    <i data-feather="star"></i>
+                                                                </li>
+                                                                <li>
+                                                                    <i data-feather="star"></i>
+                                                                </li>
+                                                                <li>
+                                                                    <i data-feather="star"></i>
+                                                                </li>
+                                                                <li>
+                                                                    <i data-feather="star"></i>
+                                                                </li>
+                                                            </ul>
+                                                            <span class="text-content">(1 ستاره)</span>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingFour">
+                                        <button class="accordion-button collapsed" type="button"
+                                            data-bs-toggle="collapse" data-bs-target="#collapseFour">
+                                            <span>تخفیف</span>
+                                        </button>
+                                    </h2>
+                                    <div id="collapseFour" class="accordion-collapse collapse show">
+                                        <div class="accordion-body">
+                                            <ul class="category-list custom-padding">
+                                                <li>
+                                                    <div class="form-check ps-0 m-0 category-list-box">
+                                                        <input class="checkbox_animated" type="checkbox"
+                                                            id="flexCheckDefault">
+                                                        <label class="form-check-label" for="flexCheckDefault">
+                                                            <span class="name">تا 5%</span>
+                                                            <span class="number">(06)</span>
+                                                        </label>
+                                                    </div>
+                                                </li>
+
+                                                <li>
+                                                    <div class="form-check ps-0 m-0 category-list-box">
+                                                        <input class="checkbox_animated" type="checkbox"
+                                                            id="flexCheckDefault1">
+                                                        <label class="form-check-label" for="flexCheckDefault1">
+                                                            <span class="name">5% - 10%</span>
+                                                            <span class="number">(08)</span>
+                                                        </label>
+                                                    </div>
+                                                </li>
+
+                                                <li>
+                                                    <div class="form-check ps-0 m-0 category-list-box">
+                                                        <input class="checkbox_animated" type="checkbox"
+                                                            id="flexCheckDefault2">
+                                                        <label class="form-check-label" for="flexCheckDefault2">
+                                                            <span class="name">10% - 15%</span>
+                                                            <span class="number">(10)</span>
+                                                        </label>
+                                                    </div>
+                                                </li>
+
+                                                <li>
+                                                    <div class="form-check ps-0 m-0 category-list-box">
+                                                        <input class="checkbox_animated" type="checkbox"
+                                                            id="flexCheckDefault3">
+                                                        <label class="form-check-label" for="flexCheckDefault3">
+                                                            <span class="name">15% - 25%</span>
+                                                            <span class="number">(14)</span>
+                                                        </label>
+                                                    </div>
+                                                </li>
+
+                                                <li>
+                                                    <div class="form-check ps-0 m-0 category-list-box">
+                                                        <input class="checkbox_animated" type="checkbox"
+                                                            id="flexCheckDefault4">
+                                                        <label class="form-check-label" for="flexCheckDefault4">
+                                                            <span class="name">بیشتر از 25%</span>
+                                                            <span class="number">(13)</span>
+                                                        </label>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingFive">
+                                        <button class="accordion-button collapsed" type="button"
+                                            data-bs-toggle="collapse" data-bs-target="#collapseFive">
+                                            <span>وزن بسته</span>
+                                        </button>
+                                    </h2>
+                                    <div id="collapseFive" class="accordion-collapse collapse show">
+                                        <div class="accordion-body">
+                                            <ul class="category-list custom-padding custom-height">
+                                                <li>
+                                                    <div class="form-check ps-0 m-0 category-list-box">
+                                                        <input class="checkbox_animated" type="checkbox"
+                                                            id="flexCheckDefault5">
+                                                        <label class="form-check-label" for="flexCheckDefault5">
+                                                            <span class="name">400 تا 500 گرم</span>
+                                                            <span class="number">(05)</span>
+                                                        </label>
+                                                    </div>
+                                                </li>
+
+                                                <li>
+                                                    <div class="form-check ps-0 m-0 category-list-box">
+                                                        <input class="checkbox_animated" type="checkbox"
+                                                            id="flexCheckDefault6">
+                                                        <label class="form-check-label" for="flexCheckDefault6">
+                                                            <span class="name">500 تا 700 گرم</span>
+                                                            <span class="number">(02)</span>
+                                                        </label>
+                                                    </div>
+                                                </li>
+
+                                                <li>
+                                                    <div class="form-check ps-0 m-0 category-list-box">
+                                                        <input class="checkbox_animated" type="checkbox"
+                                                            id="flexCheckDefault7">
+                                                        <label class="form-check-label" for="flexCheckDefault7">
+                                                            <span class="name">700 تا 1 کیلوگرم</span>
+                                                            <span class="number">(04)</span>
+                                                        </label>
+                                                    </div>
+                                                </li>
+
+                                                <li>
+                                                    <div class="form-check ps-0 m-0 category-list-box">
+                                                        <input class="checkbox_animated" type="checkbox"
+                                                            id="flexCheckDefault8">
+                                                        <label class="form-check-label" for="flexCheckDefault8">
+                                                            <span class="name">120 - 150 گرم هر عدد وکیوم 2 عدد</span>
+                                                            <span class="number">(06)</span>
+                                                        </label>
+                                                    </div>
+                                                </li>
+
+                                                <li>
+                                                    <div class="form-check ps-0 m-0 category-list-box">
+                                                        <input class="checkbox_animated" type="checkbox"
+                                                            id="flexCheckDefault9">
+                                                        <label class="form-check-label" for="flexCheckDefault9">
+                                                            <span class="name">1 گیلوگرم</span>
+                                                            <span class="number">(09)</span>
+                                                        </label>
+                                                    </div>
+                                                </li>
+
+                                                <li>
+                                                    <div class="form-check ps-0 m-0 category-list-box">
+                                                        <input class="checkbox_animated" type="checkbox"
+                                                            id="flexCheckDefault10">
+                                                        <label class="form-check-label" for="flexCheckDefault10">
+                                                            <span class="name">1 تا 1.2 کیگوگرم</span>
+                                                            <span class="number">(06)</span>
+                                                        </label>
+                                                    </div>
+                                                </li>
+
+                                                <li>
+                                                    <div class="form-check ps-0 m-0 category-list-box">
+                                                        <input class="checkbox_animated" type="checkbox"
+                                                            id="flexCheckDefault11">
+                                                        <label class="form-check-label" for="flexCheckDefault11">
+                                                            <span class="name">مولتی بسته 2*24 عددی</span>
+                                                            <span class="number">(03)</span>
+                                                        </label>
+                                                    </div>
+                                                </li>
+
+                                                <li>
+                                                    <div class="form-check ps-0 m-0 category-list-box">
+                                                        <input class="checkbox_animated" type="checkbox"
+                                                            id="flexCheckDefault12">
+                                                        <label class="form-check-label" for="flexCheckDefault12">
+                                                            <span class="name">مولتی پک 2x6 عددی</span>
+                                                            <span class="number">(04)</span>
+                                                        </label>
+                                                    </div>
+                                                </li>
+
+                                                <li>
+                                                    <div class="form-check ps-0 m-0 category-list-box">
+                                                        <input class="checkbox_animated" type="checkbox"
+                                                            id="flexCheckDefault13">
+                                                        <label class="form-check-label" for="flexCheckDefault13">
+                                                            <span class="name">مولتی پک 4x6 عددی</span>
+                                                            <span class="number">(05)</span>
+                                                        </label>
+                                                    </div>
+                                                </li>
+
+                                                <li>
+                                                    <div class="form-check ps-0 m-0 category-list-box">
+                                                        <input class="checkbox_animated" type="checkbox"
+                                                            id="flexCheckDefault14">
+                                                        <label class="form-check-label" for="flexCheckDefault14">
+                                                            <span class="name">مولتی پک 5x6 عددی</span>
+                                                            <span class="number">(09)</span>
+                                                        </label>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-custom-">
+                <div class="show-button">
+                    <div class="filter-button-group mt-0">
+                        <div class="filter-button d-inline-block d-lg-none">
+                            <a><i class="fa-solid fa-filter"></i> منوی فیلتر</a>
+                        </div>
+                    </div>
+
+                    <div class="top-filter-menu">
+                        <div class="category-dropdown">
+                            <h5 class="text-content">مرتب سازی بر اساس :</h5>
+                            <div class="dropdown">
+                                <button class="dropdown-toggle" type="button" id="dropdownMenuButton1"
+                                    data-bs-toggle="dropdown">
+                                    <span>محبوبترین</span> <i class="fa-solid fa-angle-down"></i>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a class="dropdown-item" id="pop" href="javascript:void(0)">محبوبیت</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" id="low" href="javascript:void(0)">کمترین قمت</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" id="high" href="javascript:void(0)">بیشترین قیمت</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" id="rating" href="javascript:void(0)">امتیاز</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" id="aToz" href="javascript:void(0)">به ترتیب حروف الفبا</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" id="zToa" href="javascript:void(0)">برعکس حروف الفبا</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" id="off" href="javascript:void(0)">بیشترین تخفیف</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="grid-option d-none d-md-block">
+                            <ul>
+                                <li class="three-grid">
+                                    <a href="javascript:void(0)">
+                                        <img src="{% static 'svg/grid-3.svg' %}" class="blur-up lazyload" alt="">
+                                    </a>
+                                </li>
+                                <li class="grid-btn d-xxl-inline-block d-none">
+                                    <a href="javascript:void(0)">
+                                        <img src="{% static 'svg/grid-4.svg' %}"
+                                            class="blur-up lazyload d-lg-inline-block d-none" alt="">
+                                        <img src="{% static 'svg/grid.svg' %}"
+                                            class="blur-up lazyload img-fluid d-lg-none d-inline-block" alt="">
+                                    </a>
+                                </li>
+                                <li class="list-btn active">
+                                    <a href="javascript:void(0)">
+                                        <img src="{% static 'svg/list.svg' %}" class="blur-up lazyload" alt="">
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-sm-4 g-3 row-cols-xxl-4 row-cols-xl-3 row-cols-lg-2 row-cols-md-3 row-cols-2 product-list-section list-style">
+                    {% for product in products %}
+                        {% include 'product/includes/product.html' with product=product %}
+                    {% empty %}
+                        <p>No products found.</p>
+                    {% endfor %}
+                </div>
+                <nav class="custom-pagination">
+    <ul class="pagination justify-content-center">
+        {# Previous Page #}
+        {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link"
+                   href="?{% if request.GET %}{{ request.GET.urlencode }}&{% endif %}page={{ page_obj.previous_page_number }}">
+                    <i class="fa-solid fa-angles-right"></i>
+                </a>
+            </li>
+        {% else %}
+            <li class="page-item disabled">
+                <a class="page-link" tabindex="-1">
+                    <i class="fa-solid fa-angles-right"></i>
+                </a>
+            </li>
+        {% endif %}
+
+        {# Page Numbers #}
+        {% for num in page_obj.paginator.page_range %}
+            <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                <a class="page-link"
+                   href="?{% if request.GET %}{{ request.GET.urlencode }}&{% endif %}page={{ num }}">
+                    {{ num }}
+                </a>
+            </li>
+        {% endfor %}
+
+        {# Next Page #}
+        {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link"
+                   href="?{% if request.GET %}{{ request.GET.urlencode }}&{% endif %}page={{ page_obj.next_page_number }}">
+                    <i class="fa-solid fa-angles-left"></i>
+                </a>
+            </li>
+        {% else %}
+            <li class="page-item disabled">
+                <a class="page-link">
+                    <i class="fa-solid fa-angles-left"></i>
+                </a>
+            </li>
+        {% endif %}
+    </ul>
+</nav>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Shop Section End -->
+
+{% include 'components/quick_view_modal_box.html' %}
+
+{% include 'product/includes/add-to-cart.html' %}
+
+{% endblock %}

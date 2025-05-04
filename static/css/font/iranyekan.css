@@ -1,0 +1,36 @@
+@font-face {
+	font-family: iranyekan;
+	font-style: normal;
+	font-weight: 600;
+	src: url('../../fonts/yekan/eot/iranyekanwebboldfanum.eot');
+	src: url('../../fonts/yekan/eot/iranyekanwebboldfanum.eot?#iefix') format('embedded-opentype'),  /* IE6-8 */
+		 url('../../fonts/yekan/woff/iranyekanwebboldfanum.woff') format('woff'),  /* FF3.6+, IE9, Chrome6+, Saf5.1+*/
+		 url('../../fonts/yekan/ttf/iranyekanwebboldfanum.ttf') format('truetype');
+}
+@font-face {
+	font-family: iranyekan;
+	font-style: normal;
+	font-weight: 300;
+	src: url('../../fonts/yekan/eot/iranyekanweblightfanum.eot');
+	src: url('../../fonts/yekan/eot/iranyekanweblightfanum.eot?#iefix') format('embedded-opentype'),  /* IE6-8 */
+		 url('../../fonts/yekan/woff/iranyekanweblightfanum.woff') format('woff'),  /* FF3.6+, IE9, Chrome6+, Saf5.1+*/
+		 url('../../fonts/yekan/ttf/iranyekanweblightfanum.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: iranyekan;
+	font-style: normal;
+	font-weight: normal;
+	src: url('../../fonts/yekan/eot/iranyekanwebregularfanum.eot');
+	src: url('../../fonts/yekan/eot/iranyekanwebregularfanum.eot?#iefix') format('embedded-opentype'),  /* IE6-8 */
+		 url('../../fonts/yekan/woff/iranyekanwebregularfanum.woff') format('woff'),  /* FF3.6+, IE9, Chrome6+, Saf5.1+*/
+		 url('../../fonts/yekan/ttf/iranyekanwebregularfanum.ttf') format('truetype');
+}
+
+body , button, input, optgroup, select, textarea , .text-exo, .breadscrumb-section .breadscrumb-contain, .section-404 .contain-404,
+.product-image li, .footer-section-2 .main-footer .footer-title , .breadcrumb-section .breadcrumb-contain h2 , [dir=rtl] .breadcrumb-section .breadcrumb-contain nav .breadcrumb .breadcrumb-item+.breadcrumb-item {
+    font-family: iranyekan !important;
+}
+.banner-contain .banner-details h4, .text-kaushan{
+	font-family: iranyekan !important;
+}

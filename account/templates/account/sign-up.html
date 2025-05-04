@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}عضویت{% endblock %}
+
+{% block body %}
+<section class="log-in-section section-b-space">
+  <div class="container-fluid-lg w-100">
+    <div class="row">
+      <!-- Illustration -->
+      <div class="col-xxl-6 col-xl-5 col-lg-6 d-lg-block d-none ms-auto">
+        <div class="image-contain">
+          <img src="{% static 'images/inner-page/sign-up.png' %}"
+               class="img-fluid" alt="">
+        </div>
+      </div>
+
+      <!-- Signup form -->
+      <div class="col-xxl-4 col-xl-5 col-lg-6 col-sm-8 mx-auto">
+        <div class="log-in-box">
+
+          <!-- Titles -->
+          <div class="log-in-title">
+            <h3>
+              {% blocktrans with site_name=site_settings.site_name %}
+                به {{ site_name }} خوش آمدید
+              {% endblocktrans %}
+            </h3>
+            <h4>{% trans "ایجاد حساب کاربری" %}</h4>
+          </div>
+
+          <!-- Non-field errors (e.g. password mismatch) -->
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+              <ul class="mb-0">
+                {% for err in form.non_field_errors %}
+                  <li>{{ err }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+
+          <form method="post" class="row g-4">
+            {% csrf_token %}
+
+            {# Render fullname and email via the loop #}
+            {% for field in form %}
+              {% if field.name not in 'password1,password2,terms_accepted' %}
+                <div class="col-12">
+                  <div class="form-floating theme-form-floating">
+                    <input
+                      type="{{ field.field.widget.input_type }}"
+                      name="{{ field.html_name }}"
+                      id="{{ field.id_for_label }}"
+                      class="form-control{% if field.errors %} is-invalid{% endif %}"
+                      placeholder="{{ field.label }}"
+                      value="{{ field.value|default_if_none:'' }}"
+                    >
+                    <label for="{{ field.id_for_label }}">
+                      {{ field.label }}
+                    </label>
+                    {% if field.errors %}
+                      <div class="invalid-feedback">
+                        {{ field.errors|join:" " }}
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+              {% endif %}
+            {% endfor %}
+
+            {# Explicit password1 field #}
+            <div class="col-12">
+              <div class="form-floating theme-form-floating">
+                <input
+                  type="password"
+                  name="{{ form.password1.html_name }}"
+                  id="{{ form.password1.id_for_label }}"
+                  class="form-control{% if form.password1.errors %} is-invalid{% endif %}"
+                  placeholder="{% trans 'رمز عبور' %}"
+                >
+                <label for="{{ form.password1.id_for_label }}">
+                  {% trans "رمز عبور" %}
+                </label>
+                {% if form.password1.errors %}
+                  <div class="invalid-feedback">
+                    {{ form.password1.errors|join:" " }}
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+
+            {# Explicit password2 field #}
+            <div class="col-12">
+              <div class="form-floating theme-form-floating">
+                <input
+                  type="password"
+                  name="{{ form.password2.html_name }}"
+                  id="{{ form.password2.id_for_label }}"
+                  class="form-control{% if form.password2.errors %} is-invalid{% endif %}"
+                  placeholder="{% trans 'تکرار رمز عبور' %}"
+                >
+                <label for="{{ form.password2.id_for_label }}">
+                  {% trans "تکرار رمز عبور" %}
+                </label>
+                {% if form.password2.errors %}
+                  <div class="invalid-feedback">
+                    {{ form.password2.errors|join:" " }}
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+
+            {# Terms checkbox outside floating labels #}
+            <div class="col-12">
+              <div class="form-check">
+                <input
+                  type="checkbox"
+                  name="{{ form.terms_accepted.html_name }}"
+                  id="{{ form.terms_accepted.id_for_label }}"
+                  class="form-check-input{% if form.terms_accepted.errors %} is-invalid{% endif %}"
+                >
+                <label for="{{ form.terms_accepted.id_for_label }}"
+                       class="form-check-label">
+                  {{ form.terms_accepted.label }}
+                </label>
+                {% if form.terms_accepted.errors %}
+                  <div class="invalid-feedback">
+                    {{ form.terms_accepted.errors|join:" " }}
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="col-12">
+              <button class="btn btn-animation w-100" type="submit">
+                {% trans "ثبت نام" %}
+              </button>
+            </div>
+          </form>
+
+          <div class="other-log-in"><h6>or</h6></div>
+          <div class="sign-up-box">
+            <h4>{% trans "حساب کاربری دارید ؟" %}</h4>
+            <a href="{% url 'login' %}">{% trans "وارد شوید" %}</a>
+          </div>
+
+        </div>
+      </div>
+      <div class="col-xxl-7 col-xl-6 col-lg-6"></div>
+    </div>
+  </div>
+</section>
+{% endblock %}

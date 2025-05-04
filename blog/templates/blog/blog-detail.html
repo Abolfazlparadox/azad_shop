@@ -1,0 +1,282 @@
+{% extends 'base.html' %}
+{% load static%}
+
+{% block title %}وبلاگ{% endblock %}
+{% block body %}
+<!-- Blog Details Section Start -->
+<section class="blog-section section-b-space">
+<div class="container-fluid-lg">
+<div class="row g-sm-4 g-3">
+  <div class="col-xxl-3 col-xl-4 col-lg-5 d-lg-block d-none">
+    <div class="left-sidebar-box">
+      <div class="left-search-box">
+        <div class="search-box">
+          <input
+            type="search"
+            class="form-control"
+            id="exampleFormControlInput4"
+            placeholder="جستجو ..."
+          />
+        </div>
+      </div>
+      <div
+        class="accordion left-accordion-box"
+        id="accordionPanelsStayOpenExample"
+      >
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="panelsStayOpen-headingOne">
+            <button
+              class="accordion-button"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#panelsStayOpen-collapseOne"
+            >
+              پست های اخیر
+            </button>
+          </h2>
+          <div
+            id="panelsStayOpen-collapseOne"
+            class="accordion-collapse collapse show"
+          >
+            <div class="accordion-body pt-0">
+              <div class="recent-post-box">
+                  {% include 'blog/includes/recent_blog.html' %}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="panelsStayOpen-headingTwo">
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#panelsStayOpen-collapseTwo"
+            >
+              دسته بندی
+            </button>
+          </h2>
+          <div
+            id="panelsStayOpen-collapseTwo"
+            class="accordion-collapse collapse collapse show"
+          >
+            <div class="accordion-body p-0">
+              <div class="category-list-box">
+                <ul>
+                    {% include 'blog/includes/blog_category.html' %}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="panelsStayOpen-headingThree">
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#panelsStayOpen-collapseThree"
+            >
+              برچسب محصولات
+            </button>
+          </h2>
+          <div
+            id="panelsStayOpen-collapseThree"
+            class="accordion-collapse collapse collapse show"
+          >
+            <div class="accordion-body pt-0">
+              <div class="product-tags-box">
+                <ul>
+                    {% include 'blog/includes/blog_tage.html' %}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="panelsStayOpen-headingFour">
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#panelsStayOpen-collapseFour"
+            >
+              محصولات پرطرفدار
+            </button>
+          </h2>
+          <div
+            id="panelsStayOpen-collapseFour"
+            class="accordion-collapse collapse collapse show"
+          >
+            <div class="accordion-body">
+              <ul class="product-list product-list-2 border-0 p-0">
+                    {% include 'blog/includes/most_selling_product.html' %}
+{#                    <li class="mb-0">#}
+{#                      <div class="offer-product">#}
+{#                        <a href="shop-left-sidebar.html" class="offer-image">#}
+{#                          <img#}
+{#                            src="{% static 'images/vegetable/product/26.png' %}"#}
+{#                            class="blur-up lazyload"#}
+{#                            alt=""#}
+{#                          />#}
+{#                        </a>#}
+{##}
+{#                        <div class="offer-detail">#}
+{#                          <div>#}
+{#                            <a href="shop-left-sidebar.html">#}
+{#                              <h6 class="name">#}
+{#                                سیب قرمز اورگانیک و بهینه شده#}
+{#                              </h6>#}
+{#                            </a>#}
+{#                            <span>1 کیلوگرم</span>#}
+{#                            <h6 class="price theme-color">80.000 تومان</h6>#}
+{#                          </div>#}
+{#                        </div>#}
+{#                      </div>#}
+{#                    </li>#}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xxl-9 col-xl-8 col-lg-7 ratio_50">
+    <div class="blog-detail-image rounded-3 mb-4">
+      {% if post.banner_image %}
+        <img src="{{ post.banner_image.url }}"
+             class="bg-img blur-up lazyload"
+             alt="{{ post.title }}">
+      {% else %}
+        <img src="{% static 'images/inner-page/blog/default.jpg' %}"
+             class="bg-img blur-up lazyload"
+             alt="{{ post.title }}">
+      {% endif %}
+      <div class="blog-image-contain">
+        <ul class="contain-list">
+          {% for tag in post.tags.all %}
+            <li>{{ tag.name }}</li>
+          {% endfor %}
+        </ul>
+        <h2>{{ post.title }}</h2>
+        <ul class="contain-comment-list">
+          <li>
+            <div class="user-list">
+              <i data-feather="user"></i>
+              <span>{{ post.author.get_full_name }}</span>
+            </div>
+          </li>
+          <li>
+            <div class="user-list">
+              <i data-feather="calendar"></i>
+              <span>{{ post.published_at|date:"j F Y" }}</span>
+            </div>
+          </li>
+          <li>
+            <div class="user-list">
+              <i data-feather="message-square"></i>
+              <span>{{ post.blog_comments.count }}</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="blog-detail-contain">
+      {{ post.full_content|linebreaks }}
+      {% if post.quote_text %}
+        <div class="blog-details-quote">
+          <h3>{{ post.quote_text }}</h3>
+          <h5>- {{ post.quote_author }}</h5>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="comment-box overflow-hidden">
+      <div class="leave-title">
+        <h3>دیدگاه‌ها ({{ comments.count }})</h3>
+      </div>
+      <div class="user-comment-box">
+        <ul>
+          {% for comment in comments %}
+            {% include 'blog/includes/blog_comment.html' with comment=comment %}
+            {# include replies: #}
+            {% for reply in comment.approved_replies %}
+              <li class="li-padding">
+                {% include 'blog/includes/blog_comment.html' with comment=reply %}
+              </li>
+            {% endfor %}
+          {% empty %}
+            <li>هنوز دیدگاهی ثبت نشده است.</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+        {% if user.is_authenticated %}
+          <div class="leave-box">
+            <div class="leave-title mt-0">
+              <h3>ارسال دیدگاه</h3>
+            </div>
+
+            <div class="leave-comment">
+              <div class="comment-notes">
+                <p class="text-content mb-4">آدرس ایمیل شما منتشر نخواهد شد!</p>
+              </div>
+
+              <form method="post" action="{% url 'comment:add_to_blog' post.pk %}">
+                {% csrf_token %}
+                {{ comment_form.non_field_errors }}
+
+                <div class="row g-3">
+                  <div class="col-xxl-12 col-lg-12 col-sm-6">
+                    <div class="blog-input">
+                      {{ comment_form.content.errors }}
+                      {{ comment_form.content }}
+                    </div>
+                  </div>
+
+                  <div class="col-xxl-4 col-lg-12 col-sm-6">
+                    <div class="blog-input">
+                      {{ comment_form.rating.errors }}
+                      {{ comment_form.rating }}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-check d-flex mt-4 p-0">
+                  <input class="checkbox_animated"
+                         type="checkbox"
+                         name="save_info"
+                         id="flexCheckDefault">
+                  <label class="form-check-label text-content" for="flexCheckDefault">
+                    <span class="color color-1">
+                      نام و ایمیل من را برای دفعات بعدی ذخیره کن!
+                    </span>
+                  </label>
+                </div>
+
+                <button type="submit"
+                        class="btn btn-animation ms-xxl-auto mt-xxl-0 mt-3 btn-md fw-bold">
+                  ارسال دیدگاه
+                </button>
+              </form>
+            </div>
+          </div>
+        {% else %}
+          <div class="leave-box">
+            <p>
+              برای ارسال دیدگاه لطفاً
+              <a href="{% url 'login' %}?next={{ request.path }}">وارد شوید</a>
+              یا
+              <a href="{% url 'signup' %}">ثبت‌نام کنید</a>.
+            </p>
+          </div>
+        {% endif %}
+  </div>
+</div>
+</div>
+</section>
+<!-- Blog Details Section End -->
+{% endblock %}
