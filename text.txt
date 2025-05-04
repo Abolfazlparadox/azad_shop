@@ -34,3 +34,4 @@ python manage.py runserver_plus --nopin
 python manage.py check
 pip install django-autoslug
 abolfazl
+nima.alzd
