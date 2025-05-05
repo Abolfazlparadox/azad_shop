@@ -1,11 +1,25 @@
 {% load static %}
+{% load thumbnail %}
 <!-- Page Sidebar Start-->
 <div class="sidebar-wrapper">
     <div id="sidebarEffect"></div>
     <div>
         <div class="logo-wrapper logo-wrapper-center">
             <a href="{% url 'home' %}" data-bs-original-title="" title="">
-                <img class="img-fluid for-white" src="{{ site_settings.site_logo.url }}" alt="logo">
+                {% if site_settings.site_logo %}
+                    {% thumbnail site_settings.site_logo "840x150" crop="center" as thumb %}
+                        <img src="{{ thumb.url }}"
+                             width="{{ thumb.width }}"
+                             height="{{ thumb.height }}"
+                             class="img-fluid for-white"
+                             alt="{{ site_settings.site_name }}">
+                  {% endthumbnail %}
+                {% else %}
+                  <img src="{% static 'images/logo/1.png' %}"
+                       width="840" height="150"
+                       class="img-fluid for-white"
+                       alt="{{ site_settings.site_name }}">
+                {% endif %}
             </a>
             <div class="back-btn">
                 <i class="fa fa-angle-left"></i>

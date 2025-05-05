@@ -17,7 +17,7 @@
       <sourceFolder url="file://$MODULE_DIR$/static" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/.env" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.13 virtualenv at F:\azad_shop\.env" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.13 (azad_shop)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="TemplatesService">
@@ -25,6 +25,9 @@
     <option name="TEMPLATE_FOLDERS">
       <list>
         <option value="$MODULE_DIR$/templates" />
+        <option value="$MODULE_DIR$/blog/templates" />
+        <option value="$MODULE_DIR$/home/templates" />
+        <option value="$MODULE_DIR$/account/templates" />
       </list>
     </option>
   </component>

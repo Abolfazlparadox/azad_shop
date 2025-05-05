@@ -202,8 +202,21 @@
 
     <!-- Page Body Start-->
     <div class="page-body-wrapper">
-        {% include 'unit_admin/sidebar.html' %}
-        {% block body %}{% endblock %}
+        {% include 'unit_admin/sidebar.html' %}\
+        <div class="page-body">
+            {% block body %}{% endblock %}
+            <div class="container-fluid">
+                <!-- footer start-->
+                <footer class="footer">
+                    <div class="row">
+                        <div class="col-md-12 footer-copyright text-center">
+                            <p class="mb-0">{{ site_settings.site_name }}</p>
+                        </div>
+                    </div>
+                </footer>
+                <!-- footer end-->
+            </div>
+        </div>
     </div>
     <!-- Page Body End -->
 

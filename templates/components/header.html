@@ -200,7 +200,10 @@
                                         </div>
                                         <div class="delivery-detail">
                                             <h6>سلام,</h6>
-                                            {% if request.user.is_authenticated %}
+                                            {% if request.user.is_superuser or request.user.role == 'ADMN' %}
+                                                <h5>حساب کاربری: {{ request.user.get_full_name|default:request.user.username }}</h5>
+                                                <h5>ادمین</h5>
+                                            {% elif request.user.is_authenticated %}
                                                 <h5>حساب کاربری: {{ request.user.get_full_name|default:request.user.username }}</h5>
                                                <h5>{{ request.user.active_role_display }}</h5>
                                             {% else %}

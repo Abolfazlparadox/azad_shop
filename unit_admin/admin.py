@@ -1,4 +1,5 @@
 # unit_admin/admin.py
+
 from django.core.paginator import Paginator
 from django.template.response import TemplateResponse
 from django.urls import path
@@ -6,7 +7,7 @@ from django.utils.html import format_html
 from django.shortcuts import render, redirect
 from product.models import Product
 from account.models import User
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.contrib.admin.forms import AdminAuthenticationForm
@@ -93,11 +94,15 @@ class UnitAdminSite(admin.AdminSite):
         if request.method == 'POST':
             form = CustomUserCreationForm(
                 request.POST,
+                request.FILES,  # برای آپلود تصاویر
                 university=university
             )
             if form.is_valid():
-                form.save()
+                user = form.save()
+                messages.success(request, f"کاربر {user.username} با موفقیت ایجاد شد")
                 return redirect('unit_admin:user_list')
+            else:
+                messages.error(request, "لطفا خطاهای فرم را برطرف کنید")
         else:
             form = CustomUserCreationForm(university=university)
 

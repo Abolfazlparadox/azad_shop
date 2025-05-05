@@ -3,11 +3,21 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from account.models import User, Membership
 
+
 class CustomUserCreationForm(UserCreationForm):
+    ROLE_CHOICES = [
+        ('CUSTOMER', 'مشتری'),
+        ('ADMIN', 'ادمین'),
+        ('STUDENT', 'دانشجو'),
+        ('PROFESSOR', 'استاد'),
+        ('EMPLOYEE', 'کارمند'),
+        ('OFFI', 'دبیر رفاهی واحد'),
+    ]
+
     role = forms.ChoiceField(
-        choices=Membership.Role.choices,
+        choices=ROLE_CHOICES,
         label="نقش کاربر",
-        initial=Membership.Role.CUSTOMER
+        initial='CUSTOMER'
     )
 
     class Meta:
@@ -15,16 +25,16 @@ class CustomUserCreationForm(UserCreationForm):
         fields = (
             'username', 'email', 'first_name', 'last_name',
             'mobile', 'national_code', 'province', 'city',
-            'address', 'postal_code', 'password1', 'password2'
+            'address', 'postal_code', 'avatar', 'password1', 'password2'
         )
-        labels = {
-            'mobile': 'شماره موبایل (09xxxxxxxxx)',
-            'national_code': 'کد ملی (۱۰ رقمی)',
-        }
 
     def __init__(self, *args, **kwargs):
         self.university = kwargs.pop('university', None)
         super().__init__(*args, **kwargs)
+
+        # تنظیم placeholderها
+        self.fields['mobile'].widget.attrs['placeholder'] = '09123456789'
+        self.fields['national_code'].widget.attrs['placeholder'] = '1234567890'
 
     def save(self, commit=True):
         user = super().save(commit=False)
