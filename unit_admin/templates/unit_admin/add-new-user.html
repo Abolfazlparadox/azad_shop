@@ -19,96 +19,158 @@
                                     </button>
                                 </div>
 
-                                <!-- تب‌ها -->
-                                <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
-                                    <li class="nav-item" role="presentation">
-                                        <button class="nav-link active" id="pills-home-tab"
-                                            data-bs-toggle="pill" data-bs-target="#pills-home"
-                                            type="button">اطلاعات اصلی</button>
-                                    </li>
-                                    <li class="nav-item" role="presentation">
-                                        <button class="nav-link" id="pills-profile-tab"
-                                            data-bs-toggle="pill" data-bs-target="#pills-profile"
-                                            type="button">دسترسی‌ها</button>
-                                    </li>
-                                </ul>
+                                    <!-- تب‌ها -->
+                                    <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link active" id="pills-login-tab"
+                                                data-bs-toggle="pill" data-bs-target="#pills-login"
+                                                type="button">نام کاربری و رمز عبور</button>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link" id="pills-personal-tab"
+                                                data-bs-toggle="pill" data-bs-target="#pills-personal"
+                                                type="button">اطلاعات شخصی</button>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link" id="pills-address-tab"
+                                                data-bs-toggle="pill" data-bs-target="#pills-address"
+                                                type="button">آدرس</button>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link" id="pills-permissions-tab"
+                                                data-bs-toggle="pill" data-bs-target="#pills-permissions"
+                                                type="button">دسترسی‌ها</button>
+                                        </li>
+                                    </ul>
 
                                 <div class="tab-content" id="pills-tabContent">
-                                    <!-- تب اطلاعات اصلی -->
-                                    <div class="tab-pane fade show active" id="pills-home" role="tabpanel">
-                                        <div class="card-header-1">
-                                            <h5>مشخصات کاربری</h5>
-                                        </div>
-
+                                    <!-- Login Information Tab -->
+                                    <div class="tab-pane fade show active" id="pills-login" role="tabpanel">
                                         <div class="row">
-                                            {% for field in form %}
-                                                {% if field.name not in 'role,password1,password2' %}
-                                                <div class="mb-4 row align-items-center">
-                                                    <label class="form-label-title col-lg-2 col-md-3 mb-0">
-                                                        {{ field.label }}
-                                                        {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
-                                                    </label>
-                                                    <div class="col-md-9 col-lg-10">
-                                                        {{ field }}
-                                                        {% if field.help_text %}
-                                                        <small class="form-text text-muted">{{ field.help_text }}</small>
-                                                        {% endif %}
-                                                        {% if field.errors %}
-                                                        <div class="text-danger small mt-1">
-                                                            {{ field.errors|first }}
-                                                        </div>
-                                                        {% endif %}
-                                                    </div>
+                                            <div class="mb-4 row align-items-center">
+                                                <div class="col-md-9 col-lg-10">
+                                                    <label class="col-lg-2 col-md-3 col-form-label form-label-title">نام کاربری</label>
+                                                    {{ form.username }}
+                                                    <small class="form-text text-muted">الزامی. 150 حرف یا کمتر. فقط حروف، اعداد و @/./+/-/_</small>
                                                 </div>
-                                                {% endif %}
-                                            {% endfor %}
+                                            </div>
+                                            <div class="mb-4 row align-items-center">
+                                                <div class="col-md-9 col-lg-10">
+                                                    <label class="col-lg-2 col-md-3 col-form-label form-label-title">رمز عبور</label>
+                                                    {{ form.password1 }}
+                                                </div>
+                                            </div>
+                                            <div class="mb-4 row align-items-center">
+                                                <div class="col-md-9 col-lg-10">
+                                                    <label class="col-lg-2 col-md-3 col-form-label form-label-title">تکرار رمز عبور</label>
+                                                    {{ form.password2 }}
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <!-- تب دسترسی‌ها -->
-                                    <div class="tab-pane fade" id="pills-profile" role="tabpanel">
-                                        <div class="card-header-1">
-                                            <h5>تعیین سطح دسترسی</h5>
-                                        </div>
-
-                                        <div class="mb-4 row align-items-center">
-                                            <label class="col-md-2 mb-0">نقش کاربر</label>
-                                            <div class="col-md-9">
-                                                {{ form.role }}
-                                                {% if form.role.errors %}
-                                                <div class="text-danger small mt-1">
-                                                    {{ form.role.errors|first }}
+                                    <!-- Personal Information Tab -->
+                                    <div class="tab-pane fade" id="pills-personal" role="tabpanel">
+                                        <div class="row">
+                                            <div class="mb-4 row align-items-center">
+                                                <div class="col-md-9 col-lg-10">
+                                                    <label class="col-lg-2 col-md-3 col-form-label form-label-title">نام</label>
+                                                    {{ form.first_name }}
                                                 </div>
-                                                {% endif %}
+                                            </div>
+                                            <div class="mb-4 row align-items-center">
+                                                <div class="col-md-9 col-lg-10">
+                                                    <label class="col-lg-2 col-md-3 col-form-label form-label-title">نام خانوادگی</label>
+                                                    {{ form.last_name }}
+                                                </div>
+                                            </div>
+                                            <div class="mb-4 row align-items-center">
+                                                <div class="col-md-9 col-lg-10">
+                                                    <label class="col-lg-2 col-md-3 col-form-label form-label-title">شماره موبایل</label>
+                                                    {{ form.mobile }}
+                                                </div>
+                                            </div>
+                                            <div class="mb-4 row align-items-center">
+                                                <div class="col-md-9 col-lg-10">
+                                                    <label class="col-lg-2 col-md-3 col-form-label form-label-title">کد ملی</label>
+                                                    {{ form.national_code }}
+                                                </div>
+                                            </div>
+                                            <div class="mb-4 row align-items-center">
+                                                <div class="col-md-9 col-lg-10">
+                                                    <label class="col-lg-2 col-md-3 col-form-label form-label-title">تاریخ تولد</label>
+                                                    <input type="date" name="birthday" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="mb-4 row align-items-center">
+                                                <div class="col-md-9 col-lg-10">
+                                                    <label class="col-lg-2 col-md-3 col-form-label form-label-title">تصویر پروفایل</label>
+                                                    {{ form.avatar }}
+                                                </div>
                                             </div>
                                         </div>
+                                    </div>
 
-                                        <!-- رمز عبور -->
-                                        <div class="card-header-1">
-                                            <h5>تنظیمات رمز عبور</h5>
-                                        </div>
-
-                                        <div class="mb-4 row align-items-center">
-                                            <label class="col-md-2 mb-0">رمز عبور</label>
-                                            <div class="col-md-9">
-                                                {{ form.password1 }}
-                                                {% if form.password1.errors %}
-                                                <div class="text-danger small mt-1">
-                                                    {{ form.password1.errors|first }}
+                                    <!-- Address Tab -->
+                                    <div class="tab-pane fade" id="pills-address" role="tabpanel">
+                                        <div class="row">
+                                            <div class="mb-4 row align-items-center">
+                                                <div class="col-md-9 col-lg-10">
+                                                    <label class="col-lg-2 col-md-3 col-form-label form-label-title">استان</label>
+                                                    {{ form.province }}
                                                 </div>
-                                                {% endif %}
+                                            </div>
+                                            <div class="mb-4 row align-items-center">
+                                                <div class="col-md-9 col-lg-10">
+                                                    <label class="col-lg-2 col-md-3 col-form-label form-label-title">شهر</label>
+                                                    {{ form.city }}
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="col-md-9 col-lg-10">
+                                                    <label class="col-lg-2 col-md-3 col-form-label form-label-title">آدرس دقیق</label>
+                                                    {{ form.address }}
+                                                </div>
+                                            </div>
+                                            <div class="mb-4 row align-items-center">
+                                                <div class="col-md-9 col-lg-10">
+                                                    <label class="col-lg-2 col-md-3 col-form-label form-label-title">کد پستی</label>
+                                                    {{ form.postal_code }}
+                                                </div>
                                             </div>
                                         </div>
+                                    </div>
 
-                                        <div class="mb-4 row align-items-center">
-                                            <label class="col-md-2 mb-0">تکرار رمز عبور</label>
-                                            <div class="col-md-9">
-                                                {{ form.password2 }}
-                                                {% if form.password2.errors %}
-                                                <div class="text-danger small mt-1">
-                                                    {{ form.password2.errors|first }}
+                                    <!-- Permissions Tab -->
+                                    <div class="tab-pane fade" id="pills-permissions" role="tabpanel">
+                                        <div class="row">
+                                            <div class="mb-4 row align-items-center">
+                                                <div class="form-check form-switch mb-3">
+                                                    {{ form.is_verified }}
+                                                    <label class="form-check-label">تایید شده توسط مدیریت</label>
                                                 </div>
-                                                {% endif %}
+                                                <div class="form-check form-switch mb-3">
+                                                    {{ form.is_staff }}
+                                                    <label class="form-check-label">دسترسی کارکنان</label>
+                                                </div>
+                                                <div class="form-check form-switch mb-3">
+                                                    {{ form.is_active }}
+                                                    <label class="form-check-label">کاربر فعال</label>
+                                                </div>
+                                            </div>
+                                            <div class="mb-4 row align-items-center">
+                                                <div class="form-check form-switch mb-3">
+                                                    {{ form.marketing_consent }}
+                                                    <label class="form-check-label">مجوز بازاریابی</label>
+                                                </div>
+                                                <div class="form-check form-switch mb-3">
+                                                    {{ form.terms_accepted }}
+                                                    <label class="form-check-label">پذیرش شرایط</label>
+                                                </div>
+                                                <div class="form-check form-switch mb-3">
+                                                    {{ form.email_verified }}
+                                                    <label class="form-check-label">تایید ایمیل</label>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

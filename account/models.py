@@ -48,15 +48,6 @@ class User(AbstractUser):
     # Authentication Fields
     username = models.CharField(_('نام کاربری'),max_length=150,unique=True,help_text=_('الزامی. 150 حرف یا کمتر. فقط حروف، اعداد و @/./+/-/_'),validators=[AbstractUser.username_validator],error_messages={'unique': _("این نام کاربری قبلا ثبت شده است."),})
     email = models.EmailField(_('آدرس ایمیل'),unique=True,error_messages={'unique': _("این ایمیل قبلا ثبت شده است.")})
-    # Security Fields
-    last_login_ip = models.GenericIPAddressField(_('آخرین آی پی ورود'), null=True, blank=True)
-    failed_login_attempts = models.PositiveIntegerField(default=0)
-    locked_until = models.DateTimeField(null=True, blank=True)
-    otp_secret = models.CharField(_('کلید OTP'), max_length=32, blank=True)
-
-    is_verified = models.BooleanField(_('تایید شده'),default=False,help_text=_('آیا حساب کاربری توسط مدیریت تایید شده است؟'))
-    is_staff = models.BooleanField(_('وضعیت کارکنان'),default=False,help_text=_('مشخص می کند که آیا کاربر می تواند به این سایت مدیریت وارد شود یا خیر.'),)
-    is_active = models.BooleanField(_('فعال'),default=True,help_text=_('مشخص می کند که آیا این کاربر باید به عنوان فعال در نظر گرفته شود.'),)
     # Personal Information
     first_name = models.CharField(_('نام'), max_length=150, blank=True)
     last_name = models.CharField(_('نام خانوادگی'), max_length=150, blank=True)
@@ -71,8 +62,14 @@ class User(AbstractUser):
     postal_code = models.CharField(_('کد پستی'), max_length=10, blank=True)
     # Add foreign key to University
     universities = models.ManyToManyField(University,through='Membership',related_name='users',verbose_name=_('دانشگاه‌ها'),blank=True)
-    is_deleted = models.BooleanField(_('حذف شده'), default=False)
-    deleted_at = models.DateTimeField(_('تاریخ حذف'), null=True, blank=True)
+    # Security Fields
+    last_login_ip = models.GenericIPAddressField(_('آخرین آی پی ورود'), null=True, blank=True)
+    failed_login_attempts = models.PositiveIntegerField(default=0)
+    locked_until = models.DateTimeField(null=True, blank=True)
+    otp_secret = models.CharField(_('کلید OTP'), max_length=32, blank=True)
+    is_verified = models.BooleanField(_('تایید شده'),default=False,help_text=_('آیا حساب کاربری توسط مدیریت تایید شده است؟'))
+    is_staff = models.BooleanField(_('وضعیت کارکنان'),default=False,help_text=_('مشخص می کند که آیا کاربر می تواند به این سایت مدیریت وارد شود یا خیر.'),)
+    is_active = models.BooleanField(_('فعال'),default=True,help_text=_('مشخص می کند که آیا این کاربر باید به عنوان فعال در نظر گرفته شود.'),)
     # Consent Fields
     terms_accepted = models.BooleanField(_('پذیرش شرایط'), default=False)
     terms_accepted_at = models.DateTimeField(_('تاریخ پذیرش شرایط'), null=True, blank=True)
@@ -89,7 +86,8 @@ class User(AbstractUser):
     )
     email_verification_code = models.CharField(max_length=6, null=True, blank=True)
     email_verification_code_created = models.DateTimeField(null=True, blank=True)
-
+    is_deleted = models.BooleanField(_('حذف شده'), default=False)
+    deleted_at = models.DateTimeField(_('تاریخ حذف'), null=True, blank=True)
     def generate_email_verification_code(self):
         """Generate 6-digit numeric code"""
         code = str(random.randint(100000, 999999))  # 6-digit number

@@ -35,10 +35,8 @@ class UnitAdminSite(admin.AdminSite):
     site_title = "مدیریت دانشگاهی"
     index_title = "داشبورد"
     index_template = "unit_admin/index.html"
-    # استفاده از تمپلیت لاگین سفارشی
     login_template = "account/login.html"
     logout_template = "account/logout.html"
-    # استفاده از فرم احراز هویت سفارشی
     login_form = CustomAdminAuthForm
 
     def has_permission(self, request):
@@ -90,13 +88,8 @@ class UnitAdminSite(admin.AdminSite):
         })
 
     def add_user_view(self, request):
-        university = request.user.memberships.first().university
         if request.method == 'POST':
-            form = CustomUserCreationForm(
-                request.POST,
-                request.FILES,  # برای آپلود تصاویر
-                university=university
-            )
+            form = CustomUserCreationForm(request.POST, request.FILES)
             if form.is_valid():
                 user = form.save()
                 messages.success(request, f"کاربر {user.username} با موفقیت ایجاد شد")
@@ -104,13 +97,12 @@ class UnitAdminSite(admin.AdminSite):
             else:
                 messages.error(request, "لطفا خطاهای فرم را برطرف کنید")
         else:
-            form = CustomUserCreationForm(university=university)
+            form = CustomUserCreationForm()
 
         return render(request, 'unit_admin/add-new-user.html', {
             'form': form,
             **self.each_context(request),
         })
-
 # ایجاد نمونه از کلاس
 unit_admin = UnitAdminSite(name='unit_admin')
 
