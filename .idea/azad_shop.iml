@@ -28,6 +28,7 @@
         <option value="$MODULE_DIR$/blog/templates" />
         <option value="$MODULE_DIR$/home/templates" />
         <option value="$MODULE_DIR$/account/templates" />
+        <option value="$MODULE_DIR$/unit_admin/templates" />
       </list>
     </option>
   </component>

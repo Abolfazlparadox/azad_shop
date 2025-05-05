@@ -4,12 +4,12 @@ from django.core.paginator import Paginator
 from django.template.response import TemplateResponse
 from django.urls import path
 from django.utils.html import format_html
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from product.models import Product
-from account.models import User
+from account.models import User, Membership
 from django.contrib import admin, messages
 from django.urls import reverse
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.contrib.admin.forms import AdminAuthenticationForm
 from django.core.exceptions import ValidationError
 
@@ -64,11 +64,59 @@ class UnitAdminSite(admin.AdminSite):
         custom_urls = [
             path('users/', self.admin_view(self.user_list_view), name='user_list'),
             path('users/add/', self.admin_view(self.add_user_view), name='add_user'),
+            path('roles/', self.admin_view(self.role_list_view), name='role_list'),
             # path('users/<int:pk>/', self.admin_view(self.user_detail_view), name='user_detail'),
             # path('users/<int:pk>/edit/', self.admin_view(self.edit_user_view), name='edit_user'),
             # path('users/<int:pk>/delete/', self.admin_view(self.delete_user_view), name='delete_user'),
         ]
         return custom_urls + urls
+
+    def role_list_view(self, request):
+        # Get the current unit officer's university
+        university = request.user.memberships.get(role='OFFI').university
+
+        # Get confirmed memberships for the university
+        memberships = Membership.objects.filter(
+            university=university,
+            is_confirmed=True
+        ).select_related('user').order_by('-confirmed_at')
+
+        # Pagination
+        paginator = Paginator(memberships, 10)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+
+        return TemplateResponse(request, 'unit_admin/all-roll.html', {
+            **self.each_context(request),
+            'memberships': page_obj,
+            'page_obj': page_obj,
+            'is_paginated': page_obj.has_other_pages(),
+        })
+
+    def delete_role(self, request):
+        if request.method == 'POST':
+            role_id = request.POST.get('role_id')
+            membership = get_object_or_404(
+                Membership,
+                id=role_id,
+                university=request.user.memberships.get(role='OFFI').university
+            )
+            membership.delete()
+
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'status': 'success'})
+            return redirect('unit_admin:role_list')
+        return redirect('unit_admin:role_list')
+
+    def delete_user(request):
+        if request.method == 'POST':
+            user_id = request.POST.get('user_id')
+            user = get_object_or_404(User, id=user_id)
+            user.delete()
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'status': 'success'})
+            return redirect('user_list')
+        return redirect('user_list')
 
     def user_list_view(self, request):
         # فیلتر کاربران بر اساس دانشگاه

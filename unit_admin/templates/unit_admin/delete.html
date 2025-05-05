@@ -1,51 +1,64 @@
 {% load static %}
-<!-- Delete Modal Box Start -->
-<div class="modal fade theme-modal remove-coupon" id="exampleModalToggle" aria-hidden="true" tabindex="-1">
+<!-- Delete Confirmation Modal -->
+<div class="modal fade theme-modal" id="deleteConfirmationModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header d-block text-center">
-                <h5 class="modal-title w-100" id="exampleModalLabel22">آیا اطمینان دارید ؟</h5>
+                <h5 class="modal-title w-100">آیا اطمینان دارید ؟</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div class="modal-body">
                 <div class="remove-box">
-                    <p>لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است.</p>
+                    <p>کاربر <span id="userName"></span> به صورت دائمی حذف خواهد شد!</p>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-animation btn-md fw-bold" data-bs-dismiss="modal">خیر</button>
-                <button type="button" class="btn btn-animation btn-md fw-bold" data-bs-target="#exampleModalToggle2"
-                    data-bs-toggle="modal" data-bs-dismiss="modal">بله</button>
+                <form method="POST" id="deleteForm" class="d-inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="user_id" id="userId">
+                    <button type="submit" class="btn btn-animation btn-md fw-bold text-danger">بله، حذف شود</button>
+                </form>
             </div>
         </div>
     </div>
 </div>
-<div class="modal fade theme-modal remove-coupon" id="exampleModalToggle2" aria-hidden="true" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title text-center" id="exampleModalLabel12"></h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="remove-box text-center">
-                    <div class="wrapper">
-                        <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
-                            <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none" />
-                            <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
-                        </svg>
-                    </div>
-                    <h4 class="text-content">با موفقیت حذف شد !</h4>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-dismiss="modal">بستن</button>
-            </div>
-        </div>
-    </div>
+
+<!-- Delete Success Modal -->
+<div class="modal fade theme-modal" id="deleteSuccessModal" tabindex="-1">
+    <!-- Keep your existing success modal structure -->
 </div>
-<!-- Delete Modal Box End -->
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const deleteModal = document.getElementById('deleteConfirmationModal');
+    const successModal = new bootstrap.Modal(document.getElementById('deleteSuccessModal'));
+
+    deleteModal.addEventListener('show.bs.modal', function(event) {
+        const button = event.relatedTarget;
+        const userId = button.getAttribute('data-user-id');
+        const userName = button.getAttribute('data-user-name');
+
+        document.getElementById('userName').textContent = userName;
+        document.getElementById('userId').value = userId;
+    });
+
+    document.getElementById('deleteForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        fetch(this.action, {
+            method: 'POST',
+            body: new FormData(this),
+        }).then(response => {
+            if(response.ok) {
+                bootstrap.Modal.getInstance(deleteModal).hide();
+                successModal.show();
+                // Optional: Remove the user row from table
+                setTimeout(() => window.location.reload(), 2000);
+            }
+        });
+    });
+});
+</script>

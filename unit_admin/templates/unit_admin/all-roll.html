@@ -1,0 +1,178 @@
+{% extends 'unit_admin/base.html' %}
+{% load static i18n %}
+{% block title %}پنل مدیریت ادمین - لیست نقش ها {% endblock %}
+{% block body %}
+<!-- Container-fluid starts-->
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card card-table">
+                    <!-- Table Start -->
+                    <div class="card-body">
+                        <div class="title-header option-title">
+                            <h5>لیست نقش‌های تأیید شده</h5>
+                            <div class="d-inline-flex">
+                                <a href="#" class="align-items-center btn btn-theme d-flex">
+                                    <i data-feather="plus"></i>افزودن نقش جدید
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table role-table all-package theme-table">
+                                <thead>
+                                    <tr>
+                                        <th>ردیف</th>
+                                        <th>نام کاربر</th>
+                                        <th>نقش</th>
+                                        <th>تاریخ تأیید</th>
+                                        <th>وضعیت</th>
+                                        <th>عملیات</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for membership in memberships %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                {% if membership.user.avatar %}
+                                                <img src="{{ membership.user.avatar.url }}"
+                                                     class="rounded-circle me-2"
+                                                     width="40"
+                                                     height="40"
+                                                     alt="{{ membership.user.get_full_name }}">
+                                                {% endif %}
+                                                {{ membership.user.get_full_name }}
+                                            </div>
+                                        </td>
+                                        <td>{{ membership.get_role_display }}</td>
+                                        <td>{{ membership.confirmed_at|date:"Y/m/d H:i" }}</td>
+                                        <td>
+                                            <span class="badge bg-success">فعال</span>
+                                        </td>
+                                        <td>
+                                            <ul class="d-flex gap-2">
+                                                <li>
+                                                    <a href="#"
+                                                       class="btn btn-sm btn-icon btn-warning"
+                                                       title="ویرایش">
+                                                        <i class="ri-pencil-line"></i>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <button type="button"
+                                                            class="btn btn-sm btn-icon btn-danger"
+                                                            title="حذف"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#deleteModal"
+                                                            data-role-id="{{ membership.id }}"
+                                                            data-role-name="{{ membership.get_role_display }}">
+                                                        <i class="ri-delete-bin-line"></i>
+                                                    </button>
+                                                </li>
+                                            </ul>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="6" class="text-center">هیچ نقش فعالی یافت نشد</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        {% if is_paginated %}
+                        <nav class="mt-4">
+                            <ul class="pagination justify-content-center">
+                                {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">قبلی</a>
+                                </li>
+                                {% endif %}
+
+                                {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ num }}</span>
+                                </li>
+                                {% else %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                </li>
+                                {% endif %}
+                                {% endfor %}
+
+                                {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">بعدی</a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">حذف نقش</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>آیا از حذف نقش <span id="roleName"></span> اطمینان دارید؟</p>
+            </div>
+            <div class="modal-footer">
+                <form method="POST" id="deleteForm">
+                    {% csrf_token %}
+                    <input type="hidden" name="role_id" id="roleId">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">لغو</button>
+                    <button type="submit" class="btn btn-danger">حذف نقش</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const deleteModal = document.getElementById('deleteModal');
+
+    deleteModal.addEventListener('show.bs.modal', function(event) {
+        const button = event.relatedTarget;
+        const roleId = button.getAttribute('data-role-id');
+        const roleName = button.getAttribute('data-role-name');
+
+        document.getElementById('roleName').textContent = roleName;
+        document.getElementById('roleId').value = roleId;
+    });
+
+    document.getElementById('deleteForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+
+        fetch("", {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        }).then(response => {
+            if(response.ok) {
+                window.location.reload();
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
