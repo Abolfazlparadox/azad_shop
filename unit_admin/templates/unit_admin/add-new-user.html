@@ -19,29 +19,29 @@
                                     </button>
                                 </div>
 
-                                    <!-- تب‌ها -->
-                                    <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
-                                        <li class="nav-item" role="presentation">
-                                            <button class="nav-link active" id="pills-login-tab"
-                                                data-bs-toggle="pill" data-bs-target="#pills-login"
-                                                type="button">نام کاربری و رمز عبور</button>
-                                        </li>
-                                        <li class="nav-item" role="presentation">
-                                            <button class="nav-link" id="pills-personal-tab"
-                                                data-bs-toggle="pill" data-bs-target="#pills-personal"
-                                                type="button">اطلاعات شخصی</button>
-                                        </li>
-                                        <li class="nav-item" role="presentation">
-                                            <button class="nav-link" id="pills-address-tab"
-                                                data-bs-toggle="pill" data-bs-target="#pills-address"
-                                                type="button">آدرس</button>
-                                        </li>
-                                        <li class="nav-item" role="presentation">
-                                            <button class="nav-link" id="pills-permissions-tab"
-                                                data-bs-toggle="pill" data-bs-target="#pills-permissions"
-                                                type="button">دسترسی‌ها</button>
-                                        </li>
-                                    </ul>
+                                <!-- تب‌ها -->
+                                <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link active" id="pills-login-tab"
+                                            data-bs-toggle="pill" data-bs-target="#pills-login"
+                                            type="button">نام کاربری و رمز عبور</button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="pills-personal-tab"
+                                            data-bs-toggle="pill" data-bs-target="#pills-personal"
+                                            type="button">اطلاعات شخصی</button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="pills-address-tab"
+                                            data-bs-toggle="pill" data-bs-target="#pills-address"
+                                            type="button">آدرس</button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="pills-permissions-tab"
+                                            data-bs-toggle="pill" data-bs-target="#pills-permissions"
+                                            type="button">دسترسی‌ها</button>
+                                    </li>
+                                </ul>
 
                                 <div class="tab-content" id="pills-tabContent">
                                     <!-- Login Information Tab -->
@@ -51,6 +51,13 @@
                                                 <div class="col-md-9 col-lg-10">
                                                     <label class="col-lg-2 col-md-3 col-form-label form-label-title">نام کاربری</label>
                                                     {{ form.username }}
+                                                    {% if form.username.errors %}
+                                                    <div class="alert alert-danger mt-2">
+                                                        {% for error in form.username.errors %}
+                                                            {{ error|escape }}
+                                                        {% endfor %}
+                                                    </div>
+                                                    {% endif %}
                                                     <small class="form-text text-muted">الزامی. 150 حرف یا کمتر. فقط حروف، اعداد و @/./+/-/_</small>
                                                 </div>
                                             </div>
@@ -58,12 +65,26 @@
                                                 <div class="col-md-9 col-lg-10">
                                                     <label class="col-lg-2 col-md-3 col-form-label form-label-title">رمز عبور</label>
                                                     {{ form.password1 }}
+                                                    {% if form.password1.errors %}
+                                                    <div class="alert alert-danger mt-2">
+                                                        {% for error in form.password1.errors %}
+                                                            {{ error|escape }}
+                                                        {% endfor %}
+                                                    </div>
+                                                    {% endif %}
                                                 </div>
                                             </div>
                                             <div class="mb-4 row align-items-center">
                                                 <div class="col-md-9 col-lg-10">
                                                     <label class="col-lg-2 col-md-3 col-form-label form-label-title">تکرار رمز عبور</label>
                                                     {{ form.password2 }}
+                                                    {% if form.password2.errors %}
+                                                    <div class="alert alert-danger mt-2">
+                                                        {% for error in form.password2.errors %}
+                                                            {{ error|escape }}
+                                                        {% endfor %}
+                                                    </div>
+                                                    {% endif %}
                                                 </div>
                                             </div>
                                         </div>
@@ -76,36 +97,78 @@
                                                 <div class="col-md-9 col-lg-10">
                                                     <label class="col-lg-2 col-md-3 col-form-label form-label-title">نام</label>
                                                     {{ form.first_name }}
+                                                    {% if form.first_name.errors %}
+                                                    <div class="alert alert-danger mt-2">
+                                                        {% for error in form.first_name.errors %}
+                                                            {{ error|escape }}
+                                                        {% endfor %}
+                                                    </div>
+                                                    {% endif %}
                                                 </div>
                                             </div>
                                             <div class="mb-4 row align-items-center">
                                                 <div class="col-md-9 col-lg-10">
                                                     <label class="col-lg-2 col-md-3 col-form-label form-label-title">نام خانوادگی</label>
                                                     {{ form.last_name }}
+                                                    {% if form.last_name.errors %}
+                                                    <div class="alert alert-danger mt-2">
+                                                        {% for error in form.last_name.errors %}
+                                                            {{ error|escape }}
+                                                        {% endfor %}
+                                                    </div>
+                                                    {% endif %}
                                                 </div>
                                             </div>
                                             <div class="mb-4 row align-items-center">
                                                 <div class="col-md-9 col-lg-10">
                                                     <label class="col-lg-2 col-md-3 col-form-label form-label-title">شماره موبایل</label>
                                                     {{ form.mobile }}
+                                                    {% if form.mobile.errors %}
+                                                    <div class="alert alert-danger mt-2">
+                                                        {% for error in form.mobile.errors %}
+                                                            {{ error|escape }}
+                                                        {% endfor %}
+                                                    </div>
+                                                    {% endif %}
                                                 </div>
                                             </div>
                                             <div class="mb-4 row align-items-center">
                                                 <div class="col-md-9 col-lg-10">
                                                     <label class="col-lg-2 col-md-3 col-form-label form-label-title">کد ملی</label>
                                                     {{ form.national_code }}
+                                                    {% if form.national_code.errors %}
+                                                    <div class="alert alert-danger mt-2">
+                                                        {% for error in form.national_code.errors %}
+                                                            {{ error|escape }}
+                                                        {% endfor %}
+                                                    </div>
+                                                    {% endif %}
                                                 </div>
                                             </div>
                                             <div class="mb-4 row align-items-center">
                                                 <div class="col-md-9 col-lg-10">
                                                     <label class="col-lg-2 col-md-3 col-form-label form-label-title">تاریخ تولد</label>
-                                                    <input type="date" name="birthday" class="form-control">
+                                                    {{ form.birthday }}
+                                                    {% if form.birthday.errors %}
+                                                    <div class="alert alert-danger mt-2">
+                                                        {% for error in form.birthday.errors %}
+                                                            {{ error|escape }}
+                                                        {% endfor %}
+                                                    </div>
+                                                    {% endif %}
                                                 </div>
                                             </div>
                                             <div class="mb-4 row align-items-center">
                                                 <div class="col-md-9 col-lg-10">
                                                     <label class="col-lg-2 col-md-3 col-form-label form-label-title">تصویر پروفایل</label>
                                                     {{ form.avatar }}
+                                                    {% if form.avatar.errors %}
+                                                    <div class="alert alert-danger mt-2">
+                                                        {% for error in form.avatar.errors %}
+                                                            {{ error|escape }}
+                                                        {% endfor %}
+                                                    </div>
+                                                    {% endif %}
                                                 </div>
                                             </div>
                                         </div>
@@ -118,24 +181,52 @@
                                                 <div class="col-md-9 col-lg-10">
                                                     <label class="col-lg-2 col-md-3 col-form-label form-label-title">استان</label>
                                                     {{ form.province }}
+                                                    {% if form.province.errors %}
+                                                    <div class="alert alert-danger mt-2">
+                                                        {% for error in form.province.errors %}
+                                                            {{ error|escape }}
+                                                        {% endfor %}
+                                                    </div>
+                                                    {% endif %}
                                                 </div>
                                             </div>
                                             <div class="mb-4 row align-items-center">
                                                 <div class="col-md-9 col-lg-10">
                                                     <label class="col-lg-2 col-md-3 col-form-label form-label-title">شهر</label>
                                                     {{ form.city }}
+                                                    {% if form.city.errors %}
+                                                    <div class="alert alert-danger mt-2">
+                                                        {% for error in form.city.errors %}
+                                                            {{ error|escape }}
+                                                        {% endfor %}
+                                                    </div>
+                                                    {% endif %}
                                                 </div>
                                             </div>
                                             <div class="col-12">
                                                 <div class="col-md-9 col-lg-10">
                                                     <label class="col-lg-2 col-md-3 col-form-label form-label-title">آدرس دقیق</label>
                                                     {{ form.address }}
+                                                    {% if form.address.errors %}
+                                                    <div class="alert alert-danger mt-2">
+                                                        {% for error in form.address.errors %}
+                                                            {{ error|escape }}
+                                                        {% endfor %}
+                                                    </div>
+                                                    {% endif %}
                                                 </div>
                                             </div>
                                             <div class="mb-4 row align-items-center">
                                                 <div class="col-md-9 col-lg-10">
                                                     <label class="col-lg-2 col-md-3 col-form-label form-label-title">کد پستی</label>
                                                     {{ form.postal_code }}
+                                                    {% if form.postal_code.errors %}
+                                                    <div class="alert alert-danger mt-2">
+                                                        {% for error in form.postal_code.errors %}
+                                                            {{ error|escape }}
+                                                        {% endfor %}
+                                                    </div>
+                                                    {% endif %}
                                                 </div>
                                             </div>
                                         </div>
@@ -144,32 +235,74 @@
                                     <!-- Permissions Tab -->
                                     <div class="tab-pane fade" id="pills-permissions" role="tabpanel">
                                         <div class="row">
-                                            <div class="mb-4 row align-items-center">
+                                            <div class="col-md-6">
                                                 <div class="form-check form-switch mb-3">
                                                     {{ form.is_verified }}
                                                     <label class="form-check-label">تایید شده توسط مدیریت</label>
+                                                    {% if form.is_verified.errors %}
+                                                    <div class="alert alert-danger mt-2">
+                                                        {% for error in form.is_verified.errors %}
+                                                            {{ error|escape }}
+                                                        {% endfor %}
+                                                    </div>
+                                                    {% endif %}
                                                 </div>
                                                 <div class="form-check form-switch mb-3">
                                                     {{ form.is_staff }}
                                                     <label class="form-check-label">دسترسی کارکنان</label>
+                                                    {% if form.is_staff.errors %}
+                                                    <div class="alert alert-danger mt-2">
+                                                        {% for error in form.is_staff.errors %}
+                                                            {{ error|escape }}
+                                                        {% endfor %}
+                                                    </div>
+                                                    {% endif %}
                                                 </div>
                                                 <div class="form-check form-switch mb-3">
                                                     {{ form.is_active }}
                                                     <label class="form-check-label">کاربر فعال</label>
+                                                    {% if form.is_active.errors %}
+                                                    <div class="alert alert-danger mt-2">
+                                                        {% for error in form.is_active.errors %}
+                                                            {{ error|escape }}
+                                                        {% endfor %}
+                                                    </div>
+                                                    {% endif %}
                                                 </div>
                                             </div>
-                                            <div class="mb-4 row align-items-center">
+                                            <div class="col-md-6">
                                                 <div class="form-check form-switch mb-3">
                                                     {{ form.marketing_consent }}
                                                     <label class="form-check-label">مجوز بازاریابی</label>
+                                                    {% if form.marketing_consent.errors %}
+                                                    <div class="alert alert-danger mt-2">
+                                                        {% for error in form.marketing_consent.errors %}
+                                                            {{ error|escape }}
+                                                        {% endfor %}
+                                                    </div>
+                                                    {% endif %}
                                                 </div>
                                                 <div class="form-check form-switch mb-3">
                                                     {{ form.terms_accepted }}
                                                     <label class="form-check-label">پذیرش شرایط</label>
+                                                    {% if form.terms_accepted.errors %}
+                                                    <div class="alert alert-danger mt-2">
+                                                        {% for error in form.terms_accepted.errors %}
+                                                            {{ error|escape }}
+                                                        {% endfor %}
+                                                    </div>
+                                                    {% endif %}
                                                 </div>
                                                 <div class="form-check form-switch mb-3">
                                                     {{ form.email_verified }}
                                                     <label class="form-check-label">تایید ایمیل</label>
+                                                    {% if form.email_verified.errors %}
+                                                    <div class="alert alert-danger mt-2">
+                                                        {% for error in form.email_verified.errors %}
+                                                            {{ error|escape }}
+                                                        {% endfor %}
+                                                    </div>
+                                                    {% endif %}
                                                 </div>
                                             </div>
                                         </div>
@@ -184,5 +317,52 @@
     </div>
 </div>
 <!-- New User End -->
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Province-City AJAX Handling
+    const provinceSelect = document.getElementById('id_province');
+    const citySelect = document.getElementById('id_city');
+
+    if (provinceSelect && citySelect) {
+        provinceSelect.addEventListener('change', function() {
+            const provinceId = this.value;
+            if (provinceId) {
+                fetch(`/unit-admin/get-cities/?province_id=${provinceId}`)
+                    .then(response => response.text())
+                    .then(data => {
+                        citySelect.innerHTML = data;
+                    });
+            }
+        });
+    }
+
+    // CSRF Token Handling
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Set CSRF token for all AJAX requests
+    const csrftoken = getCookie('csrftoken');
+    const headers = new Headers({
+        'X-CSRFToken': csrftoken,
+        'Content-Type': 'application/x-www-form-urlencoded'
+    });
+
+    // Initialize feather icons
+    feather.replace();
+});
+</script>
 
 {% endblock %}

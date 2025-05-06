@@ -1,0 +1,105 @@
+{% extends 'unit_admin/base.html' %}
+{% load static %}
+{% block body %}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-8 m-auto">
+            <form method="POST">
+                {% csrf_token %}
+                <div class="card">
+                    <div class="card-body">
+                        <div class="title-header option-title">
+                            <h5>افزودن نقش جدید</h5>
+                            <button type="submit" class="align-items-center btn btn-theme d-flex">
+                                <i data-feather="save"></i>ذخیره نقش
+                            </button>
+                        </div>
+
+                        <!-- تب‌ها -->
+                        <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="pills-selection-tab"
+                                    data-bs-toggle="pill" data-bs-target="#pills-selection"
+                                    type="button">انتخاب کاربر و نقش</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="pills-confirm-tab"
+                                    data-bs-toggle="pill" data-bs-target="#pills-confirm"
+                                    type="button">تاییدیه</button>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content" id="pills-tabContent">
+                            <!-- Selection Tab -->
+                            <div class="tab-pane fade show active" id="pills-selection" role="tabpanel">
+                                <div class="row">
+                                    <div class="mb-4 row align-items-center">
+                                        <div class="col-md-9 col-lg-10">
+                                            <label class="form-label">کاربر</label>
+                                            {{ form.user }}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-4 row align-items-center">
+                                        <div class="col-md-9 col-lg-10">
+                                            <label class="form-label">نقش</label>
+                                            {{ form.role }}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-4 row align-items-center">
+                                        <div class="col-md-9 col-lg-10">
+                                            <label class="form-label">کد نقش (اختیاری)</label>
+                                            {{ form.code }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Confirmation Tab -->
+                            <div class="tab-pane fade" id="pills-confirm" role="tabpanel">
+                                <div class="row">
+                                    <div class="mb-4 row align-items-center">
+                                        <div class="col-md-9 col-lg-10">
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" 
+                                                       type="checkbox" 
+                                                       checked 
+                                                       disabled>
+                                                <label class="form-check-label">
+                                                    تایید خودکار توسط دبیر رفاهی
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-4 row align-items-center">
+                                        <div class="col-md-9 col-lg-10">
+                                            <label class="form-label">تاریخ درخواست</label>
+                                            <input type="text" 
+                                                   class="form-control" 
+                                                   value="{% now 'Y/m/d H:i' %}" 
+                                                   disabled>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-4 row align-items-center">
+                                        <div class="col-md-9 col-lg-10">
+                                            <label class="form-label">تاریخ تایید</label>
+                                            <input type="text" 
+                                                   class="form-control" 
+                                                   value="{% now 'Y/m/d H:i' %}" 
+                                                   disabled>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

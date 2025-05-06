@@ -45,7 +45,7 @@
                     <li class="back-btn"></li>
 
                     <li class="sidebar-list">
-                        <a class="sidebar-link sidebar-title link-nav" href="{% url 'unit_admin:index' %}">
+                        <a class="sidebar-link sidebar-title link-nav" href="{% url 'unit_admin:admin_index' %}">
                             <i class="ri-home-line"></i>
                             <span>پیشخوان</span>
                         </a>
@@ -145,7 +145,7 @@
                                 <a href="{% url 'unit_admin:role_list' %}">تمام نقش ها</a>
                             </li>
                             <li>
-                                <a href="create-role.html">افزودن نقش جدید</a>
+                                <a href="{% url 'unit_admin:add_role' %}">افزودن نقش جدید</a>
                             </li>
                         </ul>
                     </li>

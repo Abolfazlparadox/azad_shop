@@ -1,26 +1,11 @@
 # account/admin.py
 from time import timezone
-
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 from import_export.admin import ImportExportModelAdmin
 from .models import User, Membership, Address
-
-
-class UnitOfficerAdminSite(admin.AdminSite):
-    site_header = "پنل مدیریت دبیر رفاهی واحد"
-    site_title = "مدیریت محتوای دانشگاهی"
-    index_title = "داشبورد مدیریت"
-
-    def has_permission(self, request):
-        return request.user.memberships.filter(
-            role='OFFI',
-            is_confirmed=True
-        ).exists()
-
-unit_admin = UnitOfficerAdminSite(name='unit_admin')
 
 def _is_super_or_global_admin(user):
     return user.is_superuser or user.is_staff
@@ -145,18 +130,17 @@ class AddressAdmin(admin.ModelAdmin):  # تغییر از GuardedModelAdmin به 
                 qs = qs.filter(user__memberships__university=user_university)
         return qs.distinct()
 
-# ثبت مدل‌ها در پنل سفارشی
-@admin.register(Membership, site=unit_admin)
-class UnitMembershipAdmin(admin.ModelAdmin):
-    list_display = ('user', 'university', 'role', 'is_confirmed')
-
-    def get_queryset(self, request):
-        qs = super().get_queryset(request)
-        user_university = request.user.memberships.get(role='OFFI').university
-        return qs.filter(university=user_university)
-
-    def has_add_permission(self, request):
-        return False  # غیرفعال کردن ایجاد عضویت جدید در پنل واحد
-
-    def has_delete_permission(self, request, obj=None):
-        return False  #
+# @admin.register(Membership)
+# class UnitMembershipAdmin(admin.ModelAdmin):
+#     list_display = ('user', 'university', 'role', 'is_confirmed')
+#
+#     def get_queryset(self, request):
+#         qs = super().get_queryset(request)
+#         user_university = request.user.memberships.get(role='OFFI').university
+#         return qs.filter(university=user_university)
+#
+#     def has_add_permission(self, request):
+#         return False  # غیرفعال کردن ایجاد عضویت جدید در پنل واحد
+#
+#     def has_delete_permission(self, request, obj=None):
+#         return False  #

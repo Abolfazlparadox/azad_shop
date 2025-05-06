@@ -54,7 +54,7 @@
                         </button>
                         <a href="{% url 'home' %}" class="web-logo nav-logo">
                             {% if site_settings.site_logo %}
-                              {% thumbnail site_settings.site_logo "840x150" crop="center" as thumb %}
+                              {% thumbnail site_settings.site_logo "900x900"  as thumb %}
                                 <img src="{{ thumb.url }}"
                                      width="{{ thumb.width }}"
                                      height="{{ thumb.height }}"
@@ -220,7 +220,7 @@
                                             <a href="{% url 'admin:index' %}" target="_blank">پنل مدیریت</a>
                                           </li>
                                         {% elif request.user.memberships.first.role == 'OFFI' %}
-                                            <a href="{% url 'unit_admin:index' %}">پنل مدیریت واحد</a>
+                                            <a href="{% url 'unit_admin:admin_index' %}">پنل مدیریت واحد</a>
                                         {% endif %}
                                         {# Always show logout for authenticated users #}
                                         <li class="product-box-contain">

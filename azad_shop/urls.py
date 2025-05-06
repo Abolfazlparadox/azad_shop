@@ -17,10 +17,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path,include
 from django.conf.urls.static import static
-from unit_admin.admin import unit_admin
 from django.conf import settings
 urlpatterns = [
-    path('unit-admin/', unit_admin.urls,name='unit_admin'),
+    path(
+        'unit-admin/',
+        include(('unit_admin.urls', 'unit_admin'), namespace='unit_admin')
+    ),
+
     path('admin/', admin.site.urls),
     path('',include('home.urls')),
     path('blog/', include('blog.urls')),

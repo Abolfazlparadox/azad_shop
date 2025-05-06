@@ -22,7 +22,7 @@
                         <div class="table-responsive table-product">
                         <div id="table_id_wrapper" class="dataTables_wrapper no-footer">
                             <table class="table all-package theme-table" id="table_id">
-                                    <thead>
+
                                         <tr>
                                             <th>تصویر</th>
                                             <th>نام</th>
@@ -30,7 +30,7 @@
                                             <th>ایمیل</th>
                                             <th>تنظیمات</th>
                                         </tr>
-                                    </thead>
+
 
                                     <tbody>
                                     {% for user in users %}
@@ -72,14 +72,12 @@
                                                     </li>
                                                     <li>
                                                         <!-- Delete Button Trigger -->
-                                                        <button type="button"
-                                                                class="btn btn-sm btn-icon text-danger"
-                                                                title="حذف"
+                                                        <button class="btn btn-sm btn-danger"
                                                                 data-bs-toggle="modal"
-                                                                data-bs-target="#deleteConfirmationModal"
-                                                                data-user-id="{{ user.id }}"
-                                                                data-user-name="{{ user.get_full_name }}">
-                                                            <i class="ri-delete-bin-line"></i>
+                                                                data-bs-target="#deleteUserModal"
+                                                                data-user-id="{{ user.pk }}"
+                                                                data-user-name="{{ user.username }}">
+                                                          حذف کاربر
                                                         </button>
                                                     </li>
                                                 </ul>

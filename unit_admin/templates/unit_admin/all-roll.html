@@ -13,7 +13,7 @@
                         <div class="title-header option-title">
                             <h5>لیست نقش‌های تأیید شده</h5>
                             <div class="d-inline-flex">
-                                <a href="#" class="align-items-center btn btn-theme d-flex">
+                                <a href="{% url 'unit_admin:add_role' %}" class="align-items-center btn btn-theme d-flex">
                                     <i data-feather="plus"></i>افزودن نقش جدید
                                 </a>
                             </div>
@@ -68,14 +68,12 @@
                                                     </a>
                                                 </li>
                                                 <li>
-                                                    <button type="button"
-                                                            class="btn btn-sm btn-icon text-danger"
-                                                            title="حذف"
+                                                    <button class="btn btn-sm btn-danger"
                                                             data-bs-toggle="modal"
-                                                            data-bs-target="#roleDeleteModal"
-                                                            data-role-id="{{ membership.id }}"
-                                                            data-role-name="{{ membership.get_role_display }}">
-                                                        <i class="ri-delete-bin-line"></i>
+                                                            data-bs-target="#deleteRoleModal"
+                                                            data-role-id="{{ membership.pk }}"
+                                                            data-role-name="{{ membership.user.username }}">
+                                                      حذف نقش
                                                     </button>
                                                 </li>
                                             </ul>

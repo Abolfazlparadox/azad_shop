@@ -40,3 +40,7 @@ nima.alzd
 pip install sorl-thumbnail
 pip install django-jalali-date
 نصب کردم
+
++989333714077
+0781094429
+9613696744
