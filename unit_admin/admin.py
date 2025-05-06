@@ -11,9 +11,10 @@ from django.contrib import admin, messages
 from django.urls import reverse
 from django.http import HttpResponseRedirect, JsonResponse
 from django.contrib.admin.forms import AdminAuthenticationForm
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, PermissionDenied
 
 from unit_admin.forms import CustomUserCreationForm
+
 
 
 # 1. ایجاد فرم لاگین سفارشی بدون نیاز به is_staff
@@ -54,7 +55,7 @@ class UnitAdminSite(admin.AdminSite):
         """مدیریت فرآیند لاگین"""
         # کاربر لاگین کرده اما دسترسی ندارد
         if request.user.is_authenticated and not self.has_permission(request):
-            return HttpResponseRedirect(reverse('access_denied'))
+            return HttpResponseRedirect(reverse('403'))
 
         # فراخوانی لاگین اصلی با تنظیمات سفارشی
         return super().login(request, extra_context)
@@ -65,6 +66,7 @@ class UnitAdminSite(admin.AdminSite):
             path('users/', self.admin_view(self.user_list_view), name='user_list'),
             path('users/add/', self.admin_view(self.add_user_view), name='add_user'),
             path('roles/', self.admin_view(self.role_list_view), name='role_list'),
+            path('roles/delete/', self.admin_view(self.delete_role), name='delete_role'),
             # path('users/<int:pk>/', self.admin_view(self.user_detail_view), name='user_detail'),
             # path('users/<int:pk>/edit/', self.admin_view(self.edit_user_view), name='edit_user'),
             # path('users/<int:pk>/delete/', self.admin_view(self.delete_user_view), name='delete_user'),
@@ -78,8 +80,7 @@ class UnitAdminSite(admin.AdminSite):
         # Get confirmed memberships for the university
         memberships = Membership.objects.filter(
             university=university,
-            is_confirmed=True
-        ).select_related('user').order_by('-confirmed_at')
+        ).exclude(user__id=request.user.id).distinct()
 
         # Pagination
         paginator = Paginator(memberships, 10)
@@ -96,16 +97,32 @@ class UnitAdminSite(admin.AdminSite):
     def delete_role(self, request):
         if request.method == 'POST':
             role_id = request.POST.get('role_id')
-            membership = get_object_or_404(
-                Membership,
-                id=role_id,
-                university=request.user.memberships.get(role='OFFI').university
-            )
-            membership.delete()
+            try:
+                # Get the current admin's university
+                admin_membership = request.user.memberships.get(role='OFFI')
+                university = admin_membership.university
 
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return JsonResponse({'status': 'success'})
-            return redirect('unit_admin:role_list')
+                # Get and delete the membership
+                membership = get_object_or_404(
+                    Membership,
+                    id=role_id,
+                    university=university
+                )
+                membership.delete()
+
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({
+                        'status': 'success',
+                        'message': 'نقش با موفقیت حذف شد'
+                    })
+
+                messages.success(request, "نقش با موفقیت حذف شد")
+                return redirect('unit_admin:role_list')
+
+            except Membership.DoesNotExist:
+                messages.error(request, "نقش مورد نظر یافت نشد")
+                return redirect('unit_admin:role_list')
+
         return redirect('unit_admin:role_list')
 
     def delete_user(request):
@@ -119,21 +136,31 @@ class UnitAdminSite(admin.AdminSite):
         return redirect('user_list')
 
     def user_list_view(self, request):
-        # فیلتر کاربران بر اساس دانشگاه
-        university = request.user.memberships.get(role='OFFI').university
-        user_list = User.objects.filter(memberships__university=university)
+        try:
+            # Get current user's university membership
+            admin_membership = request.user.memberships.get(role='OFFI')
+            university = admin_membership.university
 
-        # صفحه‌بندی
-        paginator = Paginator(user_list, 3)
-        page_number = request.GET.get('page')
-        page_obj = paginator.get_page(page_number)
+            # Get users with confirmed memberships in the same university
+            user_list = User.objects.filter(
+                memberships__university=university,
+                memberships__is_confirmed=True
+            ).exclude(id=request.user.id).distinct()
 
-        return TemplateResponse(request, 'unit_admin/all-users.html', {
-            **self.each_context(request),
-            'users': page_obj,
-            'page_obj': page_obj,
-            'is_paginated': page_obj.has_other_pages(),
-        })
+            # Pagination
+            paginator = Paginator(user_list, 3)
+            page_number = request.GET.get('page')
+            page_obj = paginator.get_page(page_number)
+
+            return TemplateResponse(request, 'unit_admin/all-users.html', {
+                **self.each_context(request),
+                'users': page_obj,
+                'page_obj': page_obj,
+                'is_paginated': page_obj.has_other_pages(),
+            })
+
+        except Membership.DoesNotExist:
+            raise PermissionDenied("شما دسترسی لازم را ندارید")
 
     def add_user_view(self, request):
         if request.method == 'POST':
@@ -154,48 +181,5 @@ class UnitAdminSite(admin.AdminSite):
 # ایجاد نمونه از کلاس
 unit_admin = UnitAdminSite(name='unit_admin')
 
-
-@admin.register(User, site=unit_admin)
-class UserAdmin(admin.ModelAdmin):
-    list_display = ('profile_image', 'full_name', 'mobile', 'email', 'university', 'role_status')
-    list_display_links = ('full_name',)
-    search_fields = ('first_name', 'last_name', 'mobile')
-    list_filter = ('memberships__role',)
-
-    def get_queryset(self, request):
-        # فیلتر کاربران بر اساس دانشگاه دبیر رفاهی
-        qs = super().get_queryset(request)
-        if request.user.has_perm('account.view_user'):
-            university = request.user.memberships.filter(role='OFFI').first().university
-            return qs.filter(memberships__university=university)
-        return qs.none()
-
-    def university(self, obj):
-        return obj.memberships.first().university.name if obj.memberships.exists() else '-'
-
-    university.short_description = 'دانشگاه'
-
-    def role_status(self, obj):
-        membership = obj.memberships.first()
-        if membership:
-            return f"{membership.get_role_display()} ({'فعال' if membership.is_confirmed else 'غیرفعال'})"
-        return '-'
-
-    role_status.short_description = 'وضعیت نقش'
-
-    def profile_image(self, obj):
-        if obj.profile.image:
-            return format_html('<img src="{}" class="user-thumbnail">', obj.profile.image.url)
-        return format_html('<div class="default-avatar">{}</div>', obj.first_name[0])
-
-    profile_image.short_description = 'تصویر'
-
-@admin.register(Product, site=unit_admin)
-class ProductAdmin(admin.ModelAdmin):
-    list_display = ('title', 'university', 'price')
-
-    def get_queryset(self, request):
-        qs = super().get_queryset(request)
-        return qs.filter(university=request.user.university)
 
 

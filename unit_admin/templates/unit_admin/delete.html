@@ -26,11 +26,71 @@
     </div>
 </div>
 
+<!-- Role Delete Modal -->
+<div class="modal fade theme-modal" id="roleDeleteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header d-block text-center">
+                <h5 class="modal-title w-100">آیا اطمینان دارید ؟</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="remove-box">
+                    <p>نقش <span id="roleName"></span> به صورت دائمی حذف خواهد شد!</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-animation btn-md fw-bold" data-bs-dismiss="modal">خیر</button>
+                <form method="POST" id="roleDeleteForm" class="d-inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="role_id" id="roleId">
+                    <button type="submit" class="btn btn-animation btn-md fw-bold text-danger">بله، حذف شود</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Delete Success Modal -->
 <div class="modal fade theme-modal" id="deleteSuccessModal" tabindex="-1">
     <!-- Keep your existing success modal structure -->
 </div>
 
+<script>
+    // Role Delete Handling
+    const roleDeleteModal = document.getElementById('roleDeleteModal');
+    if (roleDeleteModal) {
+        roleDeleteModal.addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+            const roleId = button.getAttribute('data-role-id');
+            const roleName = button.getAttribute('data-role-name');
+
+            document.getElementById('roleName').textContent = roleName;
+            document.getElementById('roleId').value = roleId;
+        });
+
+        document.getElementById('roleDeleteForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+            fetch("{% url 'unit_admin:delete_role' %}", {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            }).then(response => {
+                if(response.ok) {
+                    window.location.reload(); // Reload to update the list
+                }
+            });
+        });
+    }
+</script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const deleteModal = document.getElementById('deleteConfirmationModal');

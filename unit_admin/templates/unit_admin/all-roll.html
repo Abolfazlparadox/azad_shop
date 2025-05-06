@@ -49,24 +49,30 @@
                                         </td>
                                         <td>{{ membership.get_role_display }}</td>
                                         <td>{{ membership.confirmed_at|date:"Y/m/d H:i" }}</td>
-                                        <td>
+                                    {% if membership.is_confirmed %}
+                                    <td class="status-danger">
                                             <span class="badge bg-success">فعال</span>
+                                    </td>
+                                    {% else %}
+                                        <td class="status-danger">
+                                            <span>غیر فعال</span>
                                         </td>
+                                    {% endif %}
                                         <td>
                                             <ul class="d-flex gap-2">
                                                 <li>
                                                     <a href="#"
-                                                       class="btn btn-sm btn-icon btn-warning"
+                                                       class="btn btn-sm btn-icon text-warning"
                                                        title="ویرایش">
                                                         <i class="ri-pencil-line"></i>
                                                     </a>
                                                 </li>
                                                 <li>
                                                     <button type="button"
-                                                            class="btn btn-sm btn-icon btn-danger"
+                                                            class="btn btn-sm btn-icon text-danger"
                                                             title="حذف"
                                                             data-bs-toggle="modal"
-                                                            data-bs-target="#deleteModal"
+                                                            data-bs-target="#roleDeleteModal"
                                                             data-role-id="{{ membership.id }}"
                                                             data-role-name="{{ membership.get_role_display }}">
                                                         <i class="ri-delete-bin-line"></i>
@@ -119,60 +125,4 @@
             </div>
         </div>
     </div>
-
-<!-- Delete Modal -->
-<div class="modal fade" id="deleteModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">حذف نقش</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <p>آیا از حذف نقش <span id="roleName"></span> اطمینان دارید؟</p>
-            </div>
-            <div class="modal-footer">
-                <form method="POST" id="deleteForm">
-                    {% csrf_token %}
-                    <input type="hidden" name="role_id" id="roleId">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">لغو</button>
-                    <button type="submit" class="btn btn-danger">حذف نقش</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const deleteModal = document.getElementById('deleteModal');
-
-    deleteModal.addEventListener('show.bs.modal', function(event) {
-        const button = event.relatedTarget;
-        const roleId = button.getAttribute('data-role-id');
-        const roleName = button.getAttribute('data-role-name');
-
-        document.getElementById('roleName').textContent = roleName;
-        document.getElementById('roleId').value = roleId;
-    });
-
-    document.getElementById('deleteForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        const formData = new FormData(this);
-
-        fetch("", {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        }).then(response => {
-            if(response.ok) {
-                window.location.reload();
-            }
-        });
-    });
-});
-</script>
 {% endblock %}
