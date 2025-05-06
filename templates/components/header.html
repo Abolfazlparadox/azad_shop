@@ -217,7 +217,7 @@
                                         {# If superuser or admin role, show link to admin panel #}
                                         {% if request.user.is_superuser or request.user.role == 'ADMN' %}
                                           <li class="product-box-contain">
-                                            <a href="{% url 'admin:index' %}">پنل مدیریت</a>
+                                            <a href="{% url 'admin:index' %}" target="_blank">پنل مدیریت</a>
                                           </li>
                                         {% elif request.user.memberships.first.role == 'OFFI' %}
                                             <a href="{% url 'unit_admin:index' %}">پنل مدیریت واحد</a>
@@ -730,115 +730,42 @@
                                         <li class="nav-item dropdown">
                                             <a class="nav-link dropdown-toggle" href="javascript:void(0)"
                                                 data-bs-toggle="dropdown">محصولات</a>
-
                                             <div class="dropdown-menu dropdown-menu-3 dropdown-menu-2">
                                                 <div class="row">
+                                                    {% for main_category in main_categories %}
                                                     <div class="col-xl-3">
                                                         <div class="dropdown-column m-0">
-                                                            <h5 class="dropdown-header">
-                                                                برگه محصولات </h5>
-                                                            <a class="dropdown-item"
-                                                                href="product-left-thumbnail.html">محصولات (دارای تامبنیل)</a>
-                                                            <a class="dropdown-item"
-                                                                href="product-4-image.html">محصولات (4 تصویر)</a>
-                                                            <a class="dropdown-item"
-                                                                href="product-slider.html">اسلایدر محصولات</a>
-                                                            <a class="dropdown-item"
-                                                                href="product-sticky.html">محصولات چسبان</a>
-                                                            <a class="dropdown-item"
-                                                                href="product-accordion.html">محصولات بازشونده</a>
-                                                            <a class="dropdown-item"
-                                                                href="product-circle.html">تب محصولات</a>
-                                                            <a class="dropdown-item"
-                                                                href="product-digital.html">محصولات دیجیتال</a>
-
-                                                            <h5 class="custom-mt dropdown-header">ویژگی محصولات
-                                                            </h5>
-                                                            <a class="dropdown-item"
-                                                                href="product-circle.html">تخفیف (فروش ویژه)</a>
-                                                            <a class="dropdown-item"
-                                                                href="product-left-thumbnail.html">پروفرش ترین ها <label class="menu-label">جدید</label>
-                                                            </a>
-                                                            <a class="dropdown-item"
-                                                                href="product-sold-out.html">تمام شده</a>
-                                                            <a class="dropdown-item" href="product-circle.html">
-                                                                فروش ویژه</a>
+                                                            <h5 class="dropdown-header">{{ main_category.title }} </h5>
+                                                            {% for child in main_category.children.all %}
+                                                                {% if child.children.all %}
+                                                                <a class="dropdown-item" href="{% url 'product:category-list' category_slug=child.slug %}">
+                                                                    <h5 class="dropdown-header">{{ child.title }} </h5>
+                                                                </a>
+                                                                {% else %}
+                                                                 <a class="dropdown-item" href="{% url 'product:category-list' category_slug=child.slug %}">
+                                                                    {{ child.title }}
+                                                                </a>
+                                                                {% endif %}
+                                                                {% for sub_child in child.children.all %}
+                                                                    <a class="dropdown-item" href="{% url 'product:category-list' category_slug=sub_child.slug %}">
+                                                                        {{ sub_child.title }}
+                                                                    </a>
+                                                                {% empty %}
+                                                                <span class="dropdown-item text-muted">بدون فرزند </span>
+                                                                {% endfor %}
+                                                            {% empty %}
+                                                                <span class="dropdown-item text-muted">بدون زیر دسته</span>
+                                                            {% endfor %}
                                                         </div>
                                                     </div>
-                                                    <div class="col-xl-3">
-                                                        <div class="dropdown-column m-0">
-                                                            <h5 class="dropdown-header">
-                                                                استایل محصولات </h5>
-                                                            <a class="dropdown-item"
-                                                                href="product-rectangle.html">مستطیل متغیر</a>
-                                                            <a class="dropdown-item"
-                                                                href="product-circle.html">دایره متغیر <label
-                                                                    class="menu-label">جدید</label></a>
-                                                            <a class="dropdown-item"
-                                                                href="product-color-image.html">نمونه تصویر متفاوت</a>
-                                                            <a class="dropdown-item"
-                                                                href="product-color.html">رنگ متفاوت</a>
-                                                            <a class="dropdown-item"
-                                                                href="product-radio.html">دکمه رادیویی متفاوت</a>
-                                                            <a class="dropdown-item"
-                                                                href="product-dropdown.html">کشویی متغیر</a>
-                                                            <h5 class="custom-mt dropdown-header">مشخصات محصول
-                                                            </h5>
-                                                            <a class="dropdown-item"
-                                                                href="product-left-thumbnail.html">تسویه حساب چسبنده</a>
-                                                            <a class="dropdown-item"
-                                                                href="product-dynamic.html">پرداخت پویا</a>
-                                                            <a class="dropdown-item"
-                                                                href="product-sticky.html">پرداخت ایمن</a>
-                                                            <a class="dropdown-item"
-                                                                href="product-bundle.html">نمای محصول فعال</a>
-                                                            <a class="dropdown-item" href="product-bundle.html">
-                                                                آخرین سفارشات فعال
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-xl-3">
-                                                        <div class="dropdown-column m-0">
-                                                            <h5 class="dropdown-header">
-                                                                مشخصات محصول </h5>
-                                                            <a class="dropdown-item"
-                                                                href="product-image.html">محصول ساده</a>
-                                                            <a class="dropdown-item" href="product-rectangle.html">
-                                                                محصول طبقه بندی شده <label
-                                                                    class="menu-label">جدید</label>
-                                                            </a>
-                                                            <a class="dropdown-item"
-                                                                href="product-size-chart.html">جدول اندازه ها <label
-                                                                    class="menu-label">جدید</label></a>
-                                                            <a class="dropdown-item"
-                                                                href="product-size-chart.html">تحویل و برگشت</a>
-                                                            <a class="dropdown-item"
-                                                                href="product-size-chart.html">بررسی محصول</a>
-                                                            <a class="dropdown-item" href="product-expert.html">از یک متخصص بپرسید</a>
-                                                            <h5 class="custom-mt dropdown-header">مشخصات محصول
-                                                            </h5>
-                                                            <a class="dropdown-item"
-                                                                href="product-bottom-thumbnail.html">برچسب های محصول</a>
-                                                            <a class="dropdown-item" href="product-image.html">اطلاعات فروشگاه</a>
-                                                            <a class="dropdown-item"
-                                                                href="product-image.html">شبکه اجتماعی <label
-                                                                    class="menu-label warning-label">جدید</label>
-                                                            </a>
-                                                            <a class="dropdown-item"
-                                                                href="product-left-thumbnail.html">محصولات مرتبط
-                                                                <label class="menu-label warning-label">جدید</label>
-                                                            </a>
-                                                            <a class="dropdown-item"
-                                                                href="product-right-thumbnail.html">لیست علاقه مندی و مقایسه</a>
-                                                        </div>
-                                                    </div>
+                                                    {% endfor %}
                                                     <div class="col-xl-3 d-xl-block d-none">
                                                         <div class="dropdown-column m-0">
                                                             <div class="menu-img-banner">
-                                                                <a class="text-title" href="product-circle.html">
-                                                                    <img src="{% static 'images/mega-menu.png' %}"
-                                                                        alt="banner">
-                                                                </a>
+{#                                                                <a class="text-title" href="product-circle.html">#}
+{#                                                                    <img src="{% static 'images/mega-menu.png' %}"#}
+{#                                                                        alt="banner">#}
+{#                                                                </a>#}
                                                             </div>
                                                         </div>
                                                     </div>

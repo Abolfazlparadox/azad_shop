@@ -102,6 +102,7 @@ TEMPLATES = [
                 'home.context_processors.site_settings',
                 'home.context_processors.location_data',
                 'home.context_processors.user_city',
+                'home.context_processors.main_categories_processor',  # ← این خط رو اضافه کن
             ],
         },
     },
