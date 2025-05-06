@@ -1,7 +1,7 @@
 from django.views.generic import  DetailView,ListView
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
-from .models import Product, ProductCategory, ProductReview, ProductView, ProductImage, ProductVariant,Wishlist
+from .models import Product, ProductCategory, ProductReview, ProductView, ProductImage, ProductVariant,Wishlist ,ProductDescription
 from decimal import Decimal, DecimalException
 from django.core.exceptions import ValidationError
 from django.db.models import Q, Max, F, Min, Avg, Prefetch
@@ -160,6 +160,7 @@ class ProductDetailView(ProductBaseView, DetailView):
             'categories',
             Prefetch('reviews', queryset=ProductReview.objects.select_related('user')),
             'tags',  # اگر استفاده شده
+            Prefetch('descriptions', queryset=ProductDescription.objects.all())  # افزودن توضیحات
         ).filter(is_active=True)
 
     def get_client_ip(self, request):
@@ -191,19 +192,22 @@ class ProductDetailView(ProductBaseView, DetailView):
         context = super().get_context_data(**kwargs)
         product = self.object
 
-        # Calculate discount percentage
+        # محاسبه درصد تخفیف
         discount = 0
         if product.old_price and product.old_price > product.price:
             discount = round((product.old_price - product.price) / product.old_price * 100)
 
-        # Review stats
+        # اطلاعات مربوط به بازخوردها
         reviews = product.reviews.all()
         avg_rating = reviews.aggregate(avg=Avg('rating'))['avg'] or 0
 
-        # Related products
+        # محصولات مشابه
         related_products = Product.objects.filter(
             categories__in=product.categories.all()
         ).exclude(pk=product.pk).distinct()[:4]
+
+        # اضافه کردن توضیحات به context
+        descriptions = product.descriptions.all()
 
         context.update({
             'discount_percentage': discount,
@@ -217,9 +221,11 @@ class ProductDetailView(ProductBaseView, DetailView):
                 'stock': product.stock,
                 'tags': ', '.join(tag.name for tag in product.tags.all()) if hasattr(product, 'tags') else '',
                 'categories': [c.title for c in product.categories.all()]
-            }
+            },
+            'descriptions': descriptions  # توضیحات رو به context اضافه می‌کنیم
         })
         return context
+
 
 
 

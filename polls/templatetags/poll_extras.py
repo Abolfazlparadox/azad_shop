@@ -1,6 +1,7 @@
+from django.utils.translation import gettext_lazy as _
 from django import template
 from jalali_date import date2jalali
-from django.utils.translation import gettext_lazy as _
+from datetime import datetime
 
 register = template.Library()
 
@@ -14,8 +15,12 @@ def cut(value, arg):
 
 @register.filter(name='show_jalali_date')
 def show_jalali_date(value):
-    return date2jalali(value)
-
+    if not value:
+        return ""
+    try:
+        return date2jalali(value).strftime('%Y/%m/%d')
+    except Exception:
+        return value  # یا نمایش پیش‌فرض
 
 @register.filter(name='three_digits_currency')
 def three_digits_currency(value: int):
