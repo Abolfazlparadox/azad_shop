@@ -1,5 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load thumbnail %}
+{% load poll_extras %}
+
 {% block title %}
 	محصول
 {% endblock %}
@@ -18,38 +21,51 @@
                                 <div class="col-12">
                                     <div class="product-main no-arrow">
                                         {% for image in product.images.all %}
-                                        <div>
-                                            <div class="slider-image">
-                                                <img src="{{ image.image.url }}" id="img-{{ forloop.counter0 }}"
-                                                     data-zoom-image="{{ image.image.url }}"
-                                                     class="img-fluid image_zoom_cls-{{ forloop.counter0 }} blur-up lazyload" alt="{{ product.title }}">
+                                            <div>
+                                                <div class="slider-image">
+                                                    {% thumbnail image.image "1080x1080" quality=99 crop="center" as im %}
+                                                        <img src="{{ im.url }}" id="img-{{ forloop.counter0 }}"
+                                                             data-zoom-image="{{ im.url }}"
+                                                             class="img-fluid image_zoom_cls-{{ forloop.counter0 }} blur-up lazyload"
+                                                             alt="{{ product.title }}">
+                                                    {% endthumbnail %}
+                                                </div>
                                             </div>
-                                        </div>
                                         {% empty %}
-                                        <div>
-                                            <div class="slider-image">
-                                                <img src="{{ product.main_image.url }}" id="img-1"
-                                                     data-zoom-image="{{ product.main_image.url }}"
-                                                     class="img-fluid image_zoom_cls-0 blur-up lazyload" alt="{{ product.title }}">
+                                            <div>
+                                                <div class="slider-image">
+                                                    {% thumbnail product.main_image "600x600" crop="center" as im %}
+                                                        <img src="{{ im.url }}" id="img-1"
+                                                             data-zoom-image="{{ im.url }}"
+                                                             class="img-fluid image_zoom_cls-0 blur-up lazyload"
+                                                             alt="{{ product.title }}">
+                                                    {% endthumbnail %}
+                                                </div>
                                             </div>
-                                        </div>
                                         {% endfor %}
+
                                     </div>
                                 </div>
                                 <div class="col-12">
                                     <div class="left-slider-image left-slider no-arrow slick-top">
                                         {% for image in product.images.all %}
-                                        <div>
-                                            <div class="sidebar-image">
-                                                <img src="{{ image.image.url }}" class="img-fluid blur-up lazyload" alt="{{ product.title }}">
+                                            <div>
+                                                <div class="sidebar-image">
+                                                    {% thumbnail image.image "150x150" crop="center" as thumb %}
+                                                        <img src="{{ thumb.url }}" width="{{ thumb.width }}" height="{{ thumb.height }}"
+                                                             class="img-fluid blur-up lazyload" alt="{{ product.title }}">
+                                                    {% endthumbnail %}
+                                                </div>
                                             </div>
-                                        </div>
                                         {% empty %}
-                                        <div>
-                                            <div class="sidebar-image">
-                                                <img src="{{ product.main_image.url }}" class="img-fluid blur-up lazyload" alt="{{ product.title }}">
+                                            <div>
+                                                <div class="sidebar-image">
+                                                    {% thumbnail product.main_image "150x150" crop="center" as thumb %}
+                                                        <img src="{{ thumb.url }}" width="{{ thumb.width }}" height="{{ thumb.height }}"
+                                                             class="img-fluid blur-up lazyload" alt="{{ product.title }}">
+                                                    {% endthumbnail %}
+                                                </div>
                                             </div>
-                                        </div>
                                         {% endfor %}
                                     </div>
                                 </div>
@@ -69,9 +85,9 @@
                             <div class="price-rating">
                                 <h3 class="theme-color price">
                                     {% if product.old_price and product.old_price > product.price %}
-                                        <del class="text-content">{{ product.old_price|floatformat:2 }} تومان</del>
+                                        <del class="red-text ml-space">{{ product.old_price|three_digits_currency }}</del>
                                     {% endif %}
-                                    {{ product.price|floatformat:2 }} تومان
+                                    {{ product.price| three_digits_currency }}
                                     {% if discount_percentage %}
                                         <span class="offer theme-color">({{ discount_percentage }}% تخفیف)</span>
                                     {% endif %}
@@ -90,7 +106,7 @@
 
                             <!-- Product Description -->
                             <div class="product-contain">
-                                <p class="w-100 ">{{ product.description }}</p>
+                                <p class="w-100 ">{{ product.short_description }}</p>
                             </div>
 
                             <!-- Product Package / Volume Options -->
@@ -193,7 +209,7 @@
                                     <ul class="product-info-list product-info-list-2">
                                         <li>نوع : <a href="javascript:void(0)">{{ product_info.type }}</a></li>
                                         <li>کد محصول : <a href="javascript:void(0)">{{ product_info.sku }}</a></li>
-                                        <li>تاریخ ثبت : <a href="javascript:void(0)">{{ product_info.created_at|date:"j F Y" }}</a></li>
+                                        <li>تاریخ ثبت : <a href="javascript:void(0)">{{ product_info.created_at|show_jalali_date }}</a></li>
                                         <li>موجود در انبار : <a href="javascript:void(0)">{{ product_info.stock }}</a></li>
                                         <li>برچسب ها : <a href="javascript:void(0)">{{ product_info.tags }}</a></li>
                                     </ul>
@@ -338,62 +354,27 @@
                     <div class="tab-content custom-tab" id="myTabContent">
                         <div class="tab-pane fade show active" id="description" role="tabpanel">
                             <div class="product-description">
-                                <div class="nav-desh">
-                                    <p>کیک هویج ژله ای کیک بیسکویت جو دوسر کیک گومی خرس تارت. پودینگ کیک هویج
-                                         قطره لیمو خرس شیرین گومی. شکلات تارت کیک شکلاتی کیک کیک دونات شیرین بیان آلو
-                                        شکر. لوبیا ژله تیرامیسو کارامل عناب بیسکویت شیرین بیان شکلات. پودینگ تافی
-                                        عناب کیک جو دوسر رول شیرین. رویه حلوای براونی رول کروسان دسر قطره لیمو.
-                                         آب نبات پودر گل ختمی، کنجد، ژله لوبیا، نبات، پای شیرینی زنجبیلی.</p>
-                                </div>
-
+                                {% for description in descriptions %}
                                 <div class="nav-desh">
                                     <div class="desh-title">
-                                        <h5>اورگانیک :</h5>
+                                        <h5>{{ description.title_description }}:</h5>
                                     </div>
-                                    <p>لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از
-                                         طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است
-                                        و برای شرایط فعلی تکنولوژی مورد نیاز و کاربردهای متنوع با هدف بهبود ابزارهای
-                                         کاربردی می باشد. کتابهای زیادی در شصت و سه درصد گذشته، حال و آینده شناخت فراوان جامعه
-                                        و متخصصان را می طلبد تا با نرم افزارها شناخت بیشتری را برای طراحان رایانه ای علی
-                                         الخصوص طراحان خلاقی و فرهنگ پیشرو در زبان فارسی ایجاد کرد. در این صورت می توان
-                                        امید داشت که تمام و دشواری موجود در ارائه راهکارها و شرایط سخت تایپ به
-                                         پایان رسد وزمان مورد نیاز شامل حروفچینی دستاوردهای اصلی و جوابگوی
-                                         سوالات پیوسته اهل دنیای موجود طراحی اساسا مورد استفاده قرار گیرد.</p>
+                                    <p>{{ description.description }}</p>
                                 </div>
-
-                                <div class="banner-contain nav-desh">
-                                    <img src="{% static 'images/vegetable/banner/14.jpg' %}"
-                                        class="bg-img blur-up lazyload" alt="">
-                                    <div class="banner-details p-center banner-b-space w-100 text-center">
-                                        <div>
-                                            <h6 class="ls-expanded theme-color mb-sm-3 mb-1">تابستان</h6>
-                                            <h2>هیجان انگیز</h2>
-                                            <p class="mx-auto mt-1">تا 5% تخفیف ویژه</p>
-                                        </div>
-                                    </div>
+                                {% if description.Image %}
+                                <div class="banner-contain nav-desh text-center mt-3">
+                                    {% thumbnail description.Image "750x600" quality=99 crop="center" as thumb %}
+                                        <img src="{{ thumb.url }}"
+                                        class="img-fluid blur-up lazyload"
+                                        alt="{{ description.title_description }}">
+                                    {% endthumbnail %}
+                                {% else %}
+                                    <p>تصویری برای این توضیح وجود ندارد.</p>
+                                {% endif %}
                                 </div>
-
-                                <div class="nav-desh">
-                                    <div class="desh-title">
-                                        <h5>سازنده محصول کیست :</h5>
-                                    </div>
-                                    <p>لورم ایپسوم متن ساختگی با
-                                        تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است. چاپگرها
-                                        و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است و برای شرایط
-                                        فعلی تکنولوژی مورد نیاز و کاربردهای متنوع با هدف بهبود ابزارهای کاربردی
-                                        می باشد. کتابهای زیادی در شصت و سه درصد گذشته، حال و آینده شناخت فراوان
-                                        جامعه و متخصصان را می طلبد تا با نرم افزارها شناخت بیشتری را برای طراحان
-                                        رایانه ای علی الخصوص طراحان خلاقی و فرهنگ پیشرو در زبان فارسی ایجاد کرد.</p>
-
-                                    <p>لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ
-                                        و با استفاده از طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله
-                                         در ستون و سطرآنچنان که لازم است و برای شرایط فعلی تکنولوژی مورد نیاز و
-                                         کاربردهای متنوع با هدف بهبود ابزارهای کاربردی می باشد. کتابهای زیادی
-                                        در شصت و سه درصد گذشته، حال و آینده شناخت فراوان جامعه و متخصصان
-                                         را می طلبد تا با نرم افزارها شناخت بیشتری را برای طراحان رایانه
-                                         ای علی الخصوص طراحان خلاقی و فرهنگ پیشرو در زبان فارسی ایجاد کرد.
-                                    </p>
-                                </div>
+                                {% empty %}
+                                    <p>هیچ توضیحی برای این محصول وجود ندارد.</p>
+                                {% endfor %}
                             </div>
                         </div>
 

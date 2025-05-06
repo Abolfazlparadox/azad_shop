@@ -5,7 +5,7 @@ from django.db.models import Count, F
 from django.utils.translation import gettext_lazy as _
 from django_admin_listfilter_dropdown.filters import RelatedDropdownFilter
 from admin_auto_filters.filters import AutocompleteFilter
-from .models import (Product, ProductCategory, ProductBrand,ProductVariant, ProductImage, ProductReview,Discount, ProductView)
+from .models import (Product, ProductCategory, ProductBrand,ProductVariant, ProductImage, ProductReview,Discount, ProductView , ProductDescription)
 
 
 # --------------------------------------------------------------------------
@@ -123,6 +123,10 @@ class ProductBrandAdmin(UniversityAccessAdmin):
         return obj.product_set.count()
     product_count.short_description = _('تعداد محصولات')
 
+
+class ProductDescriptionInline(admin.TabularInline):
+    model = ProductDescription
+    extra = 1
 # --------------------------------------------------------------------------
 # Product
 # --------------------------------------------------------------------------
@@ -141,7 +145,7 @@ class ProductAdmin(UniversityAccessAdmin):
     )
     search_fields = ('title', 'sku', 'brand__title', 'short_description')
     prepopulated_fields = {'slug': ('title',)}
-    inlines = [ProductVariantInline, ProductImageInline]
+    inlines = [ProductVariantInline, ProductImageInline , ProductDescriptionInline ,]
     autocomplete_fields = ['categories', 'tags']
     readonly_fields = ('current_price', 'sku',)
     filter_horizontal = ('categories',)
@@ -152,7 +156,7 @@ class ProductAdmin(UniversityAccessAdmin):
         (None, {'fields': ('title', 'slug', 'brand', 'categories', 'tags')}),
         (_('قیمت‌گذاری'), {'fields': ('price', 'old_price', 'current_price')}),
         (_('موجودی'), {'fields': ('stock', 'weight', 'dimensions')}),
-        (_('توضیحات'), {'fields': ('main_image', 'short_description','description')}),
+        (_('توضیحات'), {'fields': ('main_image', 'short_description',)}),
         (_('وضعیت'), {'fields': ('is_active', 'is_deleted')}),
     )
     def get_readonly_fields(self, request, obj=None):
@@ -258,3 +262,6 @@ class ProductViewAdmin(UniversityAccessAdmin):
     list_filter = ('timestamp', ('product', RelatedDropdownFilter))
     search_fields = ('product__title', 'user__username', 'ip_address')
     readonly_fields = ('timestamp', 'session_key')
+
+
+

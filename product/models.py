@@ -78,11 +78,10 @@ class Product(BaseModel):
     categories = models.ManyToManyField('ProductCategory', related_name='products', verbose_name='دسته‌بندی‌ها')
     main_image = models.ImageField(upload_to='products/main/%Y/%m/%d/', verbose_name='تصویر اصلی')
     brand = models.ForeignKey('ProductBrand', on_delete=models.SET_NULL, null=True, blank=True, verbose_name='برند')
-    price = models.DecimalField(max_digits=12, decimal_places=2, verbose_name='قیمت')
-    old_price = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True, verbose_name='قیمت قبلی')
+    price = models.IntegerField(verbose_name='قیمت')  # تغییر به IntegerField
+    old_price = models.IntegerField(null=True, blank=True, verbose_name='قیمت قبلی')  # تغییر به IntegerField
     sku = models.CharField(max_length=50, unique=True, db_index=True, verbose_name='کد محصول (SKU)', blank=True, null=True)
     short_description = models.TextField(max_length=500, verbose_name='توضیحات کوتاه')
-    description = models.TextField(verbose_name='توضیحات کامل', null=True, blank=True)
     slug = models.SlugField(max_length=300, unique=True, allow_unicode=True, verbose_name='شناسه URL', db_index=True)
     stock = models.PositiveIntegerField(default=0, verbose_name='موجودی انبار')
     weight = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True, verbose_name='وزن (کیلوگرم)')
@@ -270,3 +269,16 @@ class ProductQuerySet(models.QuerySet):
 class ProductManager(models.Manager):
     def get_queryset(self):
         return ProductQuerySet(self.model, using=self._db).active()
+
+class ProductDescription(models.Model):
+    product = models.ForeignKey('Product', on_delete=models.CASCADE, related_name='descriptions')
+    Image = models.ImageField(upload_to='products/main/%Y/%m/%d/', null=True, blank=True ,verbose_name='تصویر برای هر متن ',)
+    title_description = models.CharField(max_length=50, db_index=True, verbose_name='سر تیتر توضیحات کامل ', blank=True, null=True)
+    description = models.TextField(verbose_name='توضیحات کامل', null=True, blank=True)
+
+    def __str__(self):
+        return self.title_description or "توضیح بدون عنوان"
+
+    class Meta:
+        verbose_name = 'توضیحات محصول'
+        verbose_name_plural = 'توضیحات محصول'

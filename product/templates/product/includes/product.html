@@ -1,4 +1,7 @@
 {% load static %}
+{% load thumbnail %}
+{% load poll_extras %}
+
 
 <div>
     <div class="product-box-3 h-100 wow fadeInUp">
@@ -6,8 +9,10 @@
             <div class="product-image">
                 <a href="{{ product.get_absolute_url }}">
                     {% if product.main_image %}
-                        <img src="{{ product.main_image.url }}"
-                             class="img-fluid blur-up lazyload" alt="{{ product.title }}">
+                        {% thumbnail product.main_image "600x600" quality=99 crop="center" as im %}
+                            <img src="{{ im.url }}"
+                                 class="img-fluid blur-up lazyload" alt="{{ product.title }}">
+                        {% endthumbnail %}
                     {% else %}
                         <img src="{% static 'images/appstore.svg' %}"
                              class="img-fluid blur-up lazyload" alt="Default image">
@@ -64,10 +69,10 @@
                 <h6 class="unit">{{ product.unit|default:"واحد" }}</h6>
                 <h5 class="price">
                     <span class="theme-color">
-                        {{ product.current_price|floatformat:2 }} تومان
+                        {{ product.current_price| three_digits_currency  }}
                     </span>
                     {% if product.old_price and product.old_price > product.price %}
-                        <del>{{ product.old_price|floatformat:2 }} تومان</del>
+                        <del class="red-text">{{ product.old_price|three_digits_currency }}</del>
                     {% endif %}
                 </h5>
                 <div class="add-to-cart-box bg-white">
