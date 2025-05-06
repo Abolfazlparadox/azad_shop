@@ -36,6 +36,7 @@ class ProductCategory(BaseModel):
         related_name='children',
         verbose_name='دسته‌بندی والد'
     )
+    university = models.ForeignKey(University, on_delete=models.CASCADE, null=True, blank=True)
 
     def save(self, *args, **kwargs):
         if not self.slug:

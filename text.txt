@@ -6,6 +6,7 @@ pip install django
 django-admin startproject main .
 pip install mysqlclient
 python manage.py makemigrations
+python manage.py migrate
 python manage.py migrate account
 python manage.py makemigrations
 pip install django-iranian-cities
