@@ -22,6 +22,7 @@ class BaseModel(models.Model):
     is_active = models.BooleanField(default=False, db_index=True, verbose_name='فعال/غیرفعال')
     is_deleted = models.BooleanField(default=False, db_index=True, verbose_name='حذف شده/نشده')
 
+
     class Meta:
         abstract = True
 
@@ -57,6 +58,8 @@ class ProductBrand(BaseModel):
     title = models.CharField(max_length=300, unique=True, verbose_name='نام برند')
     slug = models.SlugField(max_length=300, unique=True, allow_unicode=True, verbose_name='شناسه URL')
     logo = models.ImageField(upload_to='brands/logos/', null=True, blank=True, verbose_name='لوگو')
+    university = models.ForeignKey(University, on_delete=models.CASCADE, null=True, blank=True)
+
 
     def save(self, *args, **kwargs):
         if not self.slug:

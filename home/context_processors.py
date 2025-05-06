@@ -1,6 +1,8 @@
 from .models import SiteSetting, FooterLinkBox
 from django.core.cache import cache
 from iranian_cities.models import Province
+from product.models import ProductCategory
+
 def site_settings(request):
     # Retrieve the main site settings from cache or database
     site_settings_1 = cache.get('main_site_settings')
@@ -50,3 +52,8 @@ def user_city(request):
             city_name = city.name
     return {'user_city': city_name}
 
+def main_categories_processor(request):
+    main_categories = ProductCategory.objects.filter(is_active=True, parent=None).prefetch_related('children')
+    return {
+        'main_categories': main_categories
+    }
