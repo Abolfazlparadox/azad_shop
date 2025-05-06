@@ -86,9 +86,12 @@
                                             </td>
                                         </tr>
                                         {% empty %}
-                                        <tr>
-                                            <td colspan="6" class="text-center py-4">هیچ کاربری یافت نشد</td>
-                                        </tr>
+                                          <tr>
+                                            <td colspan="4" class="text-center text-danger">
+                                              هیچ کاربری یافت نشد!
+                                              (تعداد کاربران در دیتابیس: {{ User.objects.count }})
+                                            </td>
+                                          </tr>
                                      {% endfor %}
                                     </tbody>
                                 </table>

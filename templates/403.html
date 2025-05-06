@@ -1,12 +1,30 @@
-<!DOCTYPE html>
-<html lang="fa" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <title>دسترسی ممنوع</title>
-</head>
-<body>
-    <h1>403 - دسترسی غیرمجاز</h1>
-    <p>شما مجوز دسترسی به این صفحه را ندارید.</p>
-    <a href="{% url 'login' %}">ورود به سیستم</a>
-</body>
-</html>
+{% extends 'base.html' %}
+{% load static%}
+{% block title %}403{% endblock %}
+{% load thumbnail %}
+{% block body %}
+
+<!-- 404 Section Start -->
+<section class="section-404 section-lg-space">
+    <div class="container-fluid-lg">
+        <div class="row">
+            <div class="col-12">
+                <div class="image-404">
+                    <img src="{% static '/images/inner-page/404.png' %}" class="img-fluid blur-up lazyload" alt="">
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="contain-404">
+                    <h3 class="text-content">صفحه مورد نظر شما یافت نشد. لینک این آدرس ممکن است قدیمی باشد یا ممکن است از آخرین باری که شما آن را نشانک کرده اید، آن را جابه جا کرده باشیم.</h3>
+                    <button onclick="location.href = '{% url 'home' %}';"
+                        class="btn btn-md text-white theme-bg-color mt-4 mx-auto">بازگشت به صفحه اصلی</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- 404 Section End -->
+
+{% endblock %}
+
