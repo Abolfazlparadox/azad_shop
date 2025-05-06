@@ -3,9 +3,9 @@ env\Scripts\activate
 pip install -r requirements.txt  
 python.exe -m pip install --upgrade pip
 pip install django
-django-admin startproject main .
+django-admin startproject main
 pip install mysqlclient
-python manage.py makemigrations
+python manage.py makemigrations account
 python manage.py migrate
 python manage.py migrate account
 python manage.py makemigrations

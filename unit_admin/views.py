@@ -1,9 +1,9 @@
-from django.views.generic import ListView,TemplateView
+from django.views.generic import ListView, TemplateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth import get_user_model
 from iranian_cities.models import City
-
+from django.utils.translation import gettext_lazy as _
 from account.models import Membership
 from django.views.generic.edit import CreateView,DeleteView
 from django.urls import reverse_lazy
@@ -44,6 +44,7 @@ class UnitAdminIndexView(LoginRequiredMixin, TemplateView):
         # ctx['stats'] = ... هر داده‌ی دیگری که می‌خواهید به تمپلیت بدهید
         return ctx
 
+
 class UserListView(LoginRequiredMixin, ListView):
     model = User
     template_name = "unit_admin/all-users.html"
@@ -60,7 +61,6 @@ class UserListView(LoginRequiredMixin, ListView):
             ).exclude(id=self.request.user.id).distinct()
         except Membership.DoesNotExist:
             raise PermissionDenied("Access denied.")
-
 class UserCreateView(LoginRequiredMixin, CreateView):
     form_class = CustomUserCreationForm
     template_name = "unit_admin/add-new-user.html"
@@ -72,6 +72,7 @@ class UserCreateView(LoginRequiredMixin, CreateView):
         kwargs = super().get_form_kwargs()
         try:
             kwargs['university'] = self.request.user.memberships.get(role='OFFI').university
+
         except Membership.DoesNotExist:
             raise PermissionDenied("شما دسترسی لازم را ندارید")
         return kwargs
@@ -81,7 +82,7 @@ class UserCreateView(LoginRequiredMixin, CreateView):
         user.email_verified = form.cleaned_data.get('email_verified', False)
         user.is_verified = form.cleaned_data.get('is_verified', False)
         user.save()
-
+        messages.success(self.request, _('کاربر با موفقیت ایجاد شد'))  # پیام فارسی
         Membership.objects.create(
             user=user,
             university=self.request.user.memberships.get(role='OFFI').university,
@@ -125,7 +126,48 @@ class UserDeleteView(LoginRequiredMixin, View):
         messages.success(request, "کاربر با موفقیت حذف شد")
         return redirect('user_list')
 
+class UserUpdateView(UpdateView):
+    model = User
+    form_class = CustomUserCreationForm
+    template_name = 'unit_admin/add-new-user.html'
+    context_object_name = 'user_obj'
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['current_user'] = self.request.user
+        kwargs['university']   = self.request.user.memberships.get(role='OFFI').university
+        return kwargs
+
+    def form_valid(self, form):
+        form.save()
+        messages.success(self.request, _('اطلاعات کاربر با موفقیت به‌روز شد'))
+        return redirect('unit_admin:user_list')
+
+    def form_invalid(self, form):
+        print('hi')
+        messages.error(self.request, _('لطفاً خطاهای فرم را بررسی کنید'))
+        return self.render_to_response(self.get_context_data(form=form))
+
+class RoleUpdateView(UpdateView):
+    model = Membership
+    form_class = RoleCreationForm
+    template_name = 'unit_admin/add-new-roll.html'
+    context_object_name = 'membership_obj'
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['current_user'] = self.request.user
+        kwargs['university']   = self.request.user.memberships.get(role='OFFI').university
+        return kwargs
+
+    def form_valid(self, form):
+        form.save()
+        messages.success(self.request, _('نقش با موفقیت به‌روز شد'))
+        return redirect('unit_admin:role_list')
+
+    def form_invalid(self, form):
+        messages.error(self.request, _('خطا در به‌روز‌رسانی نقش'))
+        return super().form_invalid(form)
 def get_cities(request):
     province_id = request.GET.get('province_id')
 

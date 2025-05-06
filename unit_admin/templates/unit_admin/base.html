@@ -65,6 +65,15 @@
 <!-- tap on tap end -->
 <!-- page-wrapper Start-->
 <div class="page-wrapper compact-wrapper" id="pageWrapper">
+{% if messages %}
+  <ul class="messages">
+    {% for message in messages %}
+      <li class="alert alert-{{ message.tags }}">
+        {{ message }}
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}
     <!-- Page Header Start-->
     <div class="page-header">
         <div class="header-wrapper m-0">

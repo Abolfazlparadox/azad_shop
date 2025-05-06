@@ -2,10 +2,13 @@
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
+from django.db import transaction
+from django.utils import timezone
 from iranian_cities.models import Province, City
-from account.models import User, Membership
+from account.models import User, Membership, AdminActionLog
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 
 User = get_user_model()
 
@@ -41,7 +44,7 @@ class RoleCreationForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         # 1) Pop our custom kwargs
-        current_user = kwargs.pop('current_user', None)
+        self.current_user = kwargs.pop('current_user', None)
         self.university = kwargs.pop('university', None)
 
         # 2) Call parent
@@ -50,8 +53,8 @@ class RoleCreationForm(forms.ModelForm):
         # 3) Build user queryset: exclude superusers, OFFI-role, self
         qs = User.objects.all().exclude(is_superuser=True)
         qs = qs.exclude(memberships__role='OFFI')
-        if current_user:
-            qs = qs.exclude(pk=current_user.pk)
+        if self.current_user:
+            qs = qs.exclude(pk=self.current_user.pk)
         self.fields['user'].queryset = qs.distinct()
 
         # 4) Remove OFFI from role choices
@@ -75,61 +78,97 @@ class RoleCreationForm(forms.ModelForm):
                 raise forms.ValidationError("این کاربر قبلاً این نقش را در دانشگاه شما دارد")
         return cleaned
 
+    def save(self, commit=True):
+        with transaction.atomic():
+            membership = super().save(commit=commit)
+            membership.university = self.university
+            membership.is_confirmed = True
+            membership.confirmed_at = timezone.now()
+            membership.save()
+            AdminActionLog.objects.create(
+                actor=self.current_user,
+                action='create_role',
+                target_role=membership,
+                metadata={
+                    'role': membership.role,
+                    'university': str(self.university)
+                }
+            )
+        return membership
+
+# unit_admin/forms.py
+
+from django import forms
+from django.utils.translation import gettext_lazy as _
+from django.contrib.auth.forms import UserCreationForm
+from django.db import transaction
+from django.utils import timezone
+
+from iranian_cities.models import Province, City
+from account.models import User, Membership, AdminActionLog
+
+
 class CustomUserCreationForm(UserCreationForm):
     province = forms.ModelChoiceField(
         queryset=Province.objects.all(),
-        widget=forms.Select(attrs={'class': 'form-select',
-                                   'data-control': 'province-select'})
+        widget=forms.Select(attrs={
+            'class': 'form-select',
+            'data-control': 'province-select'
+        })
     )
     city = forms.ModelChoiceField(
-        queryset=City.objects.all(),
-        widget=forms.Select(attrs={'class': 'form-select',
-                                   'data-control': 'city-select'})
+        queryset=City.objects.none(),  # start empty; set in __init__
+        widget=forms.Select(attrs={
+            'class': 'form-select',
+            'data-control': 'city-select'
+        })
     )
 
     class Meta:
         model = User
         fields = (
-            'username', 'password1','email', 'password2', 'first_name', 'last_name',
-            'mobile', 'national_code', 'birthday', 'avatar', 'province', 'city',
-            'address', 'postal_code', 'is_verified', 'is_staff', 'is_active',
-            'marketing_consent', 'terms_accepted', 'email_verified'
+            'username',   'password1',      'email',     'password2',
+            'first_name', 'last_name',      'mobile',    'national_code',
+            'birthday',   'avatar',         'province',  'city',
+            'address',    'postal_code',    'is_verified',
+            'is_staff',   'is_active',      'marketing_consent',
+            'terms_accepted','email_verified'
         )
         widgets = {
             'username': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'نام کاربری خود را وارد کنید'
+                'placeholder': _('نام کاربری خود را وارد کنید')
             }),
             'password1': forms.PasswordInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'رمز عبور را وارد کنید',
+                'placeholder': _('رمز عبور را وارد کنید'),
+                'autocomplete': 'new-password'
+            }),
+            'password2': forms.PasswordInput(attrs={
+                'class': 'form-control',
+                'placeholder': _('تکرار رمز عبور'),
                 'autocomplete': 'new-password'
             }),
             'email': forms.EmailInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'ایمیل خود را وارد کنید'
-            }),
-            'password2': forms.PasswordInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'تکرار رمز عبور',
-                'autocomplete': 'new-password'
+                'placeholder': _('ایمیل خود را وارد کنید')
             }),
             'first_name': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'نام'
+                'placeholder': _('نام')
             }),
             'last_name': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'نام خانوادگی'
+                'placeholder': _('نام خانوادگی')
             }),
             'mobile': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '۰۹۱۲۳۴۵۶۷۸۹',
+                'placeholder': _('۰۹۱۲۳۴۵۶۷۸۹'),
                 'type': 'tel'
             }),
             'national_code': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'کد ملی (۱۰ رقم)',
+                'placeholder': _('کد ملی (۱۰ رقم)'),
                 'maxlength': '10'
             }),
             'birthday': forms.DateInput(attrs={
@@ -140,94 +179,143 @@ class CustomUserCreationForm(UserCreationForm):
                 'class': 'form-control',
                 'accept': 'image/*'
             }),
-
             'address': forms.Textarea(attrs={
                 'class': 'form-control',
-                'placeholder': 'خیابان، پلاک، واحد',
+                'placeholder': _('خیابان، پلاک، واحد'),
                 'rows': 3
             }),
             'postal_code': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'کد پستی ۱۰ رقمی',
+                'placeholder': _('کد پستی ۱۰ رقمی'),
                 'maxlength': '10'
             }),
-            'is_verified': forms.CheckboxInput(attrs={
-                'class': 'form-check-input',
-                'role': 'switch'
-            }),
-            'is_staff': forms.CheckboxInput(attrs={
-                'class': 'form-check-input',
-                'role': 'switch'
-            }),
-            'is_active': forms.CheckboxInput(attrs={
-                'class': 'form-check-input',
-                'role': 'switch'
-            }),
-            'marketing_consent': forms.CheckboxInput(attrs={
-                'class': 'form-check-input',
-                'role': 'switch'
-            }),
-            'terms_accepted': forms.CheckboxInput(attrs={
-                'class': 'form-check-input',
-                'role': 'switch'
-            }),
-            'email_verified': forms.CheckboxInput(attrs={
-                'class': 'form-check-input',
-                'role': 'switch'
-            })
+            # switches
+            'is_verified':    forms.CheckboxInput(attrs={'class': 'form-check-input','role': 'switch'}),
+            'is_staff':       forms.CheckboxInput(attrs={'class': 'form-check-input','role': 'switch'}),
+            'is_active':      forms.CheckboxInput(attrs={'class': 'form-check-input','role': 'switch'}),
+            'marketing_consent': forms.CheckboxInput(attrs={'class': 'form-check-input','role': 'switch'}),
+            'terms_accepted': forms.CheckboxInput(attrs={'class': 'form-check-input','role': 'switch'}),
+            'email_verified': forms.CheckboxInput(attrs={'class': 'form-check-input','role': 'switch'}),
         }
 
     def __init__(self, *args, **kwargs):
-        # دریافت دانشگاه از پارامترهای ورودی
-        self.university = kwargs.pop('university', None)
+        # Pop custom kwargs so base __init__ won’t error
+        self.current_user = kwargs.pop('current_user', None)
+        self.university   = kwargs.pop('university', None)
         super().__init__(*args, **kwargs)
 
-        # تنظیمات اولیه برای شهرها
-        self.fields['city'].queryset = City.objects.none()
+        # Help-text for username
+        self.fields['username'].help_text = _('الزامی. ۱۵۰ نویسه یا کمتر. فقط حروف، اعداد و @/./+/-/_')
 
-        # اگر استان از قبل انتخاب شده بود
+        # Password optional on edit
+        if self.instance and self.instance.pk:
+            self.fields['password1'].required = False
+            self.fields['password2'].required = False
+            self.fields['password1'].help_text = _('رمز جدید (در صورت تمایل)')
+            self.fields['password2'].help_text = _('تکرار رمز جدید')
+
+        # City dropdown: filter by POSTed province or existing one
         if 'province' in self.data:
             try:
-                province_id = int(self.data.get('province'))
-                self.fields['city'].queryset = City.objects.filter(province_id=province_id)
+                prov_id = int(self.data.get('province'))
+                self.fields['city'].queryset = City.objects.filter(province_id=prov_id)
             except (ValueError, TypeError):
                 pass
-        elif self.instance.pk:
-            self.fields['city'].queryset = self.instance.province.city_set.all()
+        elif self.instance and self.instance.pk and self.instance.province_id:
+            self.fields['city'].queryset = City.objects.filter(province_id=self.instance.province_id)
+
+    def clean_username(self):
+        username = self.cleaned_data['username']
+        qs = User.objects.filter(username=username)
+        if self.instance.pk:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise forms.ValidationError(_('این نام کاربری قبلاً ثبت شده است'))
+        return username
 
     def clean_email(self):
-        email = self.cleaned_data.get('email')
-        if User.objects.filter(email=email).exists():
-            raise forms.ValidationError("این ایمیل قبلاً ثبت شده است")
+        email = self.cleaned_data['email']
+        qs = User.objects.filter(email=email)
+        if self.instance.pk:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise forms.ValidationError(_('این ایمیل قبلاً ثبت شده است'))
         return email
-
-    def clean_birthday(self):
-        birthday = self.cleaned_data.get('birthday')
-        if birthday and birthday > timezone.now().date():
-            raise forms.ValidationError("تاریخ تولد نمی‌تواند در آینده باشد")
-        return birthday
 
     def clean_mobile(self):
         mobile = self.cleaned_data.get('mobile')
-        if User.objects.filter(mobile=mobile).exists():
-            raise forms.ValidationError("این شماره موبایل قبلاً ثبت شده است")
+        if mobile:
+            qs = User.objects.filter(mobile=mobile)
+            if self.instance.pk:
+                qs = qs.exclude(pk=self.instance.pk)
+            if qs.exists():
+                raise forms.ValidationError(_('این شماره موبایل قبلاً ثبت شده است'))
         return mobile
 
     def clean_national_code(self):
-        national_code = self.cleaned_data.get('national_code')
-        if User.objects.filter(national_code=national_code).exists():
-            raise forms.ValidationError("این کد ملی قبلاً ثبت شده است")
-        return national_code
+        code = self.cleaned_data.get('national_code')
+        if code:
+            qs = User.objects.filter(national_code=code)
+            if self.instance.pk:
+                qs = qs.exclude(pk=self.instance.pk)
+            if qs.exists():
+                raise forms.ValidationError(_('این کد ملی قبلاً ثبت شده است'))
+        return code
+
+    def clean_birthday(self):
+        bd = self.cleaned_data.get('birthday')
+        if bd and bd > timezone.now().date():
+            raise forms.ValidationError(_('تاریخ تولد نمی‌تواند در آینده باشد'))
+        return bd
+
+    def clean_password2(self):
+        # On edit, if both blank → skip password validation
+        password1 = self.cleaned_data.get('password1')
+        password2 = self.cleaned_data.get('password2')
+
+        # On update: if both blank, skip validation (i.e. no password change)
+        if self.instance and self.instance.pk and not password1 and not password2:
+            return password2
+
+        # Otherwise, call the parent class’s password2 validator
+        return super(CustomUserCreationForm, self).clean_password2()
 
     def save(self, commit=True):
-        user = super().save(commit=False)
-        if commit:
-            user.save()
-            # ایجاد عضویت برای کاربر در دانشگاه مربوطه
-            Membership.objects.create(
-                user=user,
-                university=self.university,  # استفاده از دانشگاه دریافتی
-                role='student',  # نقش پیش‌فرض
-                is_confirmed=True
-            )
+        with transaction.atomic():
+            user = super().save(commit=False)
+
+            # Update password only if provided
+            if self.cleaned_data.get('password1'):
+                user.set_password(self.cleaned_data['password1'])
+
+            if commit:
+                user.save()
+                self.save_m2m()
+
+            # New user: create membership + log
+            if not self.instance.pk:
+                Membership.objects.create(
+                    user=user,
+                    university=self.university,
+                    role='student',
+                    is_confirmed=True
+                )
+                AdminActionLog.objects.create(
+                    actor=self.current_user,
+                    action='create_user',
+                    target_user=user,
+                    metadata={
+                        'email': user.email,
+                        'created_at': timezone.now().isoformat()
+                    }
+                )
+            else:
+                # Existing user: log update
+                AdminActionLog.objects.create(
+                    actor=self.current_user,
+                    action='update_user',
+                    target_user=user,
+                    metadata={'updated_at': timezone.now().isoformat()}
+                )
+
         return user

@@ -66,9 +66,10 @@
                                                     </li>
 
                                                     <li>
-                                                        <a href="javascript:void(0)">
+                                                     {# لینک اول: ویرایش کاربر #}
+                                                          <a href="{% url 'unit_admin:user_edit' user.pk %}">
                                                             <i class="ri-pencil-line"></i>
-                                                        </a>
+                                                          </a>
                                                     </li>
                                                     <li>
                                                         <!-- Delete Button Trigger -->

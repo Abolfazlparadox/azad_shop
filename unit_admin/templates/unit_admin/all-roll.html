@@ -61,11 +61,10 @@
                                         <td>
                                             <ul class="d-flex gap-2">
                                                 <li>
-                                                    <a href="#"
-                                                       class="btn btn-sm btn-icon text-warning"
-                                                       title="ویرایش">
+                                                      {# لینک اول: ویرایش نقش #}
+                                                      <a href="{% url 'unit_admin:role_edit' membership.pk %}">
                                                         <i class="ri-pencil-line"></i>
-                                                    </a>
+                                                      </a>
                                                 </li>
                                                 <li>
                                                     <button class="btn btn-sm btn-danger"

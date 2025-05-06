@@ -326,3 +326,24 @@ class Address(models.Model):
 
     def __str__(self):
         return f"{self.get_category_display()} — {self.name}"  # e.g. "خانه — نشانی اصلی"
+
+class AdminActionLog(models.Model):
+    actor        = models.ForeignKey(settings.AUTH_USER_MODEL,
+                                     on_delete=models.CASCADE,
+                                     verbose_name=_('بازیگر'))
+    action       = models.CharField(max_length=50, verbose_name=_('عملیات'))
+    target_user  = models.ForeignKey(settings.AUTH_USER_MODEL,
+                                     null=True, blank=True,
+                                     on_delete=models.SET_NULL,
+                                     related_name='+',
+                                     verbose_name=_('کاربر هدف'))
+    target_role  = models.ForeignKey('account.Membership',
+                                     null=True, blank=True,
+                                     on_delete=models.SET_NULL,
+                                     verbose_name=_('نقش هدف'))
+    timestamp    = models.DateTimeField(auto_now_add=True, verbose_name=_('زمان'))
+    metadata     = models.JSONField(null=True, blank=True, verbose_name=_('متادیتا'))
+
+    class Meta:
+        verbose_name = _('لاگ عملیات ادمین')
+        verbose_name_plural = _('لاگ‌های عملیات ادمین')

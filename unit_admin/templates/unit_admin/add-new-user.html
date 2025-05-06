@@ -13,9 +13,19 @@
                         <div class="card">
                             <div class="card-body">
                                 <div class="title-header option-title">
-                                    <h5>افزودن کاربر جدید</h5>
+                                    {% if user_obj %}
+                                        <h5>ویرایش کاربر</h5>
+                                    {% else %}
+                                        <h5>افزودن کاربر جدید</h5>
+                                    {% endif %}
+
                                     <button type="submit" class="align-items-center btn btn-theme d-flex">
-                                        <i data-feather="save"></i>ذخیره کاربر
+                                        <i data-feather="save"></i>
+                                        {% if user_obj %}
+                                            به‌روز‌رسانی کاربر
+                                        {% else %}
+                                            ذخیره کاربر
+                                        {% endif %}
                                     </button>
                                 </div>
 
