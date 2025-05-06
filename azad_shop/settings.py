@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'iranian_cities',
     'phonenumber_field',
     'django_extensions',
+    'jalali_date',
 ]
 
 MIDDLEWARE = [
