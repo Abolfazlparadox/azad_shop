@@ -78,8 +78,8 @@ class Product(BaseModel):
     categories = models.ManyToManyField('ProductCategory', related_name='products', verbose_name='دسته‌بندی‌ها')
     main_image = models.ImageField(upload_to='products/main/%Y/%m/%d/', verbose_name='تصویر اصلی')
     brand = models.ForeignKey('ProductBrand', on_delete=models.SET_NULL, null=True, blank=True, verbose_name='برند')
-    price = models.DecimalField(max_digits=12, decimal_places=2, verbose_name='قیمت')
-    old_price = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True, verbose_name='قیمت قبلی')
+    price = models.IntegerField(verbose_name='قیمت')  # تغییر به IntegerField
+    old_price = models.IntegerField(null=True, blank=True, verbose_name='قیمت قبلی')  # تغییر به IntegerField
     sku = models.CharField(max_length=50, unique=True, db_index=True, verbose_name='کد محصول (SKU)', blank=True, null=True)
     short_description = models.TextField(max_length=500, verbose_name='توضیحات کوتاه')
     description = models.TextField(verbose_name='توضیحات کامل', null=True, blank=True)

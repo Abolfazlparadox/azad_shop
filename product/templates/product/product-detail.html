@@ -1,5 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load thumbnail %}
+{% load poll_extras %}
+
 {% block title %}
 	محصول
 {% endblock %}
@@ -18,38 +21,51 @@
                                 <div class="col-12">
                                     <div class="product-main no-arrow">
                                         {% for image in product.images.all %}
-                                        <div>
-                                            <div class="slider-image">
-                                                <img src="{{ image.image.url }}" id="img-{{ forloop.counter0 }}"
-                                                     data-zoom-image="{{ image.image.url }}"
-                                                     class="img-fluid image_zoom_cls-{{ forloop.counter0 }} blur-up lazyload" alt="{{ product.title }}">
+                                            <div>
+                                                <div class="slider-image">
+                                                    {% thumbnail image.image "1080x1080" quality=99 crop="center" as im %}
+                                                        <img src="{{ im.url }}" id="img-{{ forloop.counter0 }}"
+                                                             data-zoom-image="{{ im.url }}"
+                                                             class="img-fluid image_zoom_cls-{{ forloop.counter0 }} blur-up lazyload"
+                                                             alt="{{ product.title }}">
+                                                    {% endthumbnail %}
+                                                </div>
                                             </div>
-                                        </div>
                                         {% empty %}
-                                        <div>
-                                            <div class="slider-image">
-                                                <img src="{{ product.main_image.url }}" id="img-1"
-                                                     data-zoom-image="{{ product.main_image.url }}"
-                                                     class="img-fluid image_zoom_cls-0 blur-up lazyload" alt="{{ product.title }}">
+                                            <div>
+                                                <div class="slider-image">
+                                                    {% thumbnail product.main_image "600x600" crop="center" as im %}
+                                                        <img src="{{ im.url }}" id="img-1"
+                                                             data-zoom-image="{{ im.url }}"
+                                                             class="img-fluid image_zoom_cls-0 blur-up lazyload"
+                                                             alt="{{ product.title }}">
+                                                    {% endthumbnail %}
+                                                </div>
                                             </div>
-                                        </div>
                                         {% endfor %}
+
                                     </div>
                                 </div>
                                 <div class="col-12">
                                     <div class="left-slider-image left-slider no-arrow slick-top">
                                         {% for image in product.images.all %}
-                                        <div>
-                                            <div class="sidebar-image">
-                                                <img src="{{ image.image.url }}" class="img-fluid blur-up lazyload" alt="{{ product.title }}">
+                                            <div>
+                                                <div class="sidebar-image">
+                                                    {% thumbnail image.image "150x150" crop="center" as thumb %}
+                                                        <img src="{{ thumb.url }}" width="{{ thumb.width }}" height="{{ thumb.height }}"
+                                                             class="img-fluid blur-up lazyload" alt="{{ product.title }}">
+                                                    {% endthumbnail %}
+                                                </div>
                                             </div>
-                                        </div>
                                         {% empty %}
-                                        <div>
-                                            <div class="sidebar-image">
-                                                <img src="{{ product.main_image.url }}" class="img-fluid blur-up lazyload" alt="{{ product.title }}">
+                                            <div>
+                                                <div class="sidebar-image">
+                                                    {% thumbnail product.main_image "150x150" crop="center" as thumb %}
+                                                        <img src="{{ thumb.url }}" width="{{ thumb.width }}" height="{{ thumb.height }}"
+                                                             class="img-fluid blur-up lazyload" alt="{{ product.title }}">
+                                                    {% endthumbnail %}
+                                                </div>
                                             </div>
-                                        </div>
                                         {% endfor %}
                                     </div>
                                 </div>
@@ -69,9 +85,9 @@
                             <div class="price-rating">
                                 <h3 class="theme-color price">
                                     {% if product.old_price and product.old_price > product.price %}
-                                        <del class="text-content">{{ product.old_price|floatformat:2 }} تومان</del>
+                                        <del class="red-text ml-space">{{ product.old_price|three_digits_currency }}</del>
                                     {% endif %}
-                                    {{ product.price|floatformat:2 }} تومان
+                                    {{ product.price| three_digits_currency }}
                                     {% if discount_percentage %}
                                         <span class="offer theme-color">({{ discount_percentage }}% تخفیف)</span>
                                     {% endif %}
@@ -90,7 +106,7 @@
 
                             <!-- Product Description -->
                             <div class="product-contain">
-                                <p class="w-100 ">{{ product.description }}</p>
+                                <p class="w-100 ">{{ product.short_description }}</p>
                             </div>
 
                             <!-- Product Package / Volume Options -->

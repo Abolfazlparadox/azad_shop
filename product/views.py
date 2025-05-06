@@ -42,7 +42,7 @@ class ProductListView(ProductBaseView, ListView):
     model = Product
     template_name = 'product/product-list.html'
     context_object_name = 'products'
-    paginate_by = 12
+    paginate_by = 1
     ordering = ['-created_at']
 
     def get_queryset(self):
@@ -73,9 +73,9 @@ class ProductListView(ProductBaseView, ListView):
             messages.warning(self.request, f"Invalid price range: {e}")
 
         # --- Category filtering ---
-        categories = self.request.GET.getlist('category')
-        if categories:
-            qs = qs.filter(categories__slug__in=categories)
+        category_slug = self.kwargs.get('category_slug')
+        if category_slug:
+            qs = qs.filter(categories__slug=category_slug)
 
         # --- Rating filtering ---
         ratings = self.request.GET.getlist('rating')
@@ -120,8 +120,13 @@ class ProductListView(ProductBaseView, ListView):
         price_range = self.get_price_range()
         now = timezone.now()
 
+        # حذف پارامتر page از query برای استفاده در لینک‌های صفحه‌بندی
+        querydict = self.request.GET.copy()
+        if 'page' in querydict:
+            querydict.pop('page')
+
         ctx.update({
-            'products': qs,
+            # 'products': qs,
             'discounted_products_count': discounted,
             'non_discounted_products_count': non_discounted,
             'price_range': price_range,
@@ -129,10 +134,11 @@ class ProductListView(ProductBaseView, ListView):
             'discount_options': [5, 10, 15, 25],
             'weight_options': ['0.4', '0.5', '0.7', '1'],
             'current_search': self.request.GET.get('search', ''),
-            'current_category': self.request.GET.getlist('category'),
+            'current_category': [self.kwargs.get('category_slug')] if self.kwargs.get('category_slug') else [],
             'current_rating': self.request.GET.getlist('rating'),
             'current_discount': self.request.GET.getlist('discount'),
             'current_weight': self.request.GET.getlist('weight'),
+            'query_string': querydict.urlencode(),
             'now': now,
             'banner': {
                 'image': 'images/shop/1.jpg',
@@ -141,6 +147,7 @@ class ProductListView(ProductBaseView, ListView):
             }
         })
         return ctx
+
 
 class ProductDetailView(ProductBaseView, DetailView):
     model = Product
@@ -151,13 +158,26 @@ class ProductDetailView(ProductBaseView, DetailView):
         return Product.objects.select_related('brand').prefetch_related(
             'images',
             'categories',
-            Prefetch('reviews', queryset=ProductReview.objects.select_related('user'))
+            Prefetch('reviews', queryset=ProductReview.objects.select_related('user')),
+            'tags',  # اگر استفاده شده
         ).filter(is_active=True)
+
+    def get_client_ip(self, request):
+        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            ip = x_forwarded_for.split(',')[0]
+        else:
+            ip = request.META.get('REMOTE_ADDR')
+        return ip
 
     def get(self, request, *args, **kwargs):
         response = super().get(request, *args, **kwargs)
 
-        # Track product view
+        # Ensure session exists
+        if not request.session.session_key:
+            request.session.save()
+
+        # Track product view for anonymous users
         if not request.user.is_authenticated:
             ProductView.objects.create(
                 product=self.object,
@@ -171,16 +191,16 @@ class ProductDetailView(ProductBaseView, DetailView):
         context = super().get_context_data(**kwargs)
         product = self.object
 
-        # Calculate discount
+        # Calculate discount percentage
         discount = 0
         if product.old_price and product.old_price > product.price:
             discount = round((product.old_price - product.price) / product.old_price * 100)
 
-        # Get review stats
+        # Review stats
         reviews = product.reviews.all()
         avg_rating = reviews.aggregate(avg=Avg('rating'))['avg'] or 0
 
-        # Get related products (optimized)
+        # Related products
         related_products = Product.objects.filter(
             categories__in=product.categories.all()
         ).exclude(pk=product.pk).distinct()[:4]
@@ -191,12 +211,18 @@ class ProductDetailView(ProductBaseView, DetailView):
             'review_count': reviews.count(),
             'related_products': related_products,
             'product_info': {
-                'categories': [c.title for c in product.categories.all()],
+                'type': getattr(product, 'type', '---'),
                 'sku': product.sku,
-                'stock': product.stock
+                'created_at': product.created_at,
+                'stock': product.stock,
+                'tags': ', '.join(tag.name for tag in product.tags.all()) if hasattr(product, 'tags') else '',
+                'categories': [c.title for c in product.categories.all()]
             }
         })
         return context
+
+
+
 
 @require_POST
 @login_required
