@@ -132,7 +132,8 @@
                                 <li class="right-side">
                                     <div class="onhover-dropdown header-badge">
                                         <button type="button" class="btn p-0 position-relative header-wishlist">
-                                            <i data-feather="shopping-cart"></i>
+                                            <a href="{% url 'user_cart_page' %}" class="btn btn-sm cart-button"><i data-feather="shopping-cart"></i></a>
+
                                             <span class="position-absolute top-0 start-100 translate-middle badge">2
                                                 <span class="visually-hidden">پیام جدید</span>
                                             </span>
@@ -186,7 +187,7 @@
                                             </div>
 
                                             <div class="button-group">
-                                                <a href="cart.html" class="btn btn-sm cart-button">سبد خرید</a>
+                                                <a href="{% url 'user_cart_page' %}" class="btn btn-sm cart-button">سبد خرید</a>
                                                 <a href="checkout.html" class="btn btn-sm cart-button theme-bg-color
                                                 text-white">پرداخت نهایی</a>
                                             </div>

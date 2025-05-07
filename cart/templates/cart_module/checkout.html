@@ -1,0 +1,29 @@
+<h4>لیست محصولات</h4>
+<table>
+    <thead>
+        <tr>
+            <th>محصول</th>
+            <th>تعداد</th>
+            <th>قیمت واحد</th>
+            <th>قیمت کل</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in cart_details %}
+            <tr>
+                <td>{{ item.product.name }}</td>
+                <td>{{ item.count }}</td>
+                <td>{{ item.get_unit_price }}</td>
+                <td>{{ item.get_total_price }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h4>جمع کل: {{ total_price }}</h4>
+
+<!-- دکمه پرداخت -->
+<form method="post" action="{% url 'checkout' %}">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-animation proceed-btn fw-bold">پرداخت</button>
+</form>

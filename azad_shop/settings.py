@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'comment',
     'about',
     'polls',
+    'cart',
     # pakages
     'sorl.thumbnail',
     'import_export',

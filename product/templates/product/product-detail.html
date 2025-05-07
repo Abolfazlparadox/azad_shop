@@ -166,6 +166,7 @@
                                 </ul>
                             </div>
 
+
                             <!-- Quantity and Add to Cart -->
                             <div class="note-box product-package">
                                 <div class="cart_qty qty-box product-qty">
@@ -173,13 +174,13 @@
                                         <button type="button" class="qty-left-minus" data-type="minus" data-field="">
                                             <i class="fa fa-minus"></i>
                                         </button>
-                                        <input class="form-control input-number qty-input" type="text" name="quantity" value="1">
+                                        <input class="form-control input-number qty-input" id="product-count" name="quantity" value="0">
                                         <button type="button" class="qty-right-plus" data-type="plus" data-field="">
                                             <i class="fa fa-plus"></i>
                                         </button>
                                     </div>
                                 </div>
-                                <button onclick="location.href = '';" class="btn btn-md bg-dark cart-button text-white w-100">افزودن به سبد خرید</button>
+                                <button onclick="addProductToCart({{ product.id }})" class="btn btn-md bg-dark cart-button text-white w-100">افزودن به سبد خرید</button>
 {#                                {% url 'cart' %}#}
                             </div>
 

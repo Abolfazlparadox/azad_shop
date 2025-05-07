@@ -44,3 +44,8 @@ pip install django-jalali-date
 +989333714077
 0781094429
 9613696744
+
+نصب کردم
+ pip install requests
+ python manage.py makemigrations cart
+python manage.py migrate cart
