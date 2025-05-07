@@ -20,6 +20,7 @@
                         <table class="table all-package theme-table" id="table_id">
                                 <tr>
                                     <th>عنوان</th>
+                                    <th>کاربر</th>
                                     <th>دسته‌بندی</th>
                                     <th>استان</th>
                                     <th>شهر</th>
@@ -33,6 +34,7 @@
                                 {% for addr in addresses %}
                                 <tr>
                                     <td>{{ addr.name }}</td>
+                                    <td>{{ addr.user }}</td>
                                     <td>{{ addr.get_category_display }}</td>
                                     <td>{{ addr.province.name }}</td>
                                     <td>{{ addr.city.name }}</td>

@@ -2,7 +2,7 @@
 import secrets
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
-
+from django.http import JsonResponse, HttpResponseBadRequest
 from .decorators import email_verified_required
 from datetime import date
 from django.contrib.auth import login

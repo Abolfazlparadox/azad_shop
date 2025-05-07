@@ -1,29 +1,90 @@
 {% extends "base.html" %}
-{% load static%}
+{% load static %}
 {% block title %}درخواست نقش جدید{% endblock %}
 {% block body %}
 <div class="container py-5">
-  <h2>درخواست نقش جدید</h2>
-  <form method="post" class="row g-3">
+  <h2 class="mb-4">درخواست نقش جدید</h2>
+  <form method="post" class="row g-4">
     {% csrf_token %}
-    <div class="col-md-4">
-      {{ form.university.label_tag }}
-      {{ form.university }}
-      {{ form.university.errors }}
+
+    <!-- University Field -->
+    <div class="col-md-6">
+      <label for="university" class="form-label">{{ form.university.label }}</label>
+      <select name="university" class="form-select" id="university">
+        <option value="" selected disabled>انتخاب دانشگاه</option>
+        {% for university in form.university.field.queryset %}
+        <option value="{{ university.pk }}" {% if form.university.value == university.pk %}selected{% endif %}>
+          {{ university.name }}
+        </option>
+        {% endfor %}
+      </select>
+      {% for error in form.university.errors %}
+        <div class="invalid-feedback d-block">{{ error }}</div>
+      {% endfor %}
     </div>
-    <div class="col-md-4">
-      {{ form.role.label_tag }}
-      {{ form.role }}
-      {{ form.role.errors }}
+
+    <!-- Role Field -->
+    <div class="col-md-6">
+      <label for="role" class="form-label">{{ form.role.label }}</label>
+      <select name="role" class="form-select" id="role">
+        <option value="" selected disabled>انتخاب نقش</option>
+        {% for value, label in form.role.field.choices %}
+        <option value="{{ value }}" {% if form.role.value == value %}selected{% endif %}>
+          {{ label }}
+        </option>
+        {% endfor %}
+      </select>
+      {% for error in form.role.errors %}
+        <div class="invalid-feedback d-block">{{ error }}</div>
+      {% endfor %}
     </div>
-    <div class="col-md-4">
-      {{ form.code.label_tag }}
-      {{ form.code }}
-      {{ form.code.errors }}
+
+    <!-- Code Field -->
+    <div class="col-6">
+      <label for="code" class="form-label">{{ form.code.label }}</label>
+      <input type="text"
+             name="code"
+             id="code"
+             class="form-control {% if form.code.errors %}is-invalid{% endif %}"
+             placeholder="کد نقش را وارد کنید"
+             value="{{ form.code.value|default_if_none:'' }}">
+      {% for error in form.code.errors %}
+        <div class="invalid-feedback d-block">{{ error }}</div>
+      {% endfor %}
     </div>
+
     <div class="col-12">
-      <button class="btn btn-primary" type="submit">ارسال درخواست</button>
+      <button type="submit" class="btn btn-primary px-5">ارسال درخواست</button>
     </div>
   </form>
 </div>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+  // grab the role <select>, code <label> and code <input>
+  const roleSelect   = document.getElementById('role');
+  const codeLabel    = document.querySelector('label[for="code"]');
+  const codeInput    = document.getElementById('code');
+
+  if (roleSelect && codeLabel && codeInput) {
+    function updateCodeField() {
+      // text of the selected option, e.g. "دانشجو" یا "استاد"
+      const roleText = roleSelect.options[roleSelect.selectedIndex].text.trim();
+      if (!roleText) return;
+
+      const newText = `کد ${roleText}`;
+      // update label text
+      codeLabel.textContent = newText;
+      // update placeholder
+      codeInput.placeholder = newText;
+    }
+
+    // initialize on page load (in case an option is pre-selected)
+    updateCodeField();
+
+    // bind change event
+    roleSelect.addEventListener('change', updateCodeField);
+  }
+});
+</script>
+
 {% endblock %}

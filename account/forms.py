@@ -1,6 +1,5 @@
 # forms.py
 from django import forms
-from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.forms import UserCreationForm
 from django.utils.translation import gettext_lazy as _
@@ -12,7 +11,7 @@ from university.models import University
 from django.urls import reverse
 from django.utils.html import format_html
 from django.core.validators import RegexValidator, FileExtensionValidator
-import secrets
+
 
 import logging
 logger = logging.getLogger(__name__)
@@ -203,14 +202,99 @@ class CustomAuthenticationForm(AuthenticationForm):
         return self.cleaned_data
 
 class RequestRoleForm(forms.ModelForm):
+    university = forms.ModelChoiceField(
+        label=_("دانشگاه"),
+        queryset=University.objects.all(),
+        widget=forms.Select(attrs={
+            'class': 'form-select',
+            'placeholder': _('دانشگاه خود را انتخاب کنید')
+        })
+    )
+    role = forms.ChoiceField(
+        label=_("نقش"),
+        choices=Membership.Role,
+        widget=forms.Select(attrs={
+            'class': 'form-select',
+            'placeholder': _('نقش مورد نظر را انتخاب کنید')
+        })
+    )
+    code = forms.CharField(
+        label=_("کد احراز هویت"),
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': _('کد دریافتی از دانشگاه را وارد کنید')
+        })
+    )
+
+    error_messages = {
+        'invalid_code': _("کد وارد شده معتبر نیست."),
+        'existing_membership': _("شما قبلاً برای این دانشگاه درخواست داده‌اید."),
+        'role_mismatch': _("کد وارد شده با نقش انتخابی مطابقت ندارد."),
+        'university_inactive': _("این دانشگاه در حال حاضر فعال نیست."),
+    }
+
     class Meta:
         model = Membership
-        fields = ['university','role','code']
-        widgets = {
-            'university': forms.Select(attrs={'class':'form-select'}),
-            'role':       forms.Select(attrs={'class':'form-select'}),
-            'code':       forms.TextInput(attrs={'class':'form-control','placeholder':_('کد نقش را وارد کنید')}),
-        }
+        fields = ['university', 'role', 'code']
+
+    def clean_university(self):
+        university = self.cleaned_data.get('university')
+        if not university.is_active:
+            raise forms.ValidationError(
+                self.error_messages['university_inactive'],
+                code='university_inactive'
+            )
+        return university
+
+    def clean_code(self):
+        code = self.cleaned_data.get('code')
+        if len(code) != 8:  # Example validation
+            raise forms.ValidationError(
+                self.error_messages['invalid_code'],
+                code='invalid_code'
+            )
+        return code
+
+    def clean(self):
+        cleaned_data = super().clean()
+        university = cleaned_data.get('university')
+        role = cleaned_data.get('role')
+        code = cleaned_data.get('code')
+
+        # Check for existing membership
+        if Membership.objects.filter(
+            user=self.instance.user,
+            university=university
+        ).exists():
+            raise forms.ValidationError(
+                self.error_messages['existing_membership'],
+                code='existing_membership'
+            )
+
+        # Validate code against university and role
+        if not self.validate_verification_code(university, role, code):
+            raise forms.ValidationError(
+                self.error_messages['role_mismatch'],
+                code='role_mismatch'
+            )
+
+        return cleaned_data
+
+    def validate_verification_code(self, university, role, code):
+        """
+        Custom validation logic for verification codes
+        """
+        # Implement your actual code validation logic here
+        # Example: Check code against university's verification system
+        return len(code) == 8  # Replace with real validation
+
+    def save(self, commit=True):
+        membership = super().save(commit=False)
+        membership.user = self.instance.user
+        membership.is_confirmed = False
+        if commit:
+            membership.save()
+        return membership
 
 class ForgotPasswordForm(forms.Form):
     username = forms.EmailField(
