@@ -266,31 +266,3 @@ def compare_products(request):
     })
 
 
-
-
-
-def change_cart_detail_count(request):
-    detail_id = request.GET.get('detail_id')
-    state = request.GET.get('state')  # 'increase' or 'decrease'
-
-    item = get_object_or_404(CartDetail, id=detail_id)
-
-    if state == 'increase':
-        item.count += 1
-    elif state == 'decrease' and item.count > 1:
-        item.count -= 1
-    item.save()
-
-    cart = item.cart
-    cart_details = cart.cartdetail_set.all()
-    total_price = cart.calculate_total_price()
-
-    rendered_html = render_to_string('cart_module/includes/cart_detail_content.html', {
-        'cart_items': cart_details,
-        'total_price': total_price
-    })
-
-    return JsonResponse({
-        'status': 'success',
-        'body': rendered_html
-    })
