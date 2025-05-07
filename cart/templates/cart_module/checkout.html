@@ -1,3 +1,445 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load thumbnail %}
+{% load poll_extras %}
+
+
+{% block title %}
+	 پرداخت نهایی
+{% endblock %}
+
+{% block body %}
+    <!-- Breadcrumb Section Start -->
+    <section class="breadcrumb-section pt-0">
+        <div class="container-fluid-lg">
+            <div class="row">
+                <div class="col-12">
+                    <div class="breadcrumb-contain">
+                        <h2>پرداخت نهایی</h2>
+                        <nav>
+                            <ol class="breadcrumb mb-0">
+                                <li class="breadcrumb-item">
+                                    <a href="index.html">
+                                        <i class="fa-solid fa-house"></i>
+                                    </a>
+                                </li>
+                                <li class="breadcrumb-item active">پرداخت نهایی</li>
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Breadcrumb Section End -->
+
+    <!-- Checkout section Start -->
+    <section class="checkout-section-2 section-b-space">
+        <div class="container-fluid-lg">
+            <div class="row g-sm-4 g-3">
+                <div class="col-lg-8">
+                    <div class="left-sidebar-checkout">
+                        <div class="checkout-detail-box">
+                            <ul>
+                                <li>
+                                    <div class="checkout-icon">
+                                        <lord-icon target=".nav-item" src="https://cdn.lordicon.com/ggihhudh.json"
+                                            trigger="loop-on-hover"
+                                            colors="primary:#121331,secondary:#646e78,tertiary:#0baf9a"
+                                            class="lord-icon">
+                                        </lord-icon>
+                                    </div>
+                                    <div class="checkout-box">
+                                        <div class="checkout-title">
+                                            <h4>آدرس پستی</h4>
+                                        </div>
+
+                                        <div class="checkout-detail">
+                                            <div class="row g-4">
+                                                <div class="col-xxl-6 col-lg-12 col-md-6">
+                                                    <div class="delivery-address-box">
+                                                        <div>
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="radio" name="jack"
+                                                                    id="flexRadioDefault1">
+                                                            </div>
+
+                                                            <div class="label">
+                                                                <label>خانه</label>
+                                                            </div>
+
+                                                            <ul class="delivery-address-detail">
+                                                                <li>
+                                                                    <h4 class="fw-500">امین احمدی</h4>
+                                                                </li>
+
+                                                                <li>
+                                                                    <p class="text-content"><span
+                                                                            class="text-title">آدرس
+                                                                            : </span>شیراز بلوار چمران - نیایش ک 12</p>
+                                                                </li>
+
+                                                                <li>
+                                                                    <h6 class="text-content"><span
+                                                                            class="text-title">کد پستی
+                                                                            :</span> 1234567890</h6>
+                                                                </li>
+
+                                                                <li>
+                                                                    <h6 class="text-content mb-0"><span
+                                                                            class="text-title">شماره تماس
+                                                                            :</span> 09177777777</h6>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-xxl-6 col-lg-12 col-md-6">
+                                                    <div class="delivery-address-box">
+                                                        <div>
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="radio" name="jack"
+                                                                    id="flexRadioDefault2" checked="checked">
+                                                            </div>
+
+                                                            <div class="label">
+                                                                <label>محل کار</label>
+                                                            </div>
+
+                                                            <ul class="delivery-address-detail">
+                                                                <li>
+                                                                    <h4 class="fw-500">امین احمدی</h4>
+                                                                </li>
+
+                                                                <li>
+                                                                    <p class="text-content"><span
+                                                                            class="text-title">آدرس
+                                                                            :</span>شیراز هتل چمران
+                                                                    </p>
+                                                                </li>
+
+                                                                <li>
+                                                                    <h6 class="text-content"><span
+                                                                            class="text-title">کد پستی :</span>
+                                                                        1234567890</h6>
+                                                                </li>
+
+                                                                <li>
+                                                                    <h6 class="text-content mb-0"><span
+                                                                            class="text-title">شماره تماس
+                                                                            :</span> 1234567890</h6>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+
+                                <li>
+                                    <div class="checkout-icon">
+                                        <lord-icon target=".nav-item" src="https://cdn.lordicon.com/oaflahpk.json"
+                                            trigger="loop-on-hover" colors="primary:#0baf9a" class="lord-icon">
+                                        </lord-icon>
+                                    </div>
+                                    <div class="checkout-box">
+                                        <div class="checkout-title">
+                                            <h4>زمان ارسال</h4>
+                                        </div>
+
+                                        <div class="checkout-detail">
+                                            <div class="row g-4">
+                                                <div class="col-xxl-6">
+                                                    <div class="delivery-option">
+                                                        <div class="delivery-category">
+                                                            <div class="shipment-detail">
+                                                                <div
+                                                                    class="form-check custom-form-check hide-check-box">
+                                                                    <input class="form-check-input" type="radio"
+                                                                        name="standard" id="standard" checked>
+                                                                    <label class="form-check-label"
+                                                                        for="standard">ارسال در تاریخ امروز</label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-xxl-6">
+                                                    <div class="delivery-option">
+                                                        <div class="delivery-category">
+                                                            <div class="shipment-detail">
+                                                                <div
+                                                                    class="form-check mb-0 custom-form-check show-box-checked">
+                                                                    <input class="form-check-input" type="radio"
+                                                                        name="standard" id="future">
+                                                                    <label class="form-check-label" for="future">ارسال در تاریخ : </label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-12 future-box">
+                                                    <div class="future-option">
+                                                        <div class="row g-md-0 gy-4">
+                                                            <div class="col-md-6">
+                                                                <div class="delivery-items">
+                                                                    <div>
+                                                                        <h5 class="items text-content"><span>3 مورد </span>
+                                                                            693.48 تومان</h5>
+                                                                        <h5 class="charge text-content">هزینه ارسال
+                                                                            34.67 تومان
+                                                                            <button type="button" class="btn p-0"
+                                                                                data-bs-toggle="tooltip"
+                                                                                data-bs-placement="top"
+                                                                                title="Extra Charge">
+                                                                                <i
+                                                                                    class="fa-solid fa-circle-exclamation"></i>
+                                                                            </button>
+                                                                        </h5>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-6">
+                                                                <form
+                                                                    class="form-floating theme-form-floating date-box">
+                                                                    <input type="date" class="form-control">
+                                                                    <label>انتخاب زمان </label>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+
+                                <li>
+                                    <div class="checkout-icon">
+                                        <lord-icon target=".nav-item" src="https://cdn.lordicon.com/qmcsqnle.json"
+                                            trigger="loop-on-hover" colors="primary:#0baf9a,secondary:#0baf9a"
+                                            class="lord-icon">
+                                        </lord-icon>
+                                    </div>
+                                    <div class="checkout-box">
+                                        <div class="checkout-title">
+                                            <h4>پرداخت</h4>
+                                        </div>
+
+                                        <div class="checkout-detail">
+                                            <div class="accordion accordion-flush custom-accordion"
+                                                id="accordionFlushExample">
+                                                <div class="accordion-item">
+                                                    <div class="accordion-header" id="flush-headingFour">
+                                                        <div class="accordion-button collapsed"
+                                                            data-bs-toggle="collapse"
+                                                            data-bs-target="#flush-collapseFour">
+                                                            <div class="custom-form-check form-check mb-0">
+                                                                <label class="form-check-label" for="cash"><input
+                                                                        class="form-check-input mt-0" type="radio"
+                                                                        name="flexRadioDefault" id="cash" checked> پرداخت نقدی</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div id="flush-collapseFour"
+                                                        class="accordion-collapse collapse show"
+                                                        data-bs-parent="#accordionFlushExample">
+                                                        <div class="accordion-body">
+                                                            <p class="cod-review">با لینک پرداخت پیامک به صورت دیجیتال پرداخت کنید. در مناطق ممنوعه کووید ممکن است پول نقد پذیرفته نشود. <a href="javascript:void(0)">بیشتر بدانید.</a>
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="accordion-item">
+                                                    <div class="accordion-header" id="flush-headingOne">
+                                                        <div class="accordion-button collapsed"
+                                                            data-bs-toggle="collapse"
+                                                            data-bs-target="#flush-collapseOne">
+                                                            <div class="custom-form-check form-check mb-0">
+                                                                <label class="form-check-label" for="credit"><input
+                                                                        class="form-check-input mt-0" type="radio"
+                                                                        name="flexRadioDefault" id="credit">
+                                                                    پرداخت اینترنتی</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div id="flush-collapseOne" class="accordion-collapse collapse"
+                                                        data-bs-parent="#accordionFlushExample">
+                                                        <div class="accordion-body">
+                                                            <div class="row g-2">
+                                                                <div class="col-12">
+                                                                    <div class="payment-method">
+                                                                        <div
+                                                                            class="form-floating mb-lg-3 mb-2 theme-form-floating">
+                                                                            <input type="text" class="form-control"
+                                                                                id="credit2"
+                                                                                placeholder="Enter Credit & Debit Card Number">
+                                                                            <label for="credit2">اطلاعات کارت خود را وارد کنید</label>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="col-xxl-4">
+                                                                    <div
+                                                                        class="form-floating mb-lg-3 mb-2 theme-form-floating">
+                                                                        <input type="text" class="form-control"
+                                                                            id="expiry" placeholder="Enter Expiry Date">
+                                                                        <label for="expiry">تاریخ انقضا</label>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="col-xxl-4">
+                                                                    <div
+                                                                        class="form-floating mb-lg-3 mb-2 theme-form-floating">
+                                                                        <input type="text" class="form-control" id="cvv"
+                                                                            placeholder="Enter CVV Number">
+                                                                        <label for="cvv">CVV</label>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="col-xxl-4">
+                                                                    <div
+                                                                        class="form-floating mb-lg-3 mb-2 theme-form-floating">
+                                                                        <input type="password" class="form-control"
+                                                                            id="password" placeholder="Enter Password">
+                                                                        <label for="password">رمز</label>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="button-group mt-0">
+                                                                    <ul>
+                                                                        <li>
+                                                                            <button
+                                                                                class="btn btn-light shopping-button">لغو</button>
+                                                                        </li>
+
+                                                                        <li>
+                                                                            <button class="btn btn-animation">استفاده از این کارت</button>
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="right-side-summery-box">
+                        <div class="summery-box-2">
+                            <div class="summery-header">
+                                <h3>سبد خرید</h3>
+                            </div>
+
+                            <ul class="summery-contain">
+                                <li>
+                                    <img src="../assets/images/vegetable/product/1.png"
+                                        class="img-fluid blur-up lazyloaded checkout-image" alt="">
+                                    <h4>فلفل دلمه ای <span>1 عدد</span></h4>
+                                    <h4 class="price">32.34 تومان</h4>
+                                </li>
+
+                                <li>
+                                    <img src="../assets/images/vegetable/product/2.png"
+                                        class="img-fluid blur-up lazyloaded checkout-image" alt="">
+                                    <h4>بادمجان <span>3 عدد</span></h4>
+                                    <h4 class="price">12.23 تومان</h4>
+                                </li>
+
+                                <li>
+                                    <img src="../assets/images/vegetable/product/3.png"
+                                        class="img-fluid blur-up lazyloaded checkout-image" alt="">
+                                    <h4>پیاز <span>2 عدد</span></h4>
+                                    <h4 class="price">18.27 تومان</h4>
+                                </li>
+
+                                <li>
+                                    <img src="../assets/images/vegetable/product/4.png"
+                                        class="img-fluid blur-up lazyloaded checkout-image" alt="">
+                                    <h4>سیب زمینی <span> 1 عدد</span></h4>
+                                    <h4 class="price">26.90 تومان</h4>
+                                </li>
+
+                                <li>
+                                    <img src="../assets/images/vegetable/product/5.png"
+                                        class="img-fluid blur-up lazyloaded checkout-image" alt="">
+                                    <h4>گوجه فرنگی <span>1 عدد</span></h4>
+                                    <h4 class="price">19.28 تومان</h4>
+                                </li>
+
+                                <li>
+                                    <img src="../assets/images/vegetable/product/6.png"
+                                        class="img-fluid blur-up lazyloaded checkout-image" alt="">
+                                    <h4>بروکلی <span>2 عدد</span></h4>
+                                    <h4 class="price">29.69 تومان</h4>
+                                </li>
+                            </ul>
+
+                            <ul class="summery-total">
+                                <li>
+                                    <h4>جمع</h4>
+                                    <h4 class="price">111.81 تومان</h4>
+                                </li>
+
+                                <li>
+                                    <h4>هزینه ارسال</h4>
+                                    <h4 class="price">8.90 تومان</h4>
+                                </li>
+
+                                <li>
+                                    <h4>تخفیف</h4>
+                                    <h4 class="price">23.10 - تومان</h4>
+                                </li>
+
+                                <li class="list-total">
+                                    <h4>جمع کل</h4>
+                                    <h4 class="price">19.28 تومان</h4>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="checkout-offer">
+                            <div class="offer-title">
+                                <div class="offer-icon">
+                                    <img src="../assets/images/inner-page/offer.svg" class="img-fluid" alt="">
+                                </div>
+                                <div class="offer-name">
+                                    <h6>پیشنهادات ویژه</h6>
+                                </div>
+                            </div>
+
+                            <ul class="offer-detail">
+                                <li>
+                                    <p>ترکیب: بی بی رویال بادام/بادام کالیفرنیایی، 100 گرمی بسیار پررنگ...</p>
+                                </li>
+                                <li>
+                                    <p>ترکیب: رویال بادام هندی کالیفرنیایی، 100 گرمی فوق العاده پررنگ + 500 گرمی عسل رویال بی بی</p>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <button class="btn theme-bg-color text-white btn-md w-100 mt-4 fw-bold">ثبت سفارش</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Checkout section End -->
+
 <h4>لیست محصولات</h4>
 <table>
     <thead>
@@ -27,3 +469,8 @@
     {% csrf_token %}
     <button type="submit" class="btn btn-animation proceed-btn fw-bold">پرداخت</button>
 </form>
+{% include 'components/quick_view_modal_box.html' %}
+
+{% include 'product/includes/add-to-cart.html' %}
+
+{% endblock %}

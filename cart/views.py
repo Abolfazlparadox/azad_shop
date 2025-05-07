@@ -9,6 +9,7 @@ from django.views import View
 from .models import Cart, CartDetail, ProductVariant
 from .models import Product
 from django.utils import timezone
+from django.template.loader import render_to_string
 
 class AddProductToCartView(View):
     def get(self, request, *args, **kwargs):
@@ -114,3 +115,34 @@ class UserCartView(LoginRequiredMixin, TemplateView):
         context['cart_items'] = cart.cartdetail_set.all()
         context['total_price'] = cart.calculate_total_price() if hasattr(cart, 'calculate_total_price') else 0
         return context
+
+def remove_from_cart(request, pk):
+    item = get_object_or_404(CartDetail, pk=pk)
+    item.delete()
+    return redirect('user_cart_page')  # اسم درست view سبد خرید
+
+
+def change_cart_detail(request):
+    if request.method == "GET":
+        cart_detail_id = request.GET.get('detail_id')
+        state = request.GET.get('state')
+
+        try:
+            cart_detail = CartDetail.objects.get(id=cart_detail_id)
+
+            if state == 'increase':
+                cart_detail.count += 1
+            elif state == 'decrease' and cart_detail.count > 1:
+                cart_detail.count -= 1
+            cart_detail.save()
+
+            # محاسبه قیمت کل سبد خرید
+            total_cart_price = sum([item.get_total_price() for item in cart_detail.cart.cartdetail_set.all()])
+
+            return JsonResponse({
+                'status': 'success',
+                'total_price': cart_detail.get_total_price(),
+                'total_cart_price': total_cart_price
+            })
+        except CartDetail.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'موردی پیدا نشد'})

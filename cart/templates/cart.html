@@ -2,7 +2,6 @@
 {% load static %}
 {% load thumbnail %}
 {% load poll_extras %}
-{% load poll_extras %}
 
 
 {% block title %}
@@ -145,7 +144,7 @@
                                         <td class="price">
                                             <h4 class="table-title text-content">قیمت</h4>
                                             <h5>{{ item.product.price|three_digits_currency }}<del class="red-text ml-space"></del>{{ item.product.old_price|three_digits_currency}}</h5>
-                                            <h6 class="theme-color">سود شما : 20.680</h6>
+                                            {#   <h6 class="theme-color">سود شما : 20.680</h6>#}
                                         </td>
 
                                         <td class="quantity">
@@ -153,14 +152,20 @@
                                             <div class="quantity-price">
                                                 <div class="cart_qty">
                                                     <div class="input-group">
-                                                        <button type="button" class="btn qty-left-minus"
-                                                            data-type="minus" data-field="">
+                                                        <button
+                                                            type="button"
+                                                            class="btn qty-left-minus"
+                                                            onclick="changeCartDetailCount({{ item.id }}, 'decrease')">
                                                             <i class="fa fa-minus ms-0"></i>
                                                         </button>
+
                                                         <input class="form-control input-number qty-input" type="text"
-                                                            name="quantity" value="{{ item.count }}">
-                                                        <button type="button" class="btn qty-right-plus"
-                                                            data-type="plus" data-field="">
+                                                            name="quantity" value="{{ item.count }}" readonly>
+
+                                                        <button
+                                                            type="button"
+                                                            class="btn qty-right-plus"
+                                                            onclick="changeCartDetailCount({{ item.id }}, 'increase')">
                                                             <i class="fa fa-plus ms-0"></i>
                                                         </button>
                                                     </div>
@@ -168,16 +173,18 @@
                                             </div>
                                         </td>
 
-<td class="subtotal">
-    <h4 class="table-title text-content">قیمت نهایی محصول</h4>
-    <h5>{{ item.get_total_price }}</h5> <!-- از متد get_total_price استفاده کن -->
-</td>
+
+                                <td class="subtotal">
+                                    <h4 class="table-title text-content">قیمت نهایی محصول</h4>
+                                    <h5 id="total-price-{{ item.id }}">{{ item.get_total_price|three_digits_currency }}</h5>
+                                </td>
+
 
 
                                         <td class="save-remove">
                                             <h4 class="table-title text-content">عملیات</h4>
-                                            <a class="save notifi-wishlist" href="javascript:void(0)">افزودن به سبد خرید بعدی</a>
-                                            <a class="remove close_button" href="javascript:void(0)">حذف</a>
+{#                                            <a class="save notifi-wishlist" href="javascript:void(0)">افزودن به سبد خرید بعدی</a>#}
+                                              <a class="remove close_button" href="{% url 'remove_from_cart' item.pk %}">حذف</a>
                                         </td>
                                     </tr>
                                     {% endfor %}
@@ -219,15 +226,14 @@
                                 </li>
                             </ul>
                         </div>
-
-                        <ul class="summery-total">
-                            <li class="list-total border-top-0">
-                                <h4>جمع نهایی</h4>
-
-                                <h4 class="price theme-color">132.200 تومان</h4>
-                            </li>
-                        </ul>
-
+                            <ul class="summery-total">
+                                <li class="list-total border-top-0">
+                                    <h4>جمع نهایی</h4>
+                                    <h4 id="total-cart-price" class="price theme-color">
+                                        {{ total_price|three_digits_currency }}
+                                    </h4>
+                                </li>
+                            </ul>
                         <div class="button-group cart-button">
                             <ul>
                             <li>

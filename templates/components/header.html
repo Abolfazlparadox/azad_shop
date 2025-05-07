@@ -732,8 +732,8 @@
 {#                                        </li>#}
 
                                         <li class="nav-item dropdown">
-                                            <a class="nav-link dropdown-toggle" href="javascript:void(0)"
-                                                data-bs-toggle="dropdown">محصولات</a>
+                                            <a class="nav-link dropdown-toggle" href="{% url 'product:list' %}">محصولات</a>
+
                                             <div class="dropdown-menu dropdown-menu-3 dropdown-menu-2">
                                                 <div class="row">
                                                     {% for main_category in main_categories %}
@@ -755,10 +755,10 @@
                                                                         {{ sub_child.title }}
                                                                     </a>
                                                                 {% empty %}
-                                                                <span class="dropdown-item text-muted">بدون فرزند </span>
+{#                                                                <span class="dropdown-item text-muted">بدون فرزند </span>#}
                                                                 {% endfor %}
                                                             {% empty %}
-                                                                <span class="dropdown-item text-muted">بدون زیر دسته</span>
+{#                                                                <span class="dropdown-item text-muted">بدون زیر دسته</span>#}
                                                             {% endfor %}
                                                         </div>
                                                     </div>

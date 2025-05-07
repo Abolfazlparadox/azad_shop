@@ -40,10 +40,21 @@ $(document).ready(function () {
 
 
 
+
 function changeCartDetailCount(detailId, state) {
-    $.get('/user/change-cart-detail?detail_id=' + detailId + '&state=' + state).then(res => {
-        if (res.status === 'success') {
-            $('#cart-detail-content').html(res.body);
-        }
-    });
+    $.get('/cart/change-cart-detail/?detail_id=' + detailId + '&state=' + state)
+        .done(function (res) {
+            if (res.status === 'success') {
+                // به‌روزرسانی قیمت محصول خاص
+                $('#total-price-' + detailId).text(res.total_price);
+
+                // به‌روزرسانی قیمت کل سبد خرید (در صورتی که لازم باشد)
+                $('#total-cart-price').text(res.total_cart_price);
+            } else {
+                alert('خطا در به‌روزرسانی تعداد');
+            }
+        })
+        .fail(function () {
+            alert('خطا در ارتباط با سرور');
+        });
 }

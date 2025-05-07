@@ -10,6 +10,8 @@ from django.http import JsonResponse
 from django.utils import timezone
 from django.shortcuts import get_object_or_404, render
 from django.contrib import messages
+from django.template.loader import render_to_string
+
 from product.models import University  # if needed
 
 class ProductBaseView:
@@ -42,7 +44,7 @@ class ProductListView(ProductBaseView, ListView):
     model = Product
     template_name = 'product/product-list.html'
     context_object_name = 'products'
-    paginate_by = 1
+    paginate_by = 10
     ordering = ['-created_at']
 
     def get_queryset(self):
@@ -261,4 +263,34 @@ def compare_products(request):
     return render(request, 'product/product-compare.html', {
         'products': products,
         'features': {k: list(v) for k, v in features.items()}
+    })
+
+
+
+
+
+def change_cart_detail_count(request):
+    detail_id = request.GET.get('detail_id')
+    state = request.GET.get('state')  # 'increase' or 'decrease'
+
+    item = get_object_or_404(CartDetail, id=detail_id)
+
+    if state == 'increase':
+        item.count += 1
+    elif state == 'decrease' and item.count > 1:
+        item.count -= 1
+    item.save()
+
+    cart = item.cart
+    cart_details = cart.cartdetail_set.all()
+    total_price = cart.calculate_total_price()
+
+    rendered_html = render_to_string('cart_module/includes/cart_detail_content.html', {
+        'cart_items': cart_details,
+        'total_price': total_price
+    })
+
+    return JsonResponse({
+        'status': 'success',
+        'body': rendered_html
     })
