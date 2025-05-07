@@ -389,7 +389,7 @@ class UserDashboardView(LoginRequiredMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.object  # Use the view's object instead of request.user
-
+        list_address = Address.objects.filter(user=user)
 
         # Basic user information
         context.update({
@@ -402,6 +402,7 @@ class UserDashboardView(LoginRequiredMixin, UpdateView):
             "phone": user.mobile,
             "confirmed_memberships":user.memberships.filter(is_confirmed=True),
             "address": user.address,
+            "list_addresses": list_address,
             "postal_code": user.postal_code,
             "memberships": self._get_user_memberships(user),
             "address_form": AddressForm(),

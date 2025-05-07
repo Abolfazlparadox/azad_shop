@@ -1,0 +1,188 @@
+{# unit_admin/templates/unit_admin/address_form.html #}
+{% extends 'unit_admin/base.html' %}
+{% load static %}
+{% block body %}
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-sm-8 m-auto">
+      <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="card">
+          <div class="card-body">
+            <div class="title-header option-title d-flex justify-content-between align-items-center">
+              <h5>
+                {% if form.instance.pk %}ویرایش نشانی{% else %}افزودن نشانی جدید{% endif %}
+              </h5>
+              <button type="submit" class="btn btn-theme d-flex align-items-center">
+                <i data-feather="save"></i>
+                {% if form.instance.pk %}ذخیره تغییرات{% else %}ذخیره نشانی{% endif %}
+              </button>
+            </div>
+
+            <ul class="nav nav-pills mb-3" id="address-tab" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="details-tab"
+                        data-bs-toggle="pill" data-bs-target="#details"
+                        type="button" role="tab">
+                  مشخصات نشانی
+                </button>
+              </li>
+            </ul>
+
+            <div class="tab-content" id="address-tabContent">
+              <div class="tab-pane fade show active" id="details" role="tabpanel">
+                {# عنوان نشانی #}
+                <div class="mb-4 row align-items-center">
+                  <label class="col-sm-3 col-form-label form-label-title">عنوان نشانی</label>
+                  <div class="col-sm-9">
+                    {{ form.name }}
+                    {% if form.name.errors %}
+                      <div class="text-danger small">{{ form.name.errors.0 }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+                {# کاربر #}
+                <div class="mb-4 row align-items-center">
+                  <label class="col-sm-3 col-form-label form-label-title">کاربر</label>
+                  <div class="col-sm-9">
+                    {{ form.user }}
+                    {% if form.user.errors %}
+                      <div class="text-danger small">{{ form.user.errors.0 }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+                {# دسته‌بندی #}
+                <div class="mb-4 row align-items-center">
+                  <label class="col-sm-3 col-form-label form-label-title">دسته‌بندی</label>
+                  <div class="col-sm-9">
+                    {{ form.category }}
+                    {% if form.category.errors %}
+                      <div class="text-danger small">{{ form.category.errors.0 }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+
+                {# استان #}
+                <div class="mb-4 row align-items-center">
+                  <label class="col-sm-3 col-form-label form-label-title">استان</label>
+                  <div class="col-sm-9">
+                    {{ form.province }}
+                    {% if form.province.errors %}
+                      <div class="text-danger small">{{ form.province.errors.0 }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+
+                {# شهر #}
+                <div class="mb-4 row align-items-center">
+                  <label class="col-sm-3 col-form-label form-label-title">شهر</label>
+                  <div class="col-sm-9">
+                    {{ form.city }}
+                    {% if form.city.errors %}
+                      <div class="text-danger small">{{ form.city.errors.0 }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+
+                {# آدرس کامل #}
+                <div class="mb-4 row align-items-start">
+                  <label class="col-sm-3 col-form-label form-label-title">آدرس کامل</label>
+                  <div class="col-sm-9">
+                    {{ form.address }}
+                    {% if form.address.errors %}
+                      <div class="text-danger small">{{ form.address.errors.0 }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+
+                {# کد پستی #}
+                <div class="mb-4 row align-items-center">
+                  <label class="col-sm-3 col-form-label form-label-title">کد پستی</label>
+                  <div class="col-sm-9">
+                    {{ form.postal_code }}
+                    {% if form.postal_code.errors %}
+                      <div class="text-danger small">{{ form.postal_code.errors.0 }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+
+                {# تلفن #}
+                <div class="mb-4 row align-items-center">
+                  <label class="col-sm-3 col-form-label form-label-title">تلفن</label>
+                  <div class="col-sm-9">
+                    {{ form.telephone }}
+                    {% if form.telephone.errors %}
+                      <div class="text-danger small">{{ form.telephone.errors.0 }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+
+                {# نشانی پیش‌فرض #}
+                <div class="mb-4 row align-items-center">
+                  <div class="col-sm-3"></div>
+                  <div class="col-sm-9">
+                    <div class="form-check form-switch">
+                      {{ form.active }}
+                      <label class="form-check-label">نشانی پیش‌فرض</label>
+                    </div>
+                    {% if form.active.errors %}
+                      <div class="text-danger small">{{ form.active.errors.0 }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{# Province→City AJAX & CSRF Setup #}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const provinceSelect = document.getElementById('id_province');
+    const citySelect = document.getElementById('id_city');
+
+    if (provinceSelect && citySelect) {
+        provinceSelect.addEventListener('change', function() {
+            const provinceId = this.value;
+            if (provinceId) {
+                fetch(`/unit-admin/cities/options/?province_id=${provinceId}`)
+                    .then(response => response.text())
+                    .then(data => {
+                        citySelect.innerHTML = data;
+                    });
+            }
+        });
+    }
+
+    // CSRF Token Handling
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let cookie of cookies) {
+                cookie = cookie.trim();
+                if (cookie.startsWith(name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.slice(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    const csrftoken = getCookie('csrftoken');
+    // Feather icons
+    if (window.feather) {
+        feather.replace();
+    }
+});
+</script>
+
+{% endblock %}

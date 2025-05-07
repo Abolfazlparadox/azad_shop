@@ -50,76 +50,6 @@
                             <span>پیشخوان</span>
                         </a>
                     </li>
-
-{#                    <li class="sidebar-list">#}
-{#                        <a class="linear-icon-link sidebar-link sidebar-title" href="javascript:void(0)">#}
-{#                            <i class="ri-store-3-line"></i>#}
-{#                            <span>محصولات</span>#}
-{#                        </a>#}
-{#                        <ul class="sidebar-submenu">#}
-{#                            <li>#}
-{#                                <a href="products.html">محصولات</a>#}
-{#                            </li>#}
-{##}
-{#                            <li>#}
-{#                                <a href="add-new-product.html">افزودن محصول جدید</a>#}
-{#                            </li>#}
-{#                        </ul>#}
-{#                    </li>#}
-{#                    <li class="sidebar-list">#}
-{#                        <a class="sidebar-link sidebar-title link-nav" href="product-review.html">#}
-{#                            <i class="ri-star-line"></i>#}
-{#                            <span>بررسی محصول</span>#}
-{#                        </a>#}
-{#                    </li>#}
-{#                    <li class="sidebar-list">#}
-{#                        <a class="linear-icon-link sidebar-link sidebar-title" href="javascript:void(0)">#}
-{#                            <i class="ri-price-tag-3-line"></i>#}
-{#                            <span>کد تخفیف</span>#}
-{#                        </a>#}
-{#                        <ul class="sidebar-submenu">#}
-{#                            <li>#}
-{#                                <a href="coupon-list.html">لیست تخفیف ها</a>#}
-{#                            </li>#}
-{##}
-{#                            <li>#}
-{#                                <a href="create-coupon.html">افزودن</a>#}
-{#                            </li>#}
-{#                        </ul>#}
-{#                    </li>#}
-{##}
-{#                    <li class="sidebar-list">#}
-{#                        <a class="linear-icon-link sidebar-link sidebar-title" href="javascript:void(0)">#}
-{#                            <i class="ri-list-check-2"></i>#}
-{#                            <span>دسته بندی</span>#}
-{#                        </a>#}
-{#                        <ul class="sidebar-submenu">#}
-{#                            <li>#}
-{#                                <a href="category.html">لیست دسته ها</a>#}
-{#                            </li>#}
-{##}
-{#                            <li>#}
-{#                                <a href="add-new-category.html">افزودن دسته جدید</a>#}
-{#                            </li>#}
-{#                        </ul>#}
-{#                    </li>#}
-
-{#                    <li class="sidebar-list">#}
-{#                        <a class="linear-icon-link sidebar-link sidebar-title" href="javascript:void(0)">#}
-{#                            <i class="ri-list-settings-line"></i>#}
-{#                            <span>ویژگی ها</span>#}
-{#                        </a>#}
-{#                        <ul class="sidebar-submenu">#}
-{#                            <li>#}
-{#                                <a href="attributes.html">ویژگی ها</a>#}
-{#                            </li>#}
-{##}
-{#                            <li>#}
-{#                                <a href="add-new-attributes.html">افزودن جدید</a>#}
-{#                            </li>#}
-{#                        </ul>#}
-{#                    </li>#}
-
                     <li class="sidebar-list">
                         <a class="sidebar-link sidebar-title" href="javascript:void(0)">
                             <i class="ri-user-3-line"></i>
@@ -137,7 +67,7 @@
 
                     <li class="sidebar-list">
                         <a class="sidebar-link sidebar-title" href="javascript:void(0)">
-                            <i class="ri-user-3-line"></i>
+                            <i class="ri-account-pin-circle-line"></i>
                             <span>نقش ها</span>
                         </a>
                         <ul class="sidebar-submenu">
@@ -149,7 +79,21 @@
                             </li>
                         </ul>
                     </li>
+                    <li class="sidebar-list">
+                        <a class="sidebar-link sidebar-title" href="javascript:void(0)">
+                            <i class="ri-airplay-line"></i>
+                            <span>آدرس ها</span>
+                        </a>
+                        <ul class="sidebar-submenu">
+                            <li>
+                                <a href="{% url 'unit_admin:address_list' %}">نمایش آدرس ها</a>
+                            </li>
 
+                            <li>
+                                <a href="{% url 'unit_admin:address_add' %}">افزودن آدرس جدید</a>
+                            </li>
+                        </ul>
+                    </li>
 {#                    <li class="sidebar-list">#}
 {#                        <a class="sidebar-link sidebar-title link-nav" href="media.html">#}
 {#                            <i class="ri-price-tag-3-line"></i>#}

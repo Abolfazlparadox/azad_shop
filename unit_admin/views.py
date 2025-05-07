@@ -4,11 +4,11 @@ from django.core.exceptions import PermissionDenied
 from django.contrib.auth import get_user_model
 from iranian_cities.models import City
 from django.utils.translation import gettext_lazy as _
-from account.models import Membership
+from account.models import Membership, Address
 from django.views.generic.edit import CreateView,DeleteView
 from django.urls import reverse_lazy
 from django.views import View
-from unit_admin.forms import CustomUserCreationForm, RoleCreationForm
+from unit_admin.forms import CustomUserCreationForm, RoleCreationForm, AddressForm
 from django.contrib import messages
 from django.utils import timezone
 from django.shortcuts import redirect, get_object_or_404, render
@@ -22,7 +22,7 @@ class UnitAdminIndexView(LoginRequiredMixin, TemplateView):
     تنها کاربرانی با نقش OFFI و عضویت تأییدشده در دانشگاه اجازه‌دسترسی دارند.
     """
     template_name = 'unit_admin/index.html'
-    login_url = 'unit_admin_login'       # adjust if your login URL name differs
+    login_url = 'login'       # adjust if your login URL name differs
     redirect_field_name = 'next'
 
     def dispatch(self, request, *args, **kwargs):
@@ -30,9 +30,12 @@ class UnitAdminIndexView(LoginRequiredMixin, TemplateView):
         # (handled by LoginRequiredMixin)
 
         # 2) چک دسترسی OFFI
+      if request.user.is_authenticated:
         if not request.user.memberships.filter(role='OFFI', is_confirmed=True).exists():
             raise PermissionDenied("شما دسترسی لازم را ندارید")
-        return super().dispatch(request, *args, **kwargs)
+      else:
+          raise PermissionDenied("شما دسترسی لازم را ندارید")
+      return super().dispatch(request, *args, **kwargs)
 
 
 
@@ -125,7 +128,6 @@ class UserDeleteView(LoginRequiredMixin, View):
 
         messages.success(request, "کاربر با موفقیت حذف شد")
         return redirect('user_list')
-
 class UserUpdateView(UpdateView):
     model = User
     form_class = CustomUserCreationForm
@@ -148,26 +150,7 @@ class UserUpdateView(UpdateView):
         messages.error(self.request, _('لطفاً خطاهای فرم را بررسی کنید'))
         return self.render_to_response(self.get_context_data(form=form))
 
-class RoleUpdateView(UpdateView):
-    model = Membership
-    form_class = RoleCreationForm
-    template_name = 'unit_admin/add-new-roll.html'
-    context_object_name = 'membership_obj'
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['current_user'] = self.request.user
-        kwargs['university']   = self.request.user.memberships.get(role='OFFI').university
-        return kwargs
-
-    def form_valid(self, form):
-        form.save()
-        messages.success(self.request, _('نقش با موفقیت به‌روز شد'))
-        return redirect('unit_admin:role_list')
-
-    def form_invalid(self, form):
-        messages.error(self.request, _('خطا در به‌روز‌رسانی نقش'))
-        return super().form_invalid(form)
+#city:
 def get_cities(request):
     province_id = request.GET.get('province_id')
 
@@ -181,6 +164,7 @@ def get_cities(request):
 
     return render(request, 'unit_admin/includes/city_options.html', {'cities': cities})
 #role
+
 class RoleListView(LoginRequiredMixin, ListView):
     model = Membership
     template_name = "unit_admin/all-roll.html"
@@ -195,7 +179,6 @@ class RoleListView(LoginRequiredMixin, ListView):
             ).exclude(user=self.request.user).distinct()
         except Membership.DoesNotExist:
             raise PermissionDenied("Access denied.")
-
 class RoleCreateView(LoginRequiredMixin, CreateView):
     form_class    = RoleCreationForm
     template_name = "unit_admin/add-new-roll.html"
@@ -221,7 +204,6 @@ class RoleCreateView(LoginRequiredMixin, CreateView):
     def form_invalid(self, form):
         messages.error(self.request, "لطفا خطاهای فرم را بررسی کنید")
         return super().form_invalid(form)
-
 class RoleDeleteView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         role_id = request.POST.get('role_id')
@@ -235,3 +217,94 @@ class RoleDeleteView(LoginRequiredMixin, View):
         except Membership.DoesNotExist:
             messages.error(request, "Role not found.")
         return redirect('unit_admin:role_list')
+class RoleUpdateView(UpdateView):
+    model = Membership
+    form_class = RoleCreationForm
+    template_name = 'unit_admin/add-new-roll.html'
+    context_object_name = 'membership_obj'
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['current_user'] = self.request.user
+        kwargs['university']   = self.request.user.memberships.get(role='OFFI').university
+        return kwargs
+
+    def form_valid(self, form):
+        form.save()
+        messages.success(self.request, _('نقش با موفقیت به‌روز شد'))
+        return redirect('unit_admin:role_list')
+
+    def form_invalid(self, form):
+        messages.error(self.request, _('خطا در به‌روز‌رسانی نقش'))
+        return super().form_invalid(form)
+
+#address
+
+class AddressMixin(LoginRequiredMixin):
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            offi = request.user.memberships.get(role='OFFI', is_confirmed=True)
+        except Membership.DoesNotExist:
+            raise PermissionDenied(_('شما دسترسی لازم را ندارید'))
+        self.university = offi.university
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        kws = super().get_form_kwargs()
+        kws['university'] = self.university
+        return kws
+
+class AddressListView(AddressMixin, ListView):
+    model = Address
+    template_name = 'unit_admin/address_list.html'
+    context_object_name = 'addresses'
+    paginate_by = 10
+
+class AddressCreateView(AddressMixin, CreateView):
+    model = Address
+    form_class = AddressForm
+    template_name = 'unit_admin/address_form.html'
+    success_url = reverse_lazy('unit_admin:address_list')
+
+    def form_valid(self, form):
+        messages.success(self.request, _('نشانی با موفقیت ایجاد شد'))
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, _('لطفاً خطاهای فرم را اصلاح کنید'))
+        return super().form_invalid(form)
+
+class AddressUpdateView(AddressMixin, UpdateView):
+    model = Address
+    form_class = AddressForm
+    template_name = 'unit_admin/address_form.html'
+    success_url = reverse_lazy('unit_admin:address_list')
+
+    def get_object(self, queryset=None):
+        return get_object_or_404(
+            Address.objects.filter(
+                user__memberships__university=self.university,
+                user__memberships__is_confirmed=True
+            ), pk=self.kwargs['pk']
+        )
+
+    def form_valid(self, form):
+        messages.success(self.request, _('نشانی با موفقیت بروزرسانی شد'))
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, _('خطا در بروزرسانی نشانی'))
+        return super().form_invalid(form)
+class AddressDeleteView(AddressMixin, DeleteView):
+    model         = Address
+    template_name = 'unit_admin/address_list.html'
+    success_url   = reverse_lazy('unit_admin:address_list')
+
+    def get_object(self, queryset=None):
+        return get_object_or_404(self.get_queryset(), pk=self.kwargs['pk'])
+
+    def delete(self, request, *args, **kwargs):
+        obj = self.get_object()
+        obj.delete()
+        messages.success(self.request, _('نشانی با موفقیت حذف شد'))
+        return super().delete(request, *args, **kwargs)

@@ -6,7 +6,8 @@ from .views import (
     UserCreateView,
     RoleListView,
     RoleCreateView,
-    RoleDeleteView, UserDeleteView, UnitAdminIndexView, get_cities, UserUpdateView, RoleUpdateView,
+    RoleDeleteView, UserDeleteView, UnitAdminIndexView, get_cities, UserUpdateView, RoleUpdateView, AddressListView,
+    AddressCreateView, AddressUpdateView, AddressDeleteView,
 )
 
 app_name = 'unit_admin'
@@ -24,4 +25,9 @@ urlpatterns = [
     path('roles/delete/', RoleDeleteView.as_view(), name='delete_role'),
     # شهرها
     path('cities/options/', get_cities, name='city_options'),
+    #addresses
+    path('addresses/', AddressListView.as_view(), name='address_list'),
+    path('addresses/add/', AddressCreateView.as_view(), name='address_add'),
+    path('addresses/<int:pk>/edit/', AddressUpdateView.as_view(), name='address_edit'),
+    path('addresses/<int:pk>/delete/', AddressDeleteView.as_view(), name='address_delete'),
 ]
