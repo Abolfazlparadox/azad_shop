@@ -1,0 +1,258 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load thumbnail %}
+{% load poll_extras %}
+{% load poll_extras %}
+
+
+{% block title %}
+	سبد خرید
+{% endblock %}
+ 
+{% block body %}
+    <!-- Breadcrumb Section Start -->
+    <section class="breadcrumb-section pt-0">
+        <div class="container-fluid-lg">
+            <div class="row">
+                <div class="col-12">
+                    <div class="breadcrumb-contain">
+                        <h2>سبد خرید</h2>
+                        <nav>
+                            <ol class="breadcrumb mb-0">
+                                <li class="breadcrumb-item">
+                                    <a href="index.html">
+                                        <i class="fa-solid fa-house"></i>
+                                    </a>
+                                </li>
+                                <li class="breadcrumb-item active">سبد خرید</li>
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Breadcrumb Section End -->
+
+    <!-- Cart Section Start -->
+    <section class="cart-section section-b-space">
+        <div class="container-fluid-lg">
+            <div class="row g-sm-5 g-3">
+                <div class="col-xxl-9">
+                    <div class="cart-table">
+                        <div class="table-responsive-xl">
+                            <table class="table">
+{#                                                            <tbody>#}
+{#                                    {% for item in cart_items %}#}
+{#                                        <tr class="product-box-contain">#}
+{#                                            <td class="product-detail">#}
+{#                                                <div class="product border-0">#}
+{#                                                    {% thumbnail item.product.main_image "600x400" quality=99 crop="center" as thumb %}#}
+{#                                                        <a href="{{ item.product.get_absolute_url }}" class="product-image">#}
+{#                                                            <img src="{{ thumb.url }}" width="{{ thumb.width }}" height="{{ thumb.height }}"#}
+{#                                                                 class="img-fluid blur-up lazyload" alt="{{ item.product.title }}">#}
+{#                                                        </a>#}
+{#                                                    {% endthumbnail %}#}
+{#                                                    <div class="product-detail">#}
+{#                                                        <ul>#}
+{#                                                            <li class="name">#}
+{#                                                                <a href="{{ item.product.get_absolute_url }}">{{ item.product.title }}</a>#}
+{#                                                            </li>#}
+{##}
+{#                                                            <li class="text-content">#}
+{#                                                                <span class="text-title">قیمت واحد :</span>#}
+{#                                                                {{ item.product.price }} تومان#}
+{#                                                            </li>#}
+{##}
+{#                                                            <li class="quantity-price-box">#}
+{#                                                                <div class="cart_qty">#}
+{#                                                                    <div class="input-group">#}
+{#                                                                        <button type="button" class="btn qty-left-minus" data-type="minus">#}
+{#                                                                            <i class="fa fa-minus ms-0"></i>#}
+{#                                                                        </button>#}
+{#                                                                        <input class="form-control input-number qty-input" type="text"#}
+{#                                                                               name="quantity" value="{{ item.count }}">#}
+{#                                                                        <button type="button" class="btn qty-right-plus" data-type="plus">#}
+{#                                                                            <i class="fa fa-plus ms-0"></i>#}
+{#                                                                        </button>#}
+{#                                                                    </div>#}
+{#                                                                </div>#}
+{#                                                            </li>#}
+{##}
+{#                                                            <li>#}
+{#                                                                <h5>جمع کل : {{ item.final_price }} تومان</h5>#}
+{#                                                            </li>#}
+{#                                                        </ul>#}
+{#                                                    </div>#}
+{#                                                </div>#}
+{#                                            </td>#}
+{##}
+{#                                            <td class="price">#}
+{#                                                <h4 class="table-title text-content">قیمت</h4>#}
+{#                                                <h5>{{ item.product.price }} تومان</h5>#}
+{#                                            </td>#}
+{##}
+{#                                            <td class="quantity">#}
+{#                                                <h4 class="table-title text-content">تعداد</h4>#}
+{#                                                <div class="quantity-price">#}
+{#                                                    {{ item.count }}#}
+{#                                                </div>#}
+{#                                            </td>#}
+{##}
+{#                                            <td class="subtotal">#}
+{#                                                <h4 class="table-title text-content">جمع کل</h4>#}
+{#                                                <h5>{{ item.final_price }} تومان</h5>#}
+{#                                            </td>#}
+{##}
+{#                                            <td class="save-remove">#}
+{#                                                <h4 class="table-title text-content">عملیات</h4>#}
+                                            {#  <a class="remove close_button" href="{% url 'remove_from_cart' item.id %}">حذف</a>#}
+{#                                            </td>#}
+{#                                        </tr>#}
+{#                                    {% empty %}#}
+{#                                        <tr><td colspan="5">سبد خرید شما خالی است.</td></tr>#}
+{#                                    {% endfor %}#}
+{#                                </tbody>#}
+{##}
+{#                            </table>#}
+                                <tbody>
+                                {% for item in cart_items %}
+                                    <tr class="product-box-contain">
+                                        <td class="product-detail">
+                                            <div class="product border-0">
+                                                {% thumbnail item.product.main_image "600x400" quality=99 crop="center" as thumb %}
+                                                        <a href="{{ item.product.get_absolute_url }}" class="product-image">
+                                                            <img src="{{ thumb.url }}" width="{{ thumb.width }}" height="{{ thumb.height }}"
+                                                                 class="img-fluid blur-up lazyload" alt="{{ item.product.title }}">
+                                                        </a>
+                                                    {% endthumbnail %}
+                                                <div class="product-detail">
+                                                    <ul>
+                                                        <li class="name">
+                                                           <a href="{{ item.product.get_absolute_url }}">{{ item.product.title }}</a>
+                                                        </li>
+
+                                                        <li class="text-content"><span class="text-title">رنگ :</span> فعلا خالیه </li>
+
+                                                        <li class="text-content"><span
+                                                                class="text-title">وزن </span> فعلا خالیه  </li>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </td>
+
+                                        <td class="price">
+                                            <h4 class="table-title text-content">قیمت</h4>
+                                            <h5>{{ item.product.price|three_digits_currency }}<del class="red-text ml-space"></del>{{ item.product.old_price|three_digits_currency}}</h5>
+                                            <h6 class="theme-color">سود شما : 20.680</h6>
+                                        </td>
+
+                                        <td class="quantity">
+                                            <h4 class="table-title text-content">تعداد</h4>
+                                            <div class="quantity-price">
+                                                <div class="cart_qty">
+                                                    <div class="input-group">
+                                                        <button type="button" class="btn qty-left-minus"
+                                                            data-type="minus" data-field="">
+                                                            <i class="fa fa-minus ms-0"></i>
+                                                        </button>
+                                                        <input class="form-control input-number qty-input" type="text"
+                                                            name="quantity" value="{{ item.count }}">
+                                                        <button type="button" class="btn qty-right-plus"
+                                                            data-type="plus" data-field="">
+                                                            <i class="fa fa-plus ms-0"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+
+<td class="subtotal">
+    <h4 class="table-title text-content">قیمت نهایی محصول</h4>
+    <h5>{{ item.get_total_price }}</h5> <!-- از متد get_total_price استفاده کن -->
+</td>
+
+
+                                        <td class="save-remove">
+                                            <h4 class="table-title text-content">عملیات</h4>
+                                            <a class="save notifi-wishlist" href="javascript:void(0)">افزودن به سبد خرید بعدی</a>
+                                            <a class="remove close_button" href="javascript:void(0)">حذف</a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xxl-3">
+                    <div class="summery-box p-sticky">
+                        <div class="summery-header">
+                            <h3>صورت حساب</h3>
+                        </div>
+
+                        <div class="summery-contain">
+                            <div class="coupon-cart">
+                                <h6 class="text-content mb-2">کد تخفیف</h6>
+                                <div class="mb-3 coupon-box input-group">
+                                    <input type="email" class="form-control" id="exampleFormControlInput1"
+                                        placeholder="کد تخفیف را وارد کنید">
+                                    <button class="btn-apply">ثبت</button>
+                                </div>
+                            </div>
+                            <ul>
+                                <li>
+                                    <h4>جمع کا</h4>
+                                    <h4 class="price">125.650 تومان</h4>
+                                </li>
+
+                                <li>
+                                    <h4>کد تخفیف</h4>
+                                    <h4 class="price">(-) 0.00</h4>
+                                </li>
+
+                                <li class="align-items-start">
+                                    <h4>هزینه پست</h4>
+                                    <h4 class="price text-end">6.000 تومان</h4>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <ul class="summery-total">
+                            <li class="list-total border-top-0">
+                                <h4>جمع نهایی</h4>
+
+                                <h4 class="price theme-color">132.200 تومان</h4>
+                            </li>
+                        </ul>
+
+                        <div class="button-group cart-button">
+                            <ul>
+                            <li>
+                                <button onclick="location.href = '{% url 'checkout' %}';"
+                                        class="btn btn-animation proceed-btn fw-bold">پرداخت</button>
+                            </li>
+
+
+                                <li>
+                                    <button onclick="location.href = 'index.html';"
+                                        class="btn btn-light shopping-button text-dark">
+                                        <i class="fa-solid fa-arrow-right-long"></i>بازگشت به فروشگاه</button>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Cart Section End -->
+
+
+{% include 'components/quick_view_modal_box.html' %}
+
+{% include 'product/includes/add-to-cart.html' %}
+
+{% endblock %}

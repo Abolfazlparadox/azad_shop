@@ -1,0 +1,125 @@
+# from django.shortcuts import render, get_object_or_404
+# from django.http import JsonResponse, HttpResponse
+# from django.views import View
+# from .models import Cart, CartDetail, ProductVariant
+# import requests
+# import json
+# import time
+# from django.urls import reverse
+# from django.contrib.auth.mixins import LoginRequiredMixin
+# from django.shortcuts import redirect
+#
+# # ----------------------------- Add Product to Cart View -----------------------------
+#
+# class AddProductToCartView(View):
+#     def get(self, request, *args, **kwargs):
+#         product_variant_id = int(request.GET.get('product_variant_id'))
+#         count = int(request.GET.get('count'))
+#
+#         if count < 1:
+#             return JsonResponse({
+#                 'status': 'invalid_count',
+#                 'text': 'مقدار وارد شده معتبر نمی باشد',
+#                 'confirm_button_text': 'مرسی از شما',
+#                 'icon': 'warning'
+#             })
+#
+#         if request.user.is_authenticated:
+#             product_variant = get_object_or_404(ProductVariant, id=product_variant_id)
+#
+#             current_cart, created = Cart.objects.get_or_create(is_paid=False, user_id=request.user.id)
+#             current_cart_detail = current_cart.cartdetail_set.filter(product_variant_id=product_variant_id).first()
+#
+#             if current_cart_detail:
+#                 current_cart_detail.count += count
+#                 current_cart_detail.save()
+#             else:
+#                 CartDetail.objects.create(cart=current_cart, product_variant=product_variant, count=count)
+#
+#             return JsonResponse({
+#                 'status': 'success',
+#                 'text': 'محصول مورد نظر با موفقیت به سبد خرید شما اضافه شد',
+#                 'confirm_button_text': 'باشه ممنونم',
+#                 'icon': 'success'
+#             })
+#         else:
+#             return JsonResponse({
+#                 'status': 'not_auth',
+#                 'text': 'برای افزودن محصول به سبد خرید ابتدا می بایست وارد سایت شوید',
+#                 'confirm_button_text': 'ورود به سایت',
+#                 'icon': 'error'
+#             })
+#
+# # ----------------------------- Request Payment View -----------------------------
+#
+# class RequestPaymentView(LoginRequiredMixin, View):
+#     login_url = 'login_page'  # URL login
+#
+#     def get(self, request, *args, **kwargs):
+#         current_cart, created = Cart.objects.get_or_create(is_paid=False, user_id=request.user.id)
+#         total_price = current_cart.calculate_total_price()
+#
+#         if total_price == 0:
+#             return redirect(reverse('user_cart_page'))  # Redirect if the cart is empty
+#
+#         req_data = {
+#             "merchant_id": MERCHANT,
+#             "amount": total_price * 10,  # Multiply by 10 to get price in Rial
+#             "callback_url": CallbackURL,
+#             "description": description,
+#             "metadata": {"mobile": mobile, "email": email}
+#         }
+#
+#         req_header = {"accept": "application/json", "content-type": "application/json"}
+#         req = requests.post(url=ZP_API_REQUEST, data=json.dumps(req_data), headers=req_header)
+#
+#         authority = req.json().get('data', {}).get('authority')
+#
+#         if not req.json().get('errors'):
+#             return redirect(ZP_API_STARTPAY.format(authority=authority))
+#         else:
+#             e_code = req.json()['errors']['code']
+#             e_message = req.json()['errors']['message']
+#             return HttpResponse(f"Error code: {e_code}, Error Message: {e_message}")
+#
+# # ----------------------------- Verify Payment View -----------------------------
+#
+# class VerifyPaymentView(View):
+#     def get(self, request, *args, **kwargs):
+#         current_cart, created = Cart.objects.get_or_create(is_paid=False, user_id=request.user.id)
+#         total_price = current_cart.calculate_total_price()
+#         t_authority = request.GET.get('Authority')
+#
+#         if request.GET.get('Status') == 'OK':
+#             req_header = {"accept": "application/json", "content-type": "application/json"}
+#             req_data = {
+#                 "merchant_id": MERCHANT,
+#                 "amount": total_price * 10,  # Multiply by 10 to get price in Rial
+#                 "authority": t_authority
+#             }
+#             req = requests.post(url=ZP_API_VERIFY, data=json.dumps(req_data), headers=req_header)
+#
+#             if not req.json().get('errors'):
+#                 t_status = req.json()['data']['code']
+#                 if t_status == 100:
+#                     current_cart.is_paid = True
+#                     current_cart.payment_date = time.time()
+#                     current_cart.save()
+#                     ref_str = req.json()['data']['ref_id']
+#                     return render(request, 'cart_module/payment_result.html', {
+#                         'success': f'تراکنش شما با کد پیگیری {ref_str} با موفقیت انجام شد'
+#                     })
+#                 else:
+#                     return render(request, 'cart_module/payment_result.html', {
+#                         'error': str(req.json()['data']['message'])
+#                     })
+#             else:
+#                 e_code = req.json()['errors']['code']
+#                 e_message = req.json()['errors']['message']
+#                 return render(request, 'cart_module/payment_result.html', {
+#                     'error': e_message
+#                 })
+#         else:
+#             return render(request, 'cart_module/payment_result.html', {
+#                 'error': 'پرداخت با خطا مواجه شد / کاربر از پرداخت ممانعت کرد'
+#             })
