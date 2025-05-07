@@ -214,7 +214,7 @@
                                       </div>
 
                                       <div class="row g-4">
-                                        {% for addr in addresses %}
+                                        {% for addr in list_addresses %}
                                           <div class="col-xxl-6">
                                             <div class="dashboard-detail">
                                               <h6 class="text-content">{{ addr.get_category_display }}</h6>
@@ -874,7 +874,7 @@
                             </div>
 
                             <div class="row g-sm-4 g-3">
-                              {% for addr in addresses %}
+                              {% for addr in list_addresses %}
                                 <div class="col-xxl-4 col-xl-6 col-lg-12 col-md-6">
                                   <div class="address-box">
                                     <div>

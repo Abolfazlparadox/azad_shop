@@ -119,27 +119,82 @@
             $("body").removeClass("offcanvas");
         }
     });
-    $(".mode").on("click", function () {
-        $('.mode i').toggleClass("fa-moon-o").toggleClass("fa-lightbulb-o");
-        $('body').toggleClass("dark-only");
-        var color = $(this).attr("data-attr");
-        localStorage.setItem('body', 'dark-only');
 
-        ////ck editor body dark
-        $('.cke_wysiwyg_frame').contents().find('body').each(function () {
-            if ($("body").hasClass("dark-only")) {
-                $('.cke_wysiwyg_frame').contents().find('body').css({
-                    'background-color': '#1d1e27',
-                    color: '#98a6ad',
-                });
-            } else {
-                $('.cke_wysiwyg_frame').contents().find('body').css({
-                    'background-color': '#ffffff',
-                    color: '#333333',
-                });
-            }
-        });
-    });
+
+  // Helper to set a cookie
+  function setCookie(name, value, days) {
+    let expires = "";
+    if (days) {
+      const date = new Date();
+      date.setTime(date.getTime() + days*24*60*60*1000);
+      expires = "; expires=" + date.toUTCString();
+    }
+    document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+  }
+
+  // Helper to read a cookie
+  function getCookie(name) {
+    const nameEQ = name + "=";
+    const ca = document.cookie.split(";");
+    for (let c of ca) {
+      c = c.trim();
+      if (c.indexOf(nameEQ) === 0)
+        return c.substring(nameEQ.length);
+    }
+    return null;
+  }
+
+  // On page load, apply saved theme
+  $(document).ready(function() {
+    const theme = getCookie("theme");  // "dark" or "light"
+    const $body = $("body");
+    const $icon = $(".mode i");
+
+    if (theme === "dark") {
+      $body.addClass("dark-only");
+      $icon.addClass("fa-lightbulb-o").removeClass("fa-moon-o");
+      // CKEditor styling
+      $('.cke_wysiwyg_frame').contents().find('body').css({
+        "background-color": "#1d1e27",
+        color: "#98a6ad"
+      });
+    } else {
+      $body.removeClass("dark-only");
+      $icon.addClass("fa-moon-o").removeClass("fa-lightbulb-o");
+      $('.cke_wysiwyg_frame').contents().find('body').css({
+        "background-color": "#ffffff",
+        color: "#333333"
+      });
+    }
+  });
+
+  // Your other handlers…
+  // …
+
+  // Dark‐mode toggle handler
+  $(".mode").on("click", function() {
+    const $body = $("body");
+    const $icon = $(this).find("i");
+
+    $body.toggleClass("dark-only");
+    $icon.toggleClass("fa-moon-o fa-lightbulb-o");
+
+    // Save to cookie for 30 days
+    if ($body.hasClass("dark-only")) {
+      setCookie("theme", "dark", 30);
+      // CKEditor dark
+      $('.cke_wysiwyg_frame').contents().find('body').css({
+        "background-color": "#1d1e27",
+        color: "#98a6ad"
+      });
+    } else {
+      setCookie("theme", "light", 30);
+      $('.cke_wysiwyg_frame').contents().find('body').css({
+        "background-color": "#ffffff",
+        color: "#333333"
+      });
+    }
+  });
 })(jQuery);
 
 //page loader

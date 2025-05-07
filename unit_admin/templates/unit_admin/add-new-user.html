@@ -57,6 +57,7 @@
                                     <!-- Login Information Tab -->
                                     <div class="tab-pane fade show active" id="pills-login" role="tabpanel">
                                         <div class="row">
+                                        <!-- username -->
                                             <div class="mb-4 row align-items-center">
                                                 <div class="col-md-9 col-lg-10">
                                                     <label class="col-lg-2 col-md-3 col-form-label form-label-title">نام کاربری</label>
@@ -68,9 +69,24 @@
                                                         {% endfor %}
                                                     </div>
                                                     {% endif %}
+                                                </div>
+                                            </div>
+                                        <!-- email -->
+                                            <div class="mb-4 row align-items-center">
+                                                <div class="col-md-9 col-lg-10">
+                                                    <label class="col-lg-2 col-md-3 col-form-label form-label-title">نام کاربری</label>
+                                                    {{ form.email }}
+                                                    {% if form.email.errors %}
+                                                    <div class="alert alert-danger mt-2">
+                                                        {% for error in form.email.errors %}
+                                                            {{ error|escape }}
+                                                        {% endfor %}
+                                                    </div>
+                                                    {% endif %}
                                                     <small class="form-text text-muted">الزامی. 150 حرف یا کمتر. فقط حروف، اعداد و @/./+/-/_</small>
                                                 </div>
                                             </div>
+                                        <!-- password1 -->
                                             <div class="mb-4 row align-items-center">
                                                 <div class="col-md-9 col-lg-10">
                                                     <label class="col-lg-2 col-md-3 col-form-label form-label-title">رمز عبور</label>
@@ -84,6 +100,7 @@
                                                     {% endif %}
                                                 </div>
                                             </div>
+                                        <!-- password2 -->
                                             <div class="mb-4 row align-items-center">
                                                 <div class="col-md-9 col-lg-10">
                                                     <label class="col-lg-2 col-md-3 col-form-label form-label-title">تکرار رمز عبور</label>
@@ -103,6 +120,7 @@
                                     <!-- Personal Information Tab -->
                                     <div class="tab-pane fade" id="pills-personal" role="tabpanel">
                                         <div class="row">
+                                        <!-- first_name -->
                                             <div class="mb-4 row align-items-center">
                                                 <div class="col-md-9 col-lg-10">
                                                     <label class="col-lg-2 col-md-3 col-form-label form-label-title">نام</label>
@@ -116,6 +134,7 @@
                                                     {% endif %}
                                                 </div>
                                             </div>
+                                        <!-- last_name -->
                                             <div class="mb-4 row align-items-center">
                                                 <div class="col-md-9 col-lg-10">
                                                     <label class="col-lg-2 col-md-3 col-form-label form-label-title">نام خانوادگی</label>
@@ -129,6 +148,7 @@
                                                     {% endif %}
                                                 </div>
                                             </div>
+                                        <!-- mobile -->
                                             <div class="mb-4 row align-items-center">
                                                 <div class="col-md-9 col-lg-10">
                                                     <label class="col-lg-2 col-md-3 col-form-label form-label-title">شماره موبایل</label>
@@ -142,6 +162,7 @@
                                                     {% endif %}
                                                 </div>
                                             </div>
+                                        <!-- national_code -->
                                             <div class="mb-4 row align-items-center">
                                                 <div class="col-md-9 col-lg-10">
                                                     <label class="col-lg-2 col-md-3 col-form-label form-label-title">کد ملی</label>
@@ -155,6 +176,7 @@
                                                     {% endif %}
                                                 </div>
                                             </div>
+                                        <!-- birthday -->
                                             <div class="mb-4 row align-items-center">
                                                 <div class="col-md-9 col-lg-10">
                                                     <label class="col-lg-2 col-md-3 col-form-label form-label-title">تاریخ تولد</label>
@@ -168,6 +190,7 @@
                                                     {% endif %}
                                                 </div>
                                             </div>
+                                        <!-- avatar -->
                                             <div class="mb-4 row align-items-center">
                                                 <div class="col-md-9 col-lg-10">
                                                     <label class="col-lg-2 col-md-3 col-form-label form-label-title">تصویر پروفایل</label>
@@ -187,6 +210,7 @@
                                     <!-- Address Tab -->
                                     <div class="tab-pane fade" id="pills-address" role="tabpanel">
                                         <div class="row">
+                                        <!-- province -->
                                             <div class="mb-4 row align-items-center">
                                                 <div class="col-md-9 col-lg-10">
                                                     <label class="col-lg-2 col-md-3 col-form-label form-label-title">استان</label>
@@ -200,6 +224,7 @@
                                                     {% endif %}
                                                 </div>
                                             </div>
+                                        <!-- city -->
                                             <div class="mb-4 row align-items-center">
                                                 <div class="col-md-9 col-lg-10">
                                                     <label class="col-lg-2 col-md-3 col-form-label form-label-title">شهر</label>
@@ -213,19 +238,7 @@
                                                     {% endif %}
                                                 </div>
                                             </div>
-                                            <div class="col-12">
-                                                <div class="col-md-9 col-lg-10">
-                                                    <label class="col-lg-2 col-md-3 col-form-label form-label-title">آدرس دقیق</label>
-                                                    {{ form.address }}
-                                                    {% if form.address.errors %}
-                                                    <div class="alert alert-danger mt-2">
-                                                        {% for error in form.address.errors %}
-                                                            {{ error|escape }}
-                                                        {% endfor %}
-                                                    </div>
-                                                    {% endif %}
-                                                </div>
-                                            </div>
+                                        <!-- postal_code -->
                                             <div class="mb-4 row align-items-center">
                                                 <div class="col-md-9 col-lg-10">
                                                     <label class="col-lg-2 col-md-3 col-form-label form-label-title">کد پستی</label>
@@ -245,6 +258,7 @@
                                     <!-- Permissions Tab -->
                                     <div class="tab-pane fade" id="pills-permissions" role="tabpanel">
                                         <div class="row">
+                                        <!-- is_verified -->
                                             <div class="col-md-6">
                                                 <div class="form-check form-switch mb-3">
                                                     {{ form.is_verified }}
@@ -257,6 +271,7 @@
                                                     </div>
                                                     {% endif %}
                                                 </div>
+                                            <!-- is_staff -->
                                                 <div class="form-check form-switch mb-3">
                                                     {{ form.is_staff }}
                                                     <label class="form-check-label">دسترسی کارکنان</label>
@@ -268,6 +283,7 @@
                                                     </div>
                                                     {% endif %}
                                                 </div>
+                                            <!-- is_active -->
                                                 <div class="form-check form-switch mb-3">
                                                     {{ form.is_active }}
                                                     <label class="form-check-label">کاربر فعال</label>
@@ -280,6 +296,7 @@
                                                     {% endif %}
                                                 </div>
                                             </div>
+                                        <!-- marketing_consent -->
                                             <div class="col-md-6">
                                                 <div class="form-check form-switch mb-3">
                                                     {{ form.marketing_consent }}
@@ -292,6 +309,7 @@
                                                     </div>
                                                     {% endif %}
                                                 </div>
+                                             <!-- terms_accepted -->
                                                 <div class="form-check form-switch mb-3">
                                                     {{ form.terms_accepted }}
                                                     <label class="form-check-label">پذیرش شرایط</label>
@@ -303,6 +321,7 @@
                                                     </div>
                                                     {% endif %}
                                                 </div>
+                                            <!-- email_verified -->
                                                 <div class="form-check form-switch mb-3">
                                                     {{ form.email_verified }}
                                                     <label class="form-check-label">تایید ایمیل</label>

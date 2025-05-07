@@ -43,6 +43,27 @@
     </div>
   </div>
 </div>
+{# — Delete Address Modal — #}
+<div class="modal fade theme-modal" id="deleteAddressModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header d-block text-center">
+        <h5 class="modal-title w-100">آیا اطمینان دارید؟</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body text-center">
+        <p>نشانی <strong id="deleteAddressName"></strong> به صورت دائمی حذف خواهد شد!</p>
+      </div>
+      <div class="modal-footer justify-content-center">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">خیر</button>
+        <form method="post" id="deleteAddressForm" action="">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger">بله، حذف شود</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 
 {# — Shared Success Modal — #}
 <div class="modal fade theme-modal" id="deleteSuccessModal" tabindex="-1">

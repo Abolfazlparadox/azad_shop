@@ -5,10 +5,16 @@ from django.contrib.auth.forms import UserCreationForm
 from django.db import transaction
 from django.utils import timezone
 from iranian_cities.models import Province, City
-from account.models import User, Membership, AdminActionLog
+from account.models import User, Membership, AdminActionLog, Address
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
+
+
+
+
+
+
 
 User = get_user_model()
 
@@ -19,7 +25,6 @@ class CustomAdminAuthForm(AuthenticationForm):
                 self.error_messages["inactive"],
                 code="inactive",
             )
-
 
 class RoleCreationForm(forms.ModelForm):
     user = forms.ModelChoiceField(
@@ -95,18 +100,6 @@ class RoleCreationForm(forms.ModelForm):
                 }
             )
         return membership
-
-# unit_admin/forms.py
-
-from django import forms
-from django.utils.translation import gettext_lazy as _
-from django.contrib.auth.forms import UserCreationForm
-from django.db import transaction
-from django.utils import timezone
-
-from iranian_cities.models import Province, City
-from account.models import User, Membership, AdminActionLog
-
 
 class CustomUserCreationForm(UserCreationForm):
     province = forms.ModelChoiceField(
@@ -319,3 +312,84 @@ class CustomUserCreationForm(UserCreationForm):
                 )
 
         return user
+
+class AddressForm(forms.ModelForm):
+    class Meta:
+        model = Address
+        user = forms.ModelChoiceField(
+            queryset=User.objects.none(),
+            label=_('کاربر'),
+            widget=forms.Select(attrs={'class': 'form-select'})
+        )
+        fields = [
+            'name','user', 'category', 'address',
+            'postal_code', 'telephone',
+            'province', 'city', 'active'
+        ]
+        widgets = {
+            'user': forms.Select(attrs={'class': 'form-select'}),
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'category': forms.Select(attrs={'class': 'form-select'}),
+            'address': forms.Textarea(attrs={'class': 'form-control', 'rows':3}),
+            'postal_code': forms.TextInput(attrs={'class': 'form-control', 'maxlength':10}),
+            'telephone': forms.TextInput(attrs={'class': 'form-control'}),
+            'province': forms.Select(attrs={'class': 'form-select', 'data-province-select':True}),
+            'city': forms.Select(attrs={'class': 'form-select', 'data-city-select':True}),
+            'active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
+        labels = {
+            'name': _('عنوان نشانی'),
+            'category': _('دسته‌بندی'),
+            'address': _('آدرس کامل'),
+            'postal_code': _('کد پستی'),
+            'telephone': _('تلفن'),
+            'province': _('استان'),
+            'city': _('شهر'),
+            'active': _('نشانی پیش‌فرض'),
+        }
+
+    def __init__(self, *args, **kwargs):
+        # دریافت university و current_user از ویو
+        self.university = kwargs.pop('university', None)
+        super().__init__(*args, **kwargs)
+
+        # فیلتر کردن کوئریست کاربرها به دانشجویان دانشگاه جاری
+        if self.university:
+            qs = User.objects.filter(
+                memberships__university=self.university,
+                memberships__is_confirmed=True
+            ).distinct()
+            self.fields['user'].queryset = qs
+
+        # بقیه‌ی فیلدها: استان و شهر
+        self.fields['province'].queryset = Province.objects.all()
+        if 'province' in self.data:
+            try:
+                pid = int(self.data.get('province'))
+                self.fields['city'].queryset = City.objects.filter(province_id=pid)
+            except (ValueError, TypeError):
+                self.fields['city'].queryset = City.objects.none()
+        elif self.instance.pk:
+            self.fields['city'].queryset = self.instance.province.city_set.all()
+        else:
+            self.fields['city'].queryset = City.objects.none()
+
+    def clean_user(self):
+        user = self.cleaned_data['user']
+        # اطمینان از اینکه کاربر انتخاب‌شده حق عضویت در دانشگاه را دارد
+        if not user.memberships.filter(
+                university=self.university, is_confirmed=True
+        ).exists():
+            raise forms.ValidationError(_('این کاربر به دانشگاه شما تعلق ندارد.'))
+        return user
+
+    def save(self, commit=True):
+        addr = super().save(commit=False)
+        # user همان انتخاب‌شده است—دیگر نیازی نیست از request.user استفاده کنیم
+        if commit:
+            addr.save()
+            if addr.active:
+                Address.objects.filter(
+                    user=addr.user
+                ).exclude(pk=addr.pk).update(active=False)
+        return addr
