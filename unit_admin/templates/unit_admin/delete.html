@@ -65,6 +65,34 @@
   </div>
 </div>
 
+
+{# unit_admin/partials/delete_product_modal.html #}
+<div class="modal fade theme-modal" id="deleteProductModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header d-block text-center">
+        <h5 class="modal-title w-100" id="deleteModalTitle">آیا اطمینان دارید؟</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body text-center">
+        <p id="deleteModalBody">
+          محصول <strong id="deleteProductTitle"></strong> حذف خواهد شد!
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">خیر</button>
+        <form method="post" id="deleteProductForm" action="">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger" id="deleteModalConfirmBtn">
+            بله، حذف شود
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 {# — Shared Success Modal — #}
 <div class="modal fade theme-modal" id="deleteSuccessModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
@@ -159,6 +187,65 @@ document.addEventListener('DOMContentLoaded', function() {
       },
       msg => alert(msg)
     );
+  });
+});
+document.addEventListener('DOMContentLoaded', function() {
+  const modalEl       = document.getElementById('deleteProductModal');
+  const bsModal       = new bootstrap.Modal(modalEl);
+  const formEl        = document.getElementById('deleteProductForm');
+  const titleEl       = document.getElementById('deleteProductTitle');
+  const bodyEl        = document.getElementById('deleteModalBody');
+  const confirmBtn    = document.getElementById('deleteModalConfirmBtn');
+  const headerTitleEl = document.getElementById('deleteModalTitle');
+
+  // Attach to all delete triggers
+  document.querySelectorAll('[data-bs-target="#deleteProductModal"]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id    = btn.dataset.productId;
+      const name  = btn.dataset.productTitle;
+      const type  = btn.dataset.deleteType; // "soft" or "hard"
+
+      // Set the product name in modal
+      titleEl.textContent = name;
+
+      // Customize body text
+      if (type === 'soft') {
+        bodyEl.innerHTML = `محصول <strong>${name}</strong> به‌صورت نرم حذف خواهد شد!`;
+      } else {
+        bodyEl.innerHTML = `محصول <strong>${name}</strong> به‌صورت دائمی حذف خواهد شد!`;
+      }
+
+      // Set form action URL accordingly
+      formEl.action = `/unit-admin/products/${id}/${type === 'soft' ? 'delete' : 'hard-delete'}/`;
+
+      // Update confirm button text (optional)
+      confirmBtn.textContent = type === 'soft' ? 'بله، حذف شود' : 'بله، حذف دائمی شود';
+      confirmBtn.className = type === 'soft'
+        ? 'btn btn-danger'
+        : 'btn btn-danger';
+
+      // Show the modal
+      bsModal.show();
+    });
+  });
+
+  // Handle the form submit via AJAX
+  formEl.addEventListener('submit', function(e) {
+    e.preventDefault();
+    fetch(this.action, {
+      method: 'POST',
+      headers: { 'X-CSRFToken': this.querySelector('[name=csrfmiddlewaretoken]').value }
+    })
+    .then(resp => {
+      if (!resp.ok) throw new Error('خطا در حذف');
+      bsModal.hide();
+      // Reload page to reflect deletion
+      window.location.reload();
+    })
+    .catch(err => {
+      console.error(err);
+      alert('عملیات حذف با خطا مواجه شد.');
+    });
   });
 });
 </script>

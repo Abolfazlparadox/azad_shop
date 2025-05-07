@@ -1,0 +1,156 @@
+{# unit_admin/templates/unit_admin/product_form.html #}
+{% extends 'unit_admin/base.html' %}
+{% load static i18n %}
+
+{% block body %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-sm-8 m-auto">
+      {# Main Product Details Card #}
+      <div class="card">
+        <div class="card-body">
+          <div class="card-header-2">
+            <h5>
+              {% if form.instance.pk %}ویرایش محصول{% else %}ایجاد محصول جدید{% endif %}
+            </h5>
+          </div>
+          <form method="post" enctype="multipart/form-data" class="theme-form theme-form-2 mega-form">
+            {% csrf_token %}
+            {# Title #}
+            <div class="mb-4 row align-items-center">
+              <label class="form-label-title col-sm-3 mb-0">نام محصول</label>
+              <div class="col-sm-9">
+                {{ form.title }}
+                {% if form.title.errors %}<div class="text-danger small">{{ form.title.errors.0 }}</div>{% endif %}
+              </div>
+            </div>
+            {# Categories #}
+            <div class="mb-4 row align-items-center">
+              <label class="col-sm-3 col-form-label form-label-title">دسته‌بندی‌ها</label>
+              <div class="col-sm-9">
+                {{ form.categories }}
+                {% if form.categories.errors %}<div class="text-danger small">{{ form.categories.errors.0 }}</div>{% endif %}
+              </div>
+            </div>
+            {# Brand #}
+            <div class="mb-4 row align-items-center">
+              <label class="col-sm-3 col-form-label form-label-title">برند محصول</label>
+              <div class="col-sm-9">
+                {{ form.brand }}
+                {% if form.brand.errors %}<div class="text-danger small">{{ form.brand.errors.0 }}</div>{% endif %}
+              </div>
+            </div>
+            {# Price & Old Stock #}
+            <div class="mb-4 row align-items-center">
+              <label class="col-sm-3 form-label-title">قیمت</label>
+              <div class="col-sm-9">
+                {{ form.price }}
+                {% if form.price.errors %}<div class="text-danger small">{{ form.price.errors.0 }}</div>{% endif %}
+              </div>
+            </div>
+            <div class="mb-4 row align-items-center">
+              <label class="col-sm-3 form-label-title">تعداد</label>
+              <div class="col-sm-9">
+                {{ form.stock }}
+                {% if form.stock.errors %}<div class="text-danger small">{{ form.stock.errors.0 }}</div>{% endif %}
+              </div>
+            </div>
+            {# Short Description #}
+            <div class="mb-4 row align-items-start">
+              <label class="col-sm-3 col-form-label form-label-title">توضیحات کوتاه</label>
+              <div class="col-sm-9">
+                {{ form.short_description }}
+                {% if form.short_description.errors %}<div class="text-danger small">{{ form.short_description.errors.0 }}</div>{% endif %}
+              </div>
+            </div>
+            {# Main Image #}
+            <div class="row align-items-center mb-4">
+              <label class="col-sm-3 col-form-label form-label-title">تصویر اصلی</label>
+              <div class="col-sm-9">
+                {{ form.main_image }}
+                {% if form.main_image.errors %}<div class="text-danger small">{{ form.main_image.errors.0 }}</div>{% endif %}
+              </div>
+            </div>
+            {# is_active switch #}
+            <div class="mb-4 row align-items-center">
+              <label class="col-sm-3 col-form-label form-label-title">
+                {{ form.is_active.label_tag }}
+              </label>
+              <div class="col-sm-9">
+                <label class="switch">
+                  {{ form.is_active }}
+                  <span class="switch-state"></span>
+                </label>
+                {% if form.is_active.errors %}
+                  <div class="text-danger small">{{ form.is_active.errors.0 }}</div>
+                {% endif %}
+                {% if form.is_active.help_text %}
+                  <div class="form-text">{{ form.is_active.help_text }}</div>
+                {% endif %}
+              </div>
+            </div>
+
+            {# is_deleted switch #}
+            <div class="mb-4 row align-items-center">
+              <label class="col-sm-3 col-form-label form-label-title">
+                {{ form.is_deleted.label_tag }}
+              </label>
+              <div class="col-sm-9">
+                <label class="switch">
+                  {{ form.is_deleted }}
+                  <span class="switch-state"></span>
+                </label>
+                {% if form.is_deleted.errors %}
+                  <div class="text-danger small">{{ form.is_deleted.errors.0 }}</div>
+                {% endif %}
+                {% if form.is_deleted.help_text %}
+                  <div class="form-text">{{ form.is_deleted.help_text }}</div>
+                {% endif %}
+              </div>
+            </div>
+            {# Submit Button #}
+            <div class="text-end">
+              <button type="submit" class="btn btn-theme">
+                <i data-feather="save"></i>
+                {% if form.instance.pk %}ذخیره تغییرات{% else %}ایجاد محصول{% endif %}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      {# Additional Details: weight, dimensions, tags, etc. #}
+      <div class="card mt-4">
+        <div class="card-body">
+          <div class="card-header-2"><h5>جزئیات بیشتر</h5></div>
+          <form method="post" class="theme-form theme-form-2 mega-form">
+            {# Note: This form is just to structure; actual inputs come from same ProductForm #}
+            <div class="mb-4 row align-items-center">
+              <label class="col-sm-3 form-label-title">وزن (کیلوگرم)</label>
+              <div class="col-sm-9">
+                {{ form.weight }}
+                {% if form.weight.errors %}<div class="text-danger small">{{ form.weight.errors.0 }}</div>{% endif %}
+              </div>
+            </div>
+            <div class="mb-4 row align-items-center">
+              <label class="col-sm-3 form-label-title">ابعاد (طول×عرض×ارتفاع)</label>
+              <div class="col-sm-9">
+                {{ form.dimensions }}
+                {% if form.dimensions.errors %}<div class="text-danger small">{{ form.dimensions.errors.0 }}</div>{% endif %}
+              </div>
+            </div>
+            <div class="mb-4 row align-items-center">
+              <label class="col-sm-3 form-label-title">تگ‌ها</label>
+              <div class="col-sm-9">
+                {{ form.tags }}
+                {% if form.tags.errors %}<div class="text-danger small">{{ form.tags.errors.0 }}</div>{% endif %}
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

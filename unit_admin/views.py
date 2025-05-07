@@ -8,7 +8,9 @@ from account.models import Membership, Address
 from django.views.generic.edit import CreateView,DeleteView
 from django.urls import reverse_lazy
 from django.views import View
-from unit_admin.forms import CustomUserCreationForm, RoleCreationForm, AddressForm
+
+from product.models import Product
+from unit_admin.forms import CustomUserCreationForm, RoleCreationForm, AddressForm, ProductForm
 from django.contrib import messages
 from django.utils import timezone
 from django.shortcuts import redirect, get_object_or_404, render
@@ -307,4 +309,71 @@ class AddressDeleteView(AddressMixin, DeleteView):
         obj = self.get_object()
         obj.delete()
         messages.success(self.request, _('نشانی با موفقیت حذف شد'))
+        return super().delete(request, *args, **kwargs)
+
+#product
+class OffiProductMixin:
+    """Ensure OFFI access and set `self.university`."""
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            offi = request.user.memberships.get(role='OFFI', is_confirmed=True)
+        except Membership.DoesNotExist:
+            raise PermissionDenied(_('شما دسترسی لازم را ندارید'))
+        self.university = offi.university
+        return super().dispatch(request, *args, **kwargs)
+
+class ProductListView(LoginRequiredMixin, OffiProductMixin, ListView):
+    model = Product
+    template_name = 'unit_admin/products.html'
+    context_object_name = 'products'
+    paginate_by = 20
+
+    def get_queryset(self):
+        return Product.objects.filter(
+            university=self.university,
+        ).order_by('-created_at')
+
+class ProductCreateView(LoginRequiredMixin, OffiProductMixin, CreateView):
+    model = Product
+    form_class = ProductForm
+    template_name = 'unit_admin/product_form.html'
+    success_url = reverse_lazy('unit_admin:product_list')
+
+    def form_valid(self, form):
+        form.instance.university = self.university
+        messages.success(self.request, _('محصول با موفقیت ایجاد شد'))
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, _('لطفاً خطاهای فرم را اصلاح کنید'))
+        return super().form_invalid(form)
+
+class ProductSoftDeleteView(LoginRequiredMixin, OffiProductMixin, View):
+    """Soft-delete: set is_deleted=True"""
+    def post(self, request, pk):
+        prod = get_object_or_404(
+            Product,
+            pk=pk,
+            university=self.university,
+            is_deleted=False
+        )
+        prod.is_deleted = True
+        prod.save(update_fields=['is_deleted'])
+        messages.success(request, _('محصول با موفقیت حذف (نرم) شد'))
+        return redirect('unit_admin:product_list')
+
+class ProductHardDeleteView(LoginRequiredMixin, OffiProductMixin, DeleteView):
+    """Permanent delete"""
+    model = Product
+    success_url = reverse_lazy('unit_admin:product_list')
+
+    def get_object(self, queryset=None):
+        return get_object_or_404(
+            Product,
+            pk=self.kwargs['pk'],
+            university=self.university
+        )
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(request, _('محصول به صورت دائمی حذف شد'))
         return super().delete(request, *args, **kwargs)

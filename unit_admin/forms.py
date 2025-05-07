@@ -10,11 +10,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
-
-
-
-
-
+from product.models import Product
 
 User = get_user_model()
 
@@ -393,3 +389,59 @@ class AddressForm(forms.ModelForm):
                     user=addr.user
                 ).exclude(pk=addr.pk).update(active=False)
         return addr
+
+class ProductForm(forms.ModelForm):
+    class Meta:
+        model = Product
+        # Exclude auto and system fields
+        exclude = [
+            'slug', 'sku',
+            'university', 'created_at',
+            'updated_at','old_price'
+        ]
+        widgets = {
+            'title': forms.TextInput(attrs={'class':'form-control', 'placeholder': _('عنوان محصول')}),
+            'categories': forms.SelectMultiple(attrs={'class':'form-select'}),
+            'main_image': forms.ClearableFileInput(attrs={'class':'form-control', 'accept':'image/*'}),
+            'brand': forms.Select(attrs={'class':'form-select'}),
+            'price': forms.NumberInput(attrs={'class':'form-control', 'min':0}),
+            'short_description': forms.Textarea(attrs={'class':'form-control', 'rows':3}),
+            'stock': forms.NumberInput(attrs={'class':'form-control', 'min':0}),
+            'weight': forms.NumberInput(attrs={'class':'form-control', 'step':'0.01', 'min':0}),
+            'dimensions': forms.TextInput(attrs={'class':'form-control', 'placeholder': _('طول×عرض×ارتفاع')}),
+            'tags': forms.SelectMultiple(attrs={'class':'form-select'}),
+            'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'is_deleted': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
+        labels = {
+            'title': _('عنوان'),
+            'categories': _('دسته‌بندی‌ها'),
+            'main_image': _('تصویر اصلی'),
+            'brand': _('برند'),
+            'price': _('قیمت'),
+            'short_description': _('توضیحات کوتاه'),
+            'stock': _('موجودی'),
+            'weight': _('وزن (کیلوگرم)'),
+            'dimensions': _('ابعاد'),
+            'tags': _('تگ‌ها'),
+            'is_active': _('فعال/غیرفعال'),
+            'is_deleted': _('حذف شده'),
+        }
+        help_texts = {
+            'is_active': _('با برداشتن تیک، محصول از صفحه فروش حذف می‌شود'),
+            'is_deleted': _('نشان‌دهنده‌ی حذف نرم (soft delete) است'),
+            'weight':     _('وزن محصول را به کیلوگرم وارد کنید'),
+            'dimensions': _('ابعاد را به صورت طول×عرض×ارتفاع به سانتی‌متر وارد کنید'),
+        }
+
+    def clean_price(self):
+        price = self.cleaned_data['price']
+        if price < 0:
+            raise forms.ValidationError(_('قیمت نمی‌تواند منفی باشد'))
+        return price
+
+    def clean_stock(self):
+        stock = self.cleaned_data['stock']
+        if stock < 0:
+            raise forms.ValidationError(_('موجودی نمی‌تواند منفی باشد'))
+        return stock

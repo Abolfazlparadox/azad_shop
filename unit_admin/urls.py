@@ -7,7 +7,8 @@ from .views import (
     RoleListView,
     RoleCreateView,
     RoleDeleteView, UserDeleteView, UnitAdminIndexView, get_cities, UserUpdateView, RoleUpdateView, AddressListView,
-    AddressCreateView, AddressUpdateView, AddressDeleteView,
+    AddressCreateView, AddressUpdateView, AddressDeleteView, ProductListView, ProductCreateView,
+    ProductSoftDeleteView, ProductHardDeleteView,
 )
 
 app_name = 'unit_admin'
@@ -30,4 +31,12 @@ urlpatterns = [
     path('addresses/add/', AddressCreateView.as_view(), name='address_add'),
     path('addresses/<int:pk>/edit/', AddressUpdateView.as_view(), name='address_edit'),
     path('addresses/<int:pk>/delete/', AddressDeleteView.as_view(), name='address_delete'),
+
+    #products
+    path('products/', ProductListView.as_view(), name='product_list'),
+    path('products/add/', ProductCreateView.as_view(), name='product_add'),
+    # Soft delete via POST from a button/form
+    path('products/<int:pk>/delete/', ProductSoftDeleteView.as_view(), name='product_soft_delete'),
+    # Hard delete (if you ever need it)
+    path('products/<int:pk>/hard-delete/', ProductHardDeleteView.as_view(), name='product_hard_delete'),
 ]
