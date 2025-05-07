@@ -32,7 +32,7 @@
                         <div class="media static-top-widget">
                             <div class="media-body p-0">
                                 <span class="m-0">کل سفارشات</span>
-                                <h4 class="mb-0 counter">9856
+                                <h4 class="mb-0 counter">1258
                                     <span class="badge badge-light-danger grow">
                                         <i data-feather="trending-down"></i>8.5%</span>
                                 </h4>
@@ -51,8 +51,8 @@
                         <div class="media static-top-widget">
                             <div class="media-body p-0">
                                 <span class="m-0">مجموع محصولات</span>
-                                <h4 class="mb-0 counter">893
-                                    <a href="add-new-product.html" class="badge badge-light-secondary grow">
+                                <h4 class="mb-0 counter">{{ admin_product.count }}
+                                    <a href="{% url 'unit_admin:product_add' %}" class="badge badge-light-secondary grow">
                                         افزودن محصول جدید</a>
                                 </h4>
                             </div>

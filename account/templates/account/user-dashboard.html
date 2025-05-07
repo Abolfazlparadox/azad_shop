@@ -6,7 +6,7 @@
 <!-- User Dashboard Section Start -->
 {% if user.access_level < 2 %}
 <div class="alert alert-warning">
-    لطفا اطلاعات پروفایل خود را کامل کنید تا بتوانید درخواست نقش ارسال کنید
+    لطفا اطلاعات پروفایل خود را کامل کنید تا به سطح 2 برسید و بتوانید درخواست نقش ارسال کنید
 </div>
 {% endif %}
 <section class="user-dashboard-section section-b-space">
@@ -41,7 +41,7 @@
                                  class="blur-up lazyload update_img"
                                  alt="{{ user.get_full_name }}">
                           {% else %}
-                            <img src="{% static 'images/inner-page/user/default-avatar.jpg' %}"
+                            <img src="{% static 'images/inner-page/user/1.jpg' %}"
                                  class="blur-up lazyload update_img"
                                  alt="{{ user.get_full_name }}">
                           {% endif %}
@@ -129,6 +129,7 @@
 
                                 <div class="dashboard-user-name">
                                     <h6 class="text-content">سلام, <b class="text-title">{{ user.get_full_name }}</b></h6>
+                                    <h6 class="text-content" > سطح شما:{{ user.access_level }}</h6>
                                     <p class="text-content">{{ site_settings.about_us_text }}</p>
                                 </div>
 

@@ -204,11 +204,14 @@
                                             {% if request.user.is_superuser or request.user.role == 'ADMN' %}
                                                 <h5>حساب کاربری: {{ request.user.get_full_name|default:request.user.username }}</h5>
                                                 <h5>ادمین</h5>
+                                                <h6> سطح:{{ request.user.access_level }}</h6>
                                             {% elif request.user.is_authenticated %}
                                                 <h5>حساب کاربری: {{ request.user.get_full_name|default:request.user.username }}</h5>
                                                <h5>{{ request.user.active_role_display }}</h5>
+                                                <h6> سطح:{{ request.user.access_level }}</h6>
                                             {% else %}
                                                 <h5>حساب کاربری</h5>
+                                                <h6>بدون سطح</h6>
                                             {% endif %}
                                         </div>
                                     </div>

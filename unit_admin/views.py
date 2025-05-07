@@ -9,7 +9,7 @@ from django.views.generic.edit import CreateView,DeleteView
 from django.urls import reverse_lazy
 from django.views import View
 
-from product.models import Product
+from product.models import Product,ProductCategory
 from unit_admin.forms import CustomUserCreationForm, RoleCreationForm, AddressForm, ProductForm
 from django.contrib import messages
 from django.utils import timezone
@@ -45,14 +45,18 @@ class UnitAdminIndexView(LoginRequiredMixin, TemplateView):
         ctx = super().get_context_data(**kwargs)
         # نمونه: اضافه کردن داده‌های داشبورد
         admin_membership = self.request.user.memberships.get(role='OFFI')
+        admin_product =  Product.objects.filter(
+            university=admin_membership.university,
+        )
         ctx['university'] = admin_membership.university
+        ctx['admin_product'] = admin_product
         # ctx['stats'] = ... هر داده‌ی دیگری که می‌خواهید به تمپلیت بدهید
         return ctx
 
 
 class UserListView(LoginRequiredMixin, ListView):
     model = User
-    template_name = "unit_admin/all-users.html"
+    template_name = "unit_admin/users/all-users.html"
     context_object_name = "users"
     paginate_by = 3
 
@@ -68,7 +72,7 @@ class UserListView(LoginRequiredMixin, ListView):
             raise PermissionDenied("Access denied.")
 class UserCreateView(LoginRequiredMixin, CreateView):
     form_class = CustomUserCreationForm
-    template_name = "unit_admin/add-new-user.html"
+    template_name = "unit_admin/users/add-new-user.html"
 
     def get_success_url(self):
         return reverse_lazy('unit_admin:user_list')
@@ -133,7 +137,7 @@ class UserDeleteView(LoginRequiredMixin, View):
 class UserUpdateView(UpdateView):
     model = User
     form_class = CustomUserCreationForm
-    template_name = 'unit_admin/add-new-user.html'
+    template_name = 'unit_admin/users/add-new-user.html'
     context_object_name = 'user_obj'
 
     def get_form_kwargs(self):
@@ -169,7 +173,7 @@ def get_cities(request):
 
 class RoleListView(LoginRequiredMixin, ListView):
     model = Membership
-    template_name = "unit_admin/all-roll.html"
+    template_name = "unit_admin/roles/all-roll.html"
     context_object_name = "memberships"
     paginate_by = 10
 
@@ -183,7 +187,7 @@ class RoleListView(LoginRequiredMixin, ListView):
             raise PermissionDenied("Access denied.")
 class RoleCreateView(LoginRequiredMixin, CreateView):
     form_class    = RoleCreationForm
-    template_name = "unit_admin/add-new-roll.html"
+    template_name = "unit_admin/roles/add-new-roll.html"
     success_url   = reverse_lazy('unit_admin:role_list')
 
     def get_form_kwargs(self):
@@ -222,7 +226,7 @@ class RoleDeleteView(LoginRequiredMixin, View):
 class RoleUpdateView(UpdateView):
     model = Membership
     form_class = RoleCreationForm
-    template_name = 'unit_admin/add-new-roll.html'
+    template_name = 'unit_admin/roles/add-new-roll.html'
     context_object_name = 'membership_obj'
 
     def get_form_kwargs(self):
@@ -258,14 +262,14 @@ class AddressMixin(LoginRequiredMixin):
 
 class AddressListView(AddressMixin, ListView):
     model = Address
-    template_name = 'unit_admin/address_list.html'
+    template_name = 'unit_admin/addresses/address_list.html'
     context_object_name = 'addresses'
     paginate_by = 10
 
 class AddressCreateView(AddressMixin, CreateView):
     model = Address
     form_class = AddressForm
-    template_name = 'unit_admin/address_form.html'
+    template_name = 'unit_admin/addresses/address_form.html'
     success_url = reverse_lazy('unit_admin:address_list')
 
     def form_valid(self, form):
@@ -279,7 +283,7 @@ class AddressCreateView(AddressMixin, CreateView):
 class AddressUpdateView(AddressMixin, UpdateView):
     model = Address
     form_class = AddressForm
-    template_name = 'unit_admin/address_form.html'
+    template_name = 'unit_admin/addresses/address_form.html'
     success_url = reverse_lazy('unit_admin:address_list')
 
     def get_object(self, queryset=None):
@@ -299,7 +303,7 @@ class AddressUpdateView(AddressMixin, UpdateView):
         return super().form_invalid(form)
 class AddressDeleteView(AddressMixin, DeleteView):
     model         = Address
-    template_name = 'unit_admin/address_list.html'
+    template_name = 'unit_admin/addresses/address_list.html'
     success_url   = reverse_lazy('unit_admin:address_list')
 
     def get_object(self, queryset=None):
@@ -324,7 +328,7 @@ class OffiProductMixin:
 
 class ProductListView(LoginRequiredMixin, OffiProductMixin, ListView):
     model = Product
-    template_name = 'unit_admin/products.html'
+    template_name = 'unit_admin/products/products.html'
     context_object_name = 'products'
     paginate_by = 20
 
@@ -336,7 +340,7 @@ class ProductListView(LoginRequiredMixin, OffiProductMixin, ListView):
 class ProductCreateView(LoginRequiredMixin, OffiProductMixin, CreateView):
     model = Product
     form_class = ProductForm
-    template_name = 'unit_admin/product_form.html'
+    template_name = 'unit_admin/products/product_form.html'
     success_url = reverse_lazy('unit_admin:product_list')
 
     def form_valid(self, form):
@@ -377,3 +381,66 @@ class ProductHardDeleteView(LoginRequiredMixin, OffiProductMixin, DeleteView):
     def delete(self, request, *args, **kwargs):
         messages.success(request, _('محصول به صورت دائمی حذف شد'))
         return super().delete(request, *args, **kwargs)
+
+# Individual Mixins
+class CategoriesMixin(LoginRequiredMixin):
+    login_url = reverse_lazy('login')
+
+
+class OrdersMixin(LoginRequiredMixin):
+    login_url = reverse_lazy('login')
+
+
+class SettingsMixin(LoginRequiredMixin):
+    login_url = reverse_lazy('login')
+
+
+class TaxMixin(LoginRequiredMixin):
+    login_url = reverse_lazy('login')
+
+
+class TicketsMixin(LoginRequiredMixin):
+    login_url = reverse_lazy('login')
+
+
+class ReportsMixin(LoginRequiredMixin):
+    login_url = reverse_lazy('login')
+
+
+# Views
+class CategoriesListView(CategoriesMixin, ListView):
+    model = ProductCategory  # Replace with your actual model
+    template_name = "unit_admin/categories/list.html"
+    context_object_name = 'categories'
+    ordering = ['-name']
+    paginate_by = 20
+
+class OrdersListView(OrdersMixin, ListView):
+    model = ProductCategory  # Replace with your actual model
+    template_name = "unit_admin/orders/list.html"
+    context_object_name = 'orders'
+    ordering = ['-created_at']
+    paginate_by = 15
+
+class SettingsListView(SettingsMixin, ListView):
+    model = ProductCategory  # Replace with your actual model
+    template_name = "unit_admin/settings/list.html"
+    context_object_name = 'settings'
+
+class TaxListView(TaxMixin, ListView):
+    model = ProductCategory  # Replace with your actual model
+    template_name = "unit_admin/tax/list.html"
+    context_object_name = 'taxes'
+    ordering = ['-rate']
+
+class TicketsListView(TicketsMixin, ListView):
+    model = ProductCategory  # Replace with your actual model
+    template_name = "unit_admin/tickets/list.html"
+    context_object_name = 'tickets'
+    ordering = ['-created_at']
+
+class ReportsListView(ReportsMixin, ListView):
+    model = ProductCategory  # Replace with your actual model
+    template_name = "unit_admin/reports/list.html"
+    context_object_name = 'reports'
+    ordering = ['-generated_at']
