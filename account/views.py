@@ -32,6 +32,7 @@ from django.contrib import messages
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
+from  utility.email_service import send_email
 logger = logging.getLogger(__name__)
 
 class SignupView(CreateView):
@@ -41,29 +42,33 @@ class SignupView(CreateView):
     success_url = reverse_lazy("login")
     def form_valid(self, form):
         user = form.save(commit=False)
-        user.is_active = True
-        user.email_verified = False
-        user.username = user.email  # Set username to email explicitly
-        # Generate and send verification code
-        # First save to create the user (INSERT)
+        user.is_active = False  # کاربر در ابتدا غیر فعال است
+        user.email_verified = False  # ایمیل تأیید نشده
+        user.username = user.email  # نام کاربری برابر ایمیل قرار می‌دهیم
+        print(f'User created with email: {user.email}')  # پرینت پس از ساخت کاربر
         user.save(using='default')
+
+        # ایجاد کد تأیید ایمیل
         token = user.generate_email_verification_code()
-        subject = 'تایید ایمیل برای آزادشاپ'
-        html_message = render_to_string('account/email_verification.html', {
-            'code': token[:6],  # Show first 6 characters
-            'user': user
-        })
-        plain_message = strip_tags(html_message)
+        print(f'Generated email verification code: {token}')  # پرینت پس از ایجاد کد تأیید
 
-        send_mail(
-            subject,
-            plain_message,
-            'noreply@azadshop.ir',
-            [user.email],
-            html_message=html_message
-        )
+        # ساخت URL تأیید ایمیل
+        verification_url = self.request.build_absolute_uri(reverse_lazy('verify-email', kwargs={'pk': user.pk}))
+        print(f'Verification URL: {verification_url}')  # پرینت URL تأیید
 
-        messages.info(self.request, 'کد تأیید به ایمیل شما ارسال شد')
+        # ارسال ایمیل از طریق تابع send_email
+        try:
+            send_email(
+                subject='فعال سازی حساب کاربری',
+                to=user.email,
+                context={'user': user, 'verification_url': verification_url},
+                template_name='account/email_verification.html'
+            )
+            print(f'Email sent successfully to {user.email}')  # پرینت پس از ارسال ایمیل
+        except Exception as e:
+            print(f'Failed to send email: {str(e)}')  # پرینت خطا در صورت ارسال نشدن ایمیل
+
+        messages.info(self.request, _('کد تأیید به ایمیل شما ارسال شد'))
         return redirect('verify-email', pk=user.pk)
 
 

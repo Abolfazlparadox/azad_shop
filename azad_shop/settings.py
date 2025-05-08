@@ -216,7 +216,6 @@ ANONYMOUS_USER_NAME = None
 AUTH_USER_MODEL = 'account.User'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 IRANIAN_CITIES_ADMIN_ADD_READONLY_ENABLED = True
 IRANIAN_CITIES_ADMIN_DELETE_READONLY_ENABLED = True
@@ -229,13 +228,13 @@ LOGOUT_REDIRECT_URL = '/'
 
 SECURE_BROWSER_XSS_FILTER = True
 SESSION_COOKIE_AGE = 1800  # 30 minutes
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_PORT = 587
-# EMAIL_USE_TLS = True
-# EMAIL_HOST_USER = 'your@gmail.com'  # Your Gmail
-# EMAIL_HOST_PASSWORD = 'your-app-password'  # Generate in Google Account
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'servers.requestemail@gmail.com'
+EMAIL_HOST_PASSWORD = 'kavoihngiuyaupdo'
+EMAIL_PORT = 587
 
 
 
