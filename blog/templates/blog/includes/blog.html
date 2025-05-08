@@ -1,13 +1,23 @@
 {% load static %}
+{% load thumbnail %}
 
 <div class="col-12">
   <div class="blog-box blog-list wow fadeInUp">
     <div class="blog-image">
-      {% if post.banner_image %}
-        <img src="{{ post.banner_image.url }}" class="blur-up lazyload" alt="{{ post.title }}" />
-      {% else %}
-        <img src="{% static 'images/inner-page/blog/default.jpg' %}" class="blur-up lazyload" alt="{{ post.title }}" />
-      {% endif %}
+        {% if post.banner_image %}
+          {% thumbnail post.banner_image "500x500" crop="center" as thumb %}
+            <img src="{{ thumb.url }}"
+                 width="{{ thumb.width }}"
+                 height="{{ thumb.height }}"
+                 class="blur-up lazyload rounded"
+                 alt="{{ post.title }}" />
+          {% endthumbnail %}
+        {% else %}
+          <img src="{% static 'images/inner-page/blog/default.jpg' %}"
+               width="800" height="400"
+               class="blur-up lazyload rounded"
+               alt="{{ post.title }}" />
+        {% endif %}
     </div>
     <div class="blog-contain blog-contain-2">
       <div class="blog-label">

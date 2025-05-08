@@ -1,10 +1,12 @@
 # blog/admin.py
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
+from import_export.admin import ImportExportModelAdmin
+
 from .models import BlogPost
 
 @admin.register(BlogPost)
-class BlogPostAdmin(admin.ModelAdmin):
+class BlogPostAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     list_display = (
         'title', 'author', 'category', 'is_published', 'published_at', 'views'
     )
