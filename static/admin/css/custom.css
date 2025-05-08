@@ -140,3 +140,9 @@ html[dir="rtl"] .page-wrapper.compact-wrapper .page-header.close_icon {
         justify-content: space-between;
     }
 }
+
+
+body.dark-only .page-wrapper .page-body-wrapper .page-body .card:not(.email-body) .table thead th {
+    border-bottom: 1px solid #374558 !important;
+    background-color: #262932 !important;
+}

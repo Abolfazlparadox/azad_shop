@@ -29,6 +29,7 @@
             <!-- Product Table -->
             <div class="table-responsive mt-3">
               <table class="table table-hover table-striped theme-table" id="table_id">
+              <thead>
                   <tr>
                     <th scope="col">{% trans "تصویر محصول" %}</th>
                     <th scope="col">{% trans "نام محصول" %}</th>
@@ -39,14 +40,14 @@
                     <th scope="col">{% trans "وضعیت حذف" %}</th>
                     <th scope="col">{% trans "تنظیمات" %}</th>
                   </tr>
-
+                    </thead>
                 <tbody>
                   {% for product in products %}
                   <tr>
                     <td>
                       <div class="table-image">
                         {% if product.main_image %}
-                          {% thumbnail product.main_image "150x150" crop="center" as thumb %}
+                          {% thumbnail product.main_image "150x150" quality=99 crop="center" as thumb %}
                             <img src="{{ thumb.url }}" width="{{ thumb.width }}" height="{{ thumb.height }}"
                                  class="img-fluid rounded" alt="{{ product.title }}">
                           {% endthumbnail %}
