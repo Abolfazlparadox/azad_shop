@@ -159,8 +159,9 @@
                                                             <i class="fa fa-minus ms-0"></i>
                                                         </button>
 
-                                                        <input class="form-control input-number qty-input" type="text"
-                                                            name="quantity" value="{{ item.count }}" readonly>
+                                                            <input id="count-input-{{ item.id }}" class="form-control input-number qty-input"
+                                                                type="text" name="quantity" value="{{ item.count }}" readonly min="1">
+
 
                                                         <button
                                                             type="button"

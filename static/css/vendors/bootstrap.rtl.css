@@ -8276,7 +8276,7 @@ fieldset:disabled .btn {
 }
 
 .bg-dark {
-  background-color: #212529 !important;
+  background-color: var(--theme-color) !important;
 }
 
 .bg-body {

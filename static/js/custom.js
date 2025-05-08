@@ -39,17 +39,37 @@ $(document).ready(function () {
 });
 
 
-
+function formatPriceWithCommas(amount) {
+    amount = Number(amount);
+    return amount.toLocaleString('en-us') + ' تومان';
+}
 
 function changeCartDetailCount(detailId, state) {
     $.get('/cart/change-cart-detail/?detail_id=' + detailId + '&state=' + state)
         .done(function (res) {
-            if (res.status === 'success') {
-                // به‌روزرسانی قیمت محصول خاص
-                $('#total-price-' + detailId).text(res.total_price);
+            const countInput = $('#count-input-' + detailId);
 
-                // به‌روزرسانی قیمت کل سبد خرید (در صورتی که لازم باشد)
-                $('#total-cart-price').text(res.total_cart_price);
+            if (res.status === 'success') {
+                // بروزرسانی تعداد از سمت سرور
+                countInput.val(res.count);
+
+                // بروزرسانی قیمت‌ها با فرمت
+                $('#total-price-' + detailId).text(formatPriceWithCommas(res.total_price));
+                $('#total-cart-price').text(formatPriceWithCommas(res.total_cart_price));
+
+            } else if (res.status === 'invalid_count') {
+                Swal.fire({
+                    title: 'خطا',
+                    text: res.message,
+                    icon: 'warning',
+                    confirmButtonText: 'باشه'
+                });
+
+                // بازگرداندن مقدار معتبر و قیمت‌ها
+                countInput.val(res.count);
+                $('#total-price-' + detailId).text(formatPriceWithCommas(res.total_price));
+                $('#total-cart-price').text(formatPriceWithCommas(res.total_cart_price));
+
             } else {
                 alert('خطا در به‌روزرسانی تعداد');
             }
@@ -58,3 +78,21 @@ function changeCartDetailCount(detailId, state) {
             alert('خطا در ارتباط با سرور');
         });
 }
+
+// function changeCartDetailCount(detailId, state) {
+//     $.get('/cart/change-cart-detail/?detail_id=' + detailId + '&state=' + state)
+//         .done(function (res) {
+//             if (res.status === 'success') {
+//                 // به‌روزرسانی قیمت محصول خاص
+//                 $('#total-price-' + detailId).text(res.total_price);
+//
+//                 // به‌روزرسانی قیمت کل سبد خرید (در صورتی که لازم باشد)
+//                 $('#total-cart-price').text(res.total_cart_price);
+//             } else {
+//                 alert('خطا در به‌روزرسانی تعداد');
+//             }
+//         })
+//         .fail(function () {
+//             alert('خطا در ارتباط با سرور');
+//         });
+// }

@@ -132,17 +132,33 @@ def change_cart_detail(request):
 
             if state == 'increase':
                 cart_detail.count += 1
-            elif state == 'decrease' and cart_detail.count > 1:
-                cart_detail.count -= 1
-            cart_detail.save()
+                cart_detail.save()
 
-            # محاسبه قیمت کل سبد خرید
-            total_cart_price = sum([item.get_total_price() for item in cart_detail.cart.cartdetail_set.all()])
+            elif state == 'decrease':
+                if cart_detail.count > 1:
+                    cart_detail.count -= 1
+                    cart_detail.save()
+                else:
+                    # بازگرداندن وضعیت نامعتبر با قیمت‌ها برای جلوگیری از NaN
+                    return JsonResponse({
+                        'status': 'invalid_count',
+                        'message': 'حداقل تعداد مجاز ۱ است.',
+                        'count': cart_detail.count,
+                        'total_price': cart_detail.get_total_price(),
+                        'total_cart_price': sum([
+                            item.get_total_price() for item in cart_detail.cart.cartdetail_set.all()
+                        ])
+                    })
 
+            # حالت موفق
             return JsonResponse({
                 'status': 'success',
+                'count': cart_detail.count,
                 'total_price': cart_detail.get_total_price(),
-                'total_cart_price': total_cart_price
+                'total_cart_price': sum([
+                    item.get_total_price() for item in cart_detail.cart.cartdetail_set.all()
+                ])
             })
+
         except CartDetail.DoesNotExist:
             return JsonResponse({'status': 'error', 'message': 'موردی پیدا نشد'})

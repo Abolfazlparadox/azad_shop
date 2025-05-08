@@ -18,3 +18,7 @@
 .red-text.ml-space {
     margin-left: 8px !important; /* یا هر مقدار دلخواه مثل 10px */
 }
+select:not(:-internal-list-box):not([multiple]) option {
+    background-color: #1d1d22 !important;  /* اضافه کردن رنگ پس‌زمینه با اولویت */
+    color: white !important; /* تغییر رنگ متن با اولویت */
+}
