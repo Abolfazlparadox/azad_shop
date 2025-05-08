@@ -49,3 +49,5 @@ pip install django-jalali-date
  pip install requests
  python manage.py makemigrations cart
 python manage.py migrate cart
+
+

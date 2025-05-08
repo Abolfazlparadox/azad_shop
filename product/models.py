@@ -38,6 +38,12 @@ class ProductCategory(BaseModel):
         verbose_name='دسته‌بندی والد'
     )
     university = models.ForeignKey(University, on_delete=models.CASCADE, null=True, blank=True)
+    icon = models.FileField(
+        _('آیکون دسته‌بندی'),
+        upload_to='category-icons/',
+        blank=True, null=True,
+        help_text=_('یک فایل SVG یا PNG برای این دسته‌بندی بارگذاری کنید')
+    )
 
     def save(self, *args, **kwargs):
         if not self.slug:

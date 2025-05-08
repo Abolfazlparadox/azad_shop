@@ -10,7 +10,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
-from product.models import Product
+from product.models import Product, ProductCategory
 
 User = get_user_model()
 
@@ -445,3 +445,49 @@ class ProductForm(forms.ModelForm):
         if stock < 0:
             raise forms.ValidationError(_('موجودی نمی‌تواند منفی باشد'))
         return stock
+
+class CategoryForm(forms.ModelForm):
+    class Meta:
+        model = ProductCategory
+        fields = [
+            'title', 'slug', 'parent', 'university',
+            'icon', 'is_active', 'is_deleted'
+        ]
+        widgets = {
+            'title':      forms.TextInput(attrs={'class':'form-control'}),
+            'slug':       forms.TextInput(attrs={'class':'form-control'}),
+            'parent':     forms.Select(attrs={'class':'form-select'}),
+            'university': forms.Select(attrs={'class':'form-select', 'disabled': True}),
+            'icon':       forms.ClearableFileInput(attrs={'class':'form-control','accept':'.svg,.png'}),
+            'is_active':  forms.CheckboxInput(attrs={'class':'form-check-input'}),
+            'is_deleted': forms.CheckboxInput(attrs={'class':'form-check-input'}),
+        }
+        labels = {
+            'title':      _('عنوان'),
+            'slug':       _('نامک'),
+            'parent':     _('والد'),
+            'university': _('دانشگاه'),
+            'icon':       _('آیکن (SVG/PNG)'),
+            'is_active':  _('فعال'),
+            'is_deleted': _('حذف شده (نرم)'),
+        }
+        help_texts = {
+            'slug': _('در صورت خالی، خودکار از عنوان ساخته می‌شود'),
+            'university': _('تنظیم می‌شود براساس دانشگاه دبیر'),
+        }
+
+    def __init__(self, *args, **kwargs):
+        uni = kwargs.pop('university', None)
+        super().__init__(*args, **kwargs)
+        if uni:
+            self.fields['university'].initial = uni
+        # والد فقط دسته‌های همان دانشگاه
+        if uni:
+            qs = ProductCategory.objects.filter(university=uni, is_deleted=False)
+            self.fields['parent'].queryset = qs
+
+    def clean_slug(self):
+        slug = self.cleaned_data['slug']
+        if not slug:
+            slug = slugify(self.cleaned_data.get('title'))
+        return slug
