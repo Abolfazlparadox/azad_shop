@@ -6,21 +6,51 @@ from django.utils.translation import gettext_lazy as _
 from django_admin_listfilter_dropdown.filters import RelatedDropdownFilter
 from admin_auto_filters.filters import AutocompleteFilter
 from .models import (Product, ProductCategory, ProductBrand,ProductVariant, ProductImage, ProductReview,Discount, ProductView , ProductDescription)
+from .models import ProductAttribute, ProductAttributeType
 
 
+
+#
 # --------------------------------------------------------------------------
 # Inlines
 # --------------------------------------------------------------------------
-
 class ProductVariantInline(admin.TabularInline):
     model = ProductVariant
     extra = 1
-    fields = ('color','size','material','stock','price_modifier','final_price')
-    readonly_fields = ('final_price',)
+    fields = ('attributes','price_override','stock' ,'discount',)
+class ProductAttributeInline(admin.TabularInline):
+    model = ProductAttribute
+    extra = 1  # تعداد ردیف‌های خالی برای اضافه کردن ویژگی‌ها
+
+@admin.register(ProductAttributeType)
+class ProductAttributeTypeAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name']
+    search_fields = ['name']
+    ordering = ['name']
+
+
+@admin.register(ProductAttribute)
+class ProductAttributeAdmin(admin.ModelAdmin):
+    list_display = ['id', 'type', 'value']
+    list_filter = ['type']
+    search_fields = ['value']
+    ordering = ['type', 'value']
+
+
+@admin.register(ProductVariant)
+class ProductVariantAdmin(admin.ModelAdmin):
+    list_display = ['id', 'product', 'get_attributes', 'stock',  ]
+    filter_horizontal = ['attributes']
+
+    def get_attributes(self, obj):
+        return " / ".join([str(attr) for attr in obj.attributes.all()])
+    get_attributes.short_description = 'ویژگی‌ها'
 
     def final_price(self, instance):
         return instance.product.price + instance.price_modifier
-    final_price.short_description = _('قیمت نهایی')
+    # def final_price(self, instance):
+    #     return instance.product.price + instance.price_modifier
+    # final_price.short_description = _('قیمت نهایی')
 
 
 class ProductImageInline(admin.TabularInline):
@@ -134,7 +164,7 @@ class ProductDescriptionInline(admin.TabularInline):
 @admin.register(Product)
 class ProductAdmin(UniversityAccessAdmin):
     list_display = (
-        'image_preview', 'title', 'price', 'current_price',
+        'image_preview', 'title',
         'stock_status', 'sku', 'brand', 'category_list'
     )
     list_filter = (
@@ -145,17 +175,16 @@ class ProductAdmin(UniversityAccessAdmin):
     )
     search_fields = ('title', 'sku', 'brand__title', 'short_description')
     prepopulated_fields = {'slug': ('title',)}
-    inlines = [ProductVariantInline, ProductImageInline , ProductDescriptionInline ,]
+    inlines = [ProductImageInline, ProductDescriptionInline, ProductAttributeInline, ProductVariantInline]
     autocomplete_fields = ['categories', 'tags']
-    readonly_fields = ('current_price', 'sku',)
+    readonly_fields = ( 'sku',)
     filter_horizontal = ('categories',)
     raw_id_fields = ('brand',)
     actions = ['restock_products', 'toggle_active']
 
     fieldsets = (
         (None, {'fields': ('title', 'slug', 'brand', 'categories', 'tags')}),
-        (_('قیمت‌گذاری'), {'fields': ('price', 'old_price', 'current_price')}),
-        (_('موجودی'), {'fields': ('stock', 'weight', 'dimensions')}),
+        (_('موجودی'), {'fields': ( 'weight', 'dimensions')}),
         (_('توضیحات'), {'fields': ('main_image', 'short_description',)}),
         (_('وضعیت'), {'fields': ('is_active', 'is_deleted')}),
     )
@@ -224,7 +253,8 @@ class ProductReviewAdmin(UniversityAccessAdmin):
 
 
 @admin.register(Discount)
-class DiscountAdmin(UniversityAccessAdmin):
+# class DiscountAdmin(UniversityAccessAdmin):
+class DiscountAdmin(admin.ModelAdmin):  # ✅ مشکل حل می‌شود
     list_display = ('code', 'discount_type', 'amount', 'valid_status', 'usage_status')
     list_filter = ('discount_type', 'valid_from', 'valid_to')
     filter_horizontal = ('products', 'categories')

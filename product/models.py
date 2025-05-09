@@ -84,12 +84,9 @@ class Product(BaseModel):
     categories = models.ManyToManyField('ProductCategory', related_name='products', verbose_name='دسته‌بندی‌ها')
     main_image = models.ImageField(upload_to='products/main/%Y/%m/%d/', verbose_name='تصویر اصلی')
     brand = models.ForeignKey('ProductBrand', on_delete=models.SET_NULL, null=True, blank=True, verbose_name='برند')
-    price = models.IntegerField(verbose_name='قیمت')  # تغییر به IntegerField
-    old_price = models.IntegerField(null=True, blank=True, verbose_name='قیمت قبلی')  # تغییر به IntegerField
     sku = models.CharField(max_length=50, unique=True, db_index=True, verbose_name='کد محصول (SKU)', blank=True, null=True)
     short_description = models.TextField(max_length=500, verbose_name='توضیحات کوتاه')
     slug = models.SlugField(max_length=300, unique=True, allow_unicode=True, verbose_name='شناسه URL', db_index=True)
-    stock = models.PositiveIntegerField(default=0, verbose_name='موجودی انبار')
     weight = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True, verbose_name='وزن (کیلوگرم)')
     dimensions = models.CharField(max_length=50, blank=True, verbose_name='ابعاد (طول×عرض×ارتفاع)')
     tags = models.ManyToManyField(
@@ -112,9 +109,8 @@ class Product(BaseModel):
         verbose_name = 'محصول'
         verbose_name_plural = 'محصولات'
         indexes = [
-            models.Index(fields=['stock']),
             models.Index(fields=['slug', 'is_active']),
-            models.Index(fields=['price', 'is_active']),
+            models.Index(fields=[ 'is_active']),
             models.Index(fields=['-created_at']),
             models.Index(fields=['sku']),
         ]
@@ -132,57 +128,22 @@ class Product(BaseModel):
             random_digits = str(random.randint(10000, 99999))
             self.sku = abbreviation + random_digits
 
+            # اطمینان از اینکه sku تکراری نباشه
+            while Product.objects.filter(sku=self.sku).exists():
+                random_digits = str(random.randint(10000, 99999))
+                self.sku = abbreviation + random_digits
+
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse('product:product-detail', args=[self.slug])
 
-    @property
-    def current_price(self):
-        return self.old_price if self.old_price and self.old_price < self.price else self.price
+    # @property
+    # def current_price(self):
+    #     return self.old_price if self.old_price and self.old_price < self.price else self.price
 
     def __str__(self):
         return f"{self.title} ({self.sku})"
-
-class ProductVariant(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='variants', verbose_name='محصول')
-    color = models.CharField(max_length=50, verbose_name='رنگ')
-    size = models.CharField(max_length=50, verbose_name='سایز')
-    material = models.CharField(max_length=100, blank=True, verbose_name='جنس')
-    stock = models.PositiveIntegerField(default=0, verbose_name='موجودی')
-    price_modifier = models.DecimalField(max_digits=6, decimal_places=2, default=0, verbose_name='تغییر قیمت')
-
-    class Meta:
-        unique_together = ('product', 'color', 'size')
-        verbose_name = 'تنوع محصول'
-        verbose_name_plural = 'تنوع‌های محصول'
-
-class ProductImage(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images', verbose_name='محصول')
-    image = models.ImageField(upload_to='products/gallery/%Y/%m/%d/', verbose_name='تصویر')
-    order = models.PositiveIntegerField(default=0, verbose_name='ترتیب نمایش')
-    alt_text = models.CharField(max_length=125, blank=True, verbose_name='متن جایگزین')
-
-    class Meta:
-        ordering = ['order']
-        verbose_name = 'تصویر محصول'
-        verbose_name_plural = 'تصاویر محصول'
-
-class ProductReview(BaseModel):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews', verbose_name='محصول')
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='کاربر')
-    rating = models.PositiveSmallIntegerField(
-        validators=[MinValueValidator(1), MaxValueValidator(5)],
-        verbose_name='امتیاز'
-    )
-    title = models.CharField(max_length=200, verbose_name='عنوان نقد')
-    content = models.TextField(verbose_name='محتوا')
-    verified_purchase = models.BooleanField(default=False, verbose_name='خرید تایید شده')
-
-    class Meta:
-        unique_together = ('product', 'user')
-        verbose_name = 'نقد و بررسی'
-        verbose_name_plural = 'نقد و بررسی‌ها'
 
 class Discount(models.Model):
     code = models.CharField(max_length=50, unique=True, verbose_name='کد تخفیف')
@@ -220,6 +181,77 @@ class Discount(models.Model):
     def validate_discount(cls, sender, instance, **kwargs):
         if instance.valid_to <= instance.valid_from:
             raise ValidationError("تاریخ پایان تخفیف باید بعد از تاریخ شروع باشد.")
+
+
+class ProductAttributeType(models.Model):
+    name = models.CharField(max_length=100, verbose_name='نوع ویژگی')
+
+    class Meta:
+        verbose_name = 'نوع ویژگی'
+        verbose_name_plural = 'انواع ویژگی‌ها'
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+
+class ProductAttribute(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='attribute_values', verbose_name='محصول', null=True, blank=True)
+    type = models.ForeignKey(ProductAttributeType, on_delete=models.CASCADE, verbose_name='نوع ویژگی' , null=True, blank=True)
+    value = models.CharField(max_length=100, verbose_name='مقدار ویژگی', null=True, blank=True)
+
+    class Meta:
+        verbose_name = 'مقدار ویژگی'
+        verbose_name_plural = 'مقادیر ویژگی‌ها'
+        ordering = ['type', 'value']
+        unique_together = ('product', 'type', 'value')
+
+    def __str__(self):
+        return f"  {self.type.name}: {self.value}"
+
+class ProductVariant(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='variants',null=True, blank=True, verbose_name='محصول')
+    attributes = models.ManyToManyField(ProductAttribute, blank=True, verbose_name='ویژگی‌ها')
+    stock = models.PositiveIntegerField(verbose_name='تعداد موجودی' ,null=True, blank=True,)
+    price_override = models.IntegerField(null=True, blank=True, verbose_name='قیمت مخصوص این تنوع')
+    discount = models.ForeignKey('Discount', null=True, blank=True, on_delete=models.SET_NULL, related_name='variants')
+
+    class Meta:
+        verbose_name = 'تنوع محصول'
+        verbose_name_plural = 'تنوع‌های محصول'
+
+    def __str__(self):
+        def __str__(self):
+            return f" - {', '.join([str(attr) for attr in self.attributes.all()])} - تخفیف: {self.discount.code if self.discount else 'بدون تخفیف'}"
+
+
+class ProductImage(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images', verbose_name='محصول')
+    image = models.ImageField(upload_to='products/gallery/%Y/%m/%d/', verbose_name='تصویر')
+    order = models.PositiveIntegerField(default=0, verbose_name='ترتیب نمایش')
+    alt_text = models.CharField(max_length=125, blank=True, verbose_name='متن جایگزین')
+
+    class Meta:
+        ordering = ['order']
+        verbose_name = 'تصویر محصول'
+        verbose_name_plural = 'تصاویر محصول'
+
+class ProductReview(BaseModel):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews', verbose_name='محصول')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='کاربر')
+    rating = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)],
+        verbose_name='امتیاز'
+    )
+    title = models.CharField(max_length=200, verbose_name='عنوان نقد')
+    content = models.TextField(verbose_name='محتوا')
+    verified_purchase = models.BooleanField(default=False, verbose_name='خرید تایید شده')
+
+    class Meta:
+        unique_together = ('product', 'user')
+        verbose_name = 'نقد و بررسی'
+        verbose_name_plural = 'نقد و بررسی‌ها'
+
 
 class ProductView(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='views', verbose_name='محصول')
@@ -288,3 +320,7 @@ class ProductDescription(models.Model):
     class Meta:
         verbose_name = 'توضیحات محصول'
         verbose_name_plural = 'توضیحات محصول'
+
+
+
+
