@@ -16,7 +16,7 @@
                                     {% if user_obj %}
                                         <h5>ویرایش کاربر</h5>
                                     {% else %}
-                                        <h5>افزودن کاربر جدید</h5>
+                                        <h5>  افزودن کاربر جدید {{ request.user.memberships.first.university.name }}</h5>
                                     {% endif %}
 
                                     <button type="submit" class="align-items-center btn btn-theme d-flex">
@@ -357,7 +357,7 @@ document.addEventListener('DOMContentLoaded', function() {
         provinceSelect.addEventListener('change', function() {
             const provinceId = this.value;
             if (provinceId) {
-                fetch(`/unit-admin/get-cities/?province_id=${provinceId}`)
+                fetch(`/unit-admin/cities/options?province_id=${provinceId}`)
                     .then(response => response.text())
                     .then(data => {
                         citySelect.innerHTML = data;

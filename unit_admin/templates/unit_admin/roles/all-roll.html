@@ -11,7 +11,7 @@
                     <!-- Table Start -->
                     <div class="card-body">
                         <div class="title-header option-title">
-                            <h5>لیست نقش‌های تأیید شده</h5>
+                            <h5>لیست نقش‌های تأیید شده {{ request.user.memberships.first.university.name }}</h5>
                             <div class="d-inline-flex">
                                 <a href="{% url 'unit_admin:add_role' %}" class="align-items-center btn btn-theme d-flex">
                                     <i data-feather="plus"></i>افزودن نقش جدید

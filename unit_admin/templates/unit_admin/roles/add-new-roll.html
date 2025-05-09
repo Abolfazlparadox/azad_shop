@@ -10,7 +10,7 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="title-header option-title">
-                            <h5>افزودن نقش جدید</h5>
+                            <h5>افزودن نقش جدید {{ request.user.memberships.first.university.name }}</h5>
                             <button type="submit" class="align-items-center btn btn-theme d-flex">
                                 <i data-feather="save"></i>ذخیره نقش
                             </button>

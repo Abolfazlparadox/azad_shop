@@ -5,6 +5,8 @@ from django.contrib.auth.forms import UserCreationForm
 from django.db import transaction
 from django.utils import timezone
 from iranian_cities.models import Province, City
+from slugify import slugify
+
 from account.models import User, Membership, AdminActionLog, Address
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.exceptions import ValidationError
@@ -258,16 +260,15 @@ class CustomUserCreationForm(UserCreationForm):
         return bd
 
     def clean_password2(self):
-        # On edit, if both blank → skip password validation
         password1 = self.cleaned_data.get('password1')
         password2 = self.cleaned_data.get('password2')
 
-        # On update: if both blank, skip validation (i.e. no password change)
-        if self.instance and self.instance.pk and not password1 and not password2:
+        # On update: if both blank, skip password change
+        if self.instance.pk and not password1 and not password2:
             return password2
 
-        # Otherwise, call the parent class’s password2 validator
-        return super(CustomUserCreationForm, self).clean_password2()
+        # Otherwise explicitly invoke the built-in validation
+        return UserCreationForm.clean_password2(self)
 
     def save(self, commit=True):
         with transaction.atomic():

@@ -20,24 +20,26 @@ User = get_user_model()
 
 class OffiMixin(LoginRequiredMixin):
     login_url = reverse_lazy('login')
+
+
     def dispatch(self, request, *args, **kwargs):
         try:
+
             offi = request.user.memberships.get(role='OFFI', is_confirmed=True)
-        except Membership.DoesNotExist:
+        except Membership.DoesNotExist :
+            print('1')
             raise PermissionDenied(_('شما دسترسی ندارید'))
         self.university = offi.university
         return super().dispatch(request, *args, **kwargs)
-
-    def get_form_kwargs(self):
-        kws = super().get_form_kwargs()
-        kws['university'] = self.university
-        return kws
 
 class UnitAdminIndexView(OffiMixin, TemplateView):
     template_name = 'unit_admin/index.html'
     login_url = 'login'       # adjust if your login URL name differs
     redirect_field_name = 'next'
-
+    def get_form_kwargs(self):
+        kws = super().get_form_kwargs()
+        kws['university'] = self.university
+        return kws
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         # نمونه: اضافه کردن داده‌های داشبورد
@@ -50,12 +52,16 @@ class UnitAdminIndexView(OffiMixin, TemplateView):
         # ctx['stats'] = ... هر داده‌ی دیگری که می‌خواهید به تمپلیت بدهید
         return ctx
 
+#user
 class UserListView(OffiMixin, ListView):
     model = User
     template_name = "unit_admin/users/all-users.html"
     context_object_name = "users"
     paginate_by = 3
-
+    def get_form_kwargs(self):
+        kws = super().get_form_kwargs()
+        kws['university'] = self.university
+        return kws
     def get_queryset(self):
         try:
             admin_membership = self.request.user.memberships.get(role='OFFI')
@@ -74,13 +80,9 @@ class UserCreateView(OffiMixin, CreateView):
         return reverse_lazy('unit_admin:user_list')
 
     def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        try:
-            kwargs['university'] = self.request.user.memberships.get(role='OFFI').university
-
-        except Membership.DoesNotExist:
-            raise PermissionDenied("شما دسترسی لازم را ندارید")
-        return kwargs
+        kws = super().get_form_kwargs()
+        kws['university'] = self.university
+        return kws
 
     def form_valid(self, form):
         user = form.save(commit=False)
@@ -105,11 +107,37 @@ class UserCreateView(OffiMixin, CreateView):
         messages.error(self.request, "خطاهای زیر را برطرف کنید:")
         messages.error(self.request, "\n".join(error_messages))
         return self.render_to_response(self.get_context_data(form=form))
+
+class UserUpdateView(OffiMixin,UpdateView):
+    model = User
+    form_class = CustomUserCreationForm
+    template_name = 'unit_admin/users/add-new-user.html'
+    context_object_name = 'user_obj'
+
+    def get_form_kwargs(self):
+        # pass both current_user and university
+        kwargs = super().get_form_kwargs()
+        kwargs['current_user'] = self.request.user
+        kwargs['university'] = self.university
+        return kwargs
+
+    def form_valid(self, form):
+        form.save()
+        messages.success(self.request, _('اطلاعات کاربر با موفقیت به‌روز شد'))
+        return redirect('unit_admin:user_list')
+
+    def form_invalid(self, form):
+        print('hi')
+        messages.error(self.request, _('لطفاً خطاهای فرم را بررسی کنید'))
+        return self.render_to_response(self.get_context_data(form=form))
 class UserDeleteView(OffiMixin, View):
     """
     Handles AJAX (and normal) POST to delete a user.
     """
-
+    def get_form_kwargs(self):
+        kws = super().get_form_kwargs()
+        kws['university'] = self.university
+        return kws
     def post(self, request, pk, *args, **kwargs):
         # Permission check
         if not request.user.memberships.filter(role='OFFI', is_confirmed=True).exists():
@@ -130,28 +158,6 @@ class UserDeleteView(OffiMixin, View):
 
         messages.success(request, "کاربر با موفقیت حذف شد")
         return redirect('user_list')
-class UserUpdateView(OffiMixin,UpdateView):
-    model = User
-    form_class = CustomUserCreationForm
-    template_name = 'unit_admin/users/add-new-user.html'
-    context_object_name = 'user_obj'
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['current_user'] = self.request.user
-        kwargs['university']   = self.request.user.memberships.get(role='OFFI').university
-        return kwargs
-
-    def form_valid(self, form):
-        form.save()
-        messages.success(self.request, _('اطلاعات کاربر با موفقیت به‌روز شد'))
-        return redirect('unit_admin:user_list')
-
-    def form_invalid(self, form):
-        print('hi')
-        messages.error(self.request, _('لطفاً خطاهای فرم را بررسی کنید'))
-        return self.render_to_response(self.get_context_data(form=form))
-
 #city:
 def get_cities(request):
     province_id = request.GET.get('province_id')
@@ -172,7 +178,10 @@ class RoleListView(OffiMixin, ListView):
     template_name = "unit_admin/roles/all-roll.html"
     context_object_name = "memberships"
     paginate_by = 10
-
+    def get_form_kwargs(self):
+        kws = super().get_form_kwargs()
+        kws['university'] = self.university
+        return kws
     def get_queryset(self):
         try:
             university = self.request.user.memberships.get(role='OFFI').university
@@ -187,12 +196,10 @@ class RoleCreateView(OffiMixin, CreateView):
     success_url   = reverse_lazy('unit_admin:role_list')
 
     def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        # pass current user
-        kwargs['current_user'] = self.request.user
-        # pass university for form validation
-        kwargs['university']   = self.request.user.memberships.get(role='OFFI').university
-        return kwargs
+        kws = super().get_form_kwargs()
+        kws['current_user'] = self.request.user
+        kws['university'] = self.university
+        return kws
 
     def form_valid(self, form):
         membership = form.save(commit=False)
@@ -247,12 +254,16 @@ class AddressListView(OffiMixin, ListView):
     template_name = 'unit_admin/addresses/address_list.html'
     context_object_name = 'addresses'
     paginate_by = 10
+    def get_form_kwargs(self):
+        kws = super().get_form_kwargs()
+        kws['current_user'] = self.request.user
+        kws['university'] = self.university
+        return kws
 class AddressCreateView(OffiMixin, CreateView):
     model = Address
     form_class = AddressForm
     template_name = 'unit_admin/addresses/address_form.html'
     success_url = reverse_lazy('unit_admin:address_list')
-
     def form_valid(self, form):
         messages.success(self.request, _('نشانی با موفقیت ایجاد شد'))
         return super().form_valid(form)
@@ -266,6 +277,11 @@ class AddressUpdateView(OffiMixin, UpdateView):
     template_name = 'unit_admin/addresses/address_form.html'
     success_url = reverse_lazy('unit_admin:address_list')
 
+    def get_form_kwargs(self):
+        kws = super().get_form_kwargs()
+        kws['current_user'] = self.request.user
+        kws['university'] = self.university
+        return kws
     def get_object(self, queryset=None):
         return get_object_or_404(
             Address.objects.filter(
@@ -300,8 +316,12 @@ class ProductListView( OffiMixin, ListView):
     model = Product
     template_name = 'unit_admin/products/products.html'
     context_object_name = 'products'
-    paginate_by = 20
-
+    paginate_by = 2
+    def get_form_kwargs(self):
+        kws = super().get_form_kwargs()
+        kws['current_user'] = self.request.user
+        kws['university'] = self.university
+        return kws
     def get_queryset(self):
         return Product.objects.filter(
             university=self.university,
@@ -354,7 +374,11 @@ class ProductHardDeleteView( OffiMixin, DeleteView):
 class CategoryListView(OffiMixin, ListView):
     template_name = "unit_admin/categories/categories-list.html"
     paginate_by = 5
-
+    def get_form_kwargs(self):
+        kws = super().get_form_kwargs()
+        kws['current_user'] = self.request.user
+        kws['university'] = self.university
+        return kws
     def get_queryset(self):
         # return the flat rows list instead of model instances
         qs = ProductCategory.objects.filter(

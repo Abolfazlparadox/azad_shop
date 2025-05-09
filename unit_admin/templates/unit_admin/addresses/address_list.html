@@ -10,7 +10,7 @@
             <div class="card card-table">
                 <div class="card-body">
                     <div class="title-header option-title d-flex justify-content-between align-items-center">
-                        <h5>لیست نشانی‌های دانشگاه {{ request.user.memberships.first.university.name }}</h5>
+                        <h5>لیست نشانی‌های کاربران {{ request.user.memberships.first.university.name }}</h5>
                         <a href="{% url 'unit_admin:address_add' %}" class="btn btn-theme d-flex align-items-center">
                             <i data-feather="plus"></i> افزودن نشانی جدید
                         </a>
