@@ -6,7 +6,7 @@ from django.db import transaction
 from django.utils import timezone
 from iranian_cities.models import Province, City
 from slugify import slugify
-
+from django.contrib.auth.password_validation import validate_password
 from account.models import User, Membership, AdminActionLog, Address
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.exceptions import ValidationError
@@ -123,6 +123,7 @@ class CustomUserCreationForm(UserCreationForm):
             'birthday',   'avatar',         'province',  'city',
             'address',    'postal_code',    'is_verified',
             'is_staff',   'is_active',      'marketing_consent',
+            'is_deleted',
             'terms_accepted','email_verified'
         )
         widgets = {
@@ -187,33 +188,36 @@ class CustomUserCreationForm(UserCreationForm):
             'marketing_consent': forms.CheckboxInput(attrs={'class': 'form-check-input','role': 'switch'}),
             'terms_accepted': forms.CheckboxInput(attrs={'class': 'form-check-input','role': 'switch'}),
             'email_verified': forms.CheckboxInput(attrs={'class': 'form-check-input','role': 'switch'}),
+            'is_deleted': forms.CheckboxInput(attrs={'class': 'form-check-input', 'role': 'switch'}),
         }
 
     def __init__(self, *args, **kwargs):
-        # Pop custom kwargs so base __init__ won’t error
         self.current_user = kwargs.pop('current_user', None)
-        self.university   = kwargs.pop('university', None)
+        self.university = kwargs.pop('university', None)
         super().__init__(*args, **kwargs)
 
-        # Help-text for username
-        self.fields['username'].help_text = _('الزامی. ۱۵۰ نویسه یا کمتر. فقط حروف، اعداد و @/./+/-/_')
+        # تعیین required بودن
+        for fname in ('username', 'email', 'password1', 'password2'):
+            self.fields[fname].required = True
+            self.fields[fname].help_text = _('این فیلد الزامی است')
 
-        # Password optional on edit
+        # سایر فیلدها را اختیاری کنید
+        optional = set(self.fields) - {'username', 'email', 'password1', 'password2'}
+        for fname in optional:
+            self.fields[fname].required = False
+            # حذف HTML5 required از ویجت
+            self.fields[fname].widget.attrs.pop('required', None)
+
+        # در ویرایش: مقدار اولیه بدهید
         if self.instance and self.instance.pk:
+            for field in self.fields:
+                if hasattr(self.instance, field):
+                    self.fields[field].initial = getattr(self.instance, field)
+            # رمز را اختیاری کنید
             self.fields['password1'].required = False
             self.fields['password2'].required = False
-            self.fields['password1'].help_text = _('رمز جدید (در صورت تمایل)')
+            self.fields['password1'].help_text = _('رمز جدید (اختیاری)')
             self.fields['password2'].help_text = _('تکرار رمز جدید')
-
-        # City dropdown: filter by POSTed province or existing one
-        if 'province' in self.data:
-            try:
-                prov_id = int(self.data.get('province'))
-                self.fields['city'].queryset = City.objects.filter(province_id=prov_id)
-            except (ValueError, TypeError):
-                pass
-        elif self.instance and self.instance.pk and self.instance.province_id:
-            self.fields['city'].queryset = City.objects.filter(province_id=self.instance.province_id)
 
     def clean_username(self):
         username = self.cleaned_data['username']
@@ -267,72 +271,70 @@ class CustomUserCreationForm(UserCreationForm):
         if self.instance.pk and not password1 and not password2:
             return password2
 
-        # Otherwise explicitly invoke the built-in validation
-        return UserCreationForm.clean_password2(self)
+        # Both must be provided
+        if not password1 or not password2:
+            raise forms.ValidationError(_('لطفاً هر دو فیلد رمز را پر کنید'))
+
+        # Must match
+        if password1 != password2:
+            raise forms.ValidationError(_('رمز عبور و تکرار آن یکسان نیستند'))
+
+        # Run Django's built-in validators (length, complexity, etc.)
+        try:
+            validate_password(password2, user=self.instance)
+        except forms.ValidationError as e:
+            raise forms.ValidationError(e.messages)
+
+        return password2
 
     def save(self, commit=True):
-        with transaction.atomic():
-            user = super().save(commit=False)
-
-            # Update password only if provided
-            if self.cleaned_data.get('password1'):
-                user.set_password(self.cleaned_data['password1'])
-
-            if commit:
-                user.save()
-                self.save_m2m()
-
-            # New user: create membership + log
+        user = super().save(commit=False)
+        # اگر رمز وارد شده باشد، ستش کنید
+        new_pwd = self.cleaned_data.get('password1')
+        if new_pwd:
+            user.set_password(new_pwd)
+        if commit:
+            user.save()
+            self.save_m2m()
+            # در ایجاد: عضویت بسازید
             if not self.instance.pk:
                 Membership.objects.create(
                     user=user,
                     university=self.university,
-                    role='student',
-                    is_confirmed=True
+                    role='student', is_confirmed=True
                 )
-                AdminActionLog.objects.create(
-                    actor=self.current_user,
-                    action='create_user',
-                    target_user=user,
-                    metadata={
-                        'email': user.email,
-                        'created_at': timezone.now().isoformat()
-                    }
-                )
-            else:
-                # Existing user: log update
-                AdminActionLog.objects.create(
-                    actor=self.current_user,
-                    action='update_user',
-                    target_user=user,
-                    metadata={'updated_at': timezone.now().isoformat()}
-                )
-
         return user
 
 class AddressForm(forms.ModelForm):
+    # 1) Declare the 'user' field here, not inside Meta
+    user = forms.ModelChoiceField(
+        queryset=User.objects.none(),
+        label=_('کاربر'),
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
+
     class Meta:
         model = Address
-        user = forms.ModelChoiceField(
-            queryset=User.objects.none(),
-            label=_('کاربر'),
-            widget=forms.Select(attrs={'class': 'form-select'})
-        )
         fields = [
-            'name','user', 'category', 'address',
+            'name', 'user', 'category', 'address',
             'postal_code', 'telephone',
             'province', 'city', 'active'
         ]
         widgets = {
-            'user': forms.Select(attrs={'class': 'form-select'}),
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'category': forms.Select(attrs={'class': 'form-select'}),
-            'address': forms.Textarea(attrs={'class': 'form-control', 'rows':3}),
-            'postal_code': forms.TextInput(attrs={'class': 'form-control', 'maxlength':10}),
+            'address': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'postal_code': forms.TextInput(attrs={'class': 'form-control', 'maxlength': 10}),
             'telephone': forms.TextInput(attrs={'class': 'form-control'}),
-            'province': forms.Select(attrs={'class': 'form-select', 'data-province-select':True}),
-            'city': forms.Select(attrs={'class': 'form-select', 'data-city-select':True}),
-            'active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'province': forms.Select(attrs={
+                'class': 'form-select',
+                'data-province-select': True
+            }),
+            'city':    forms.Select(attrs={
+                'class': 'form-select',
+                'data-city-select': True
+            }),
+            'active':  forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
         labels = {
             'name': _('عنوان نشانی'),
@@ -346,45 +348,53 @@ class AddressForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
-        # دریافت university و current_user از ویو
+        # Pop the passed-in university
         self.university = kwargs.pop('university', None)
         super().__init__(*args, **kwargs)
 
-        # فیلتر کردن کوئریست کاربرها به دانشجویان دانشگاه جاری
+        # 1) Filter users to those confirmed in this university
         if self.university:
             qs = User.objects.filter(
                 memberships__university=self.university,
                 memberships__is_confirmed=True
             ).distinct()
-            self.fields['user'].queryset = qs
+        else:
+            qs = User.objects.none()
+        self.fields['user'].queryset = qs
 
-        # بقیه‌ی فیلدها: استان و شهر
+        # 2) Province dropdown always all provinces
         self.fields['province'].queryset = Province.objects.all()
+
+        # 3) City dropdown: if POST, filter by chosen province
         if 'province' in self.data:
             try:
                 pid = int(self.data.get('province'))
                 self.fields['city'].queryset = City.objects.filter(province_id=pid)
             except (ValueError, TypeError):
                 self.fields['city'].queryset = City.objects.none()
-        elif self.instance.pk:
-            self.fields['city'].queryset = self.instance.province.city_set.all()
+        # on update: existing instance has province → populate cities
+        elif self.instance and self.instance.pk and self.instance.province_id:
+            # directly filter City by province_id
+            self.fields['city'].queryset = City.objects.filter(
+            province_id=self.instance.province_id)
         else:
             self.fields['city'].queryset = City.objects.none()
 
     def clean_user(self):
         user = self.cleaned_data['user']
-        # اطمینان از اینکه کاربر انتخاب‌شده حق عضویت در دانشگاه را دارد
+        # ensure the user actually belongs to this university
         if not user.memberships.filter(
-                university=self.university, is_confirmed=True
+            university=self.university,
+            is_confirmed=True
         ).exists():
             raise forms.ValidationError(_('این کاربر به دانشگاه شما تعلق ندارد.'))
         return user
 
     def save(self, commit=True):
         addr = super().save(commit=False)
-        # user همان انتخاب‌شده است—دیگر نیازی نیست از request.user استفاده کنیم
         if commit:
             addr.save()
+            # if this address is set to active, deactivate all others
             if addr.active:
                 Address.objects.filter(
                     user=addr.user
@@ -492,3 +502,85 @@ class CategoryForm(forms.ModelForm):
         if not slug:
             slug = slugify(self.cleaned_data.get('title'))
         return slug
+
+class AdminSettingsForm(forms.ModelForm):
+    password1 = forms.CharField(
+        label=_('رمز عبور جدید'),
+        widget=forms.PasswordInput(attrs={'class':'form-control'}),
+        required=False
+    )
+    password2 = forms.CharField(
+        label=_('تکرار رمز عبور'),
+        widget=forms.PasswordInput(attrs={'class':'form-control'}),
+        required=False
+    )
+
+    class Meta:
+        model = User
+        fields = (
+            'username','email','first_name','last_name',
+            'mobile','national_code','birthday','avatar',
+            'province','city','address','postal_code',
+            # فیلدهای فقط خواندنی:
+            'is_verified', 'is_staff', 'is_active',
+            'marketing_consent', 'terms_accepted',
+            'email_verified', 'is_deleted',
+        )
+        widgets = {
+            k: forms.TextInput(attrs={'class':'form-control'})
+            for k in ['username','email','first_name','last_name',
+                      'mobile','national_code','address','postal_code']
+        }
+        widgets.update({
+            'birthday': forms.DateInput(attrs={'class':'form-control','type':'date'}),
+            'avatar': forms.ClearableFileInput(attrs={'class':'form-control','accept':'image/*'}),
+            'province': forms.Select(attrs={'class':'form-select','data-province-select':True}),
+            'city': forms.Select(attrs={'class':'form-select','data-city-select':True}),
+        })
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        readonly = [
+            'is_verified','is_staff','is_active',
+            'marketing_consent','terms_accepted',
+            'email_verified','is_deleted',
+        ]
+        for f in readonly:
+            if f in self.fields:
+                self.fields[f].disabled = True
+                # اختیاری: اضافه کردن کلاس CSS برای نشان دادن حالت غیرفعال
+                self.fields[f].widget.attrs.update({'class': 'form-control-plaintext'})
+        # شهر-استان
+        self.fields['province'].queryset = Province.objects.all()
+        if 'province' in self.data:
+            try:
+                pid = int(self.data.get('province'))
+                self.fields['city'].queryset = City.objects.filter(province_id=pid)
+            except:
+                self.fields['city'].queryset = City.objects.none()
+        elif self.instance.province_id:
+            self.fields['city'].queryset = City.objects.filter(province_id=self.instance.province_id)
+        else:
+            self.fields['city'].queryset = City.objects.none()
+
+        # help texts
+        for f in ['username','email']:
+            self.fields[f].help_text = _('این فیلد الزامی است')
+
+    def clean(self):
+        cleaned = super().clean()
+        p1 = cleaned.get('password1')
+        p2 = cleaned.get('password2')
+        if p1 or p2:
+            if p1 != p2:
+                self.add_error('password2', _('رمزها مطابقت ندارند'))
+        return cleaned
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        p1 = self.cleaned_data.get('password1')
+        if p1:
+            user.set_password(p1)
+        if commit:
+            user.save()
+        return user

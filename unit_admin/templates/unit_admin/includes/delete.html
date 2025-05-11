@@ -1,253 +1,99 @@
 {% load static %}
-
-{# — Delete User Modal — #}
-<div class="modal fade theme-modal" id="deleteUserModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header d-block text-center">
-        <h5 class="modal-title w-100">آیا اطمینان دارید؟</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body text-center">
-        <p>کاربر <strong id="deleteUserName"></strong> به صورت دائمی حذف خواهد شد!</p>
-      </div>
-      <div class="modal-footer justify-content-center">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">خیر</button>
-        <form method="post" id="deleteUserForm" action="">
-          {% csrf_token %}
-          <button type="submit" class="btn btn-danger">بله، حذف شود</button>
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
-
-{# — Delete Role Modal — #}
-<div class="modal fade theme-modal" id="deleteRoleModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header d-block text-center">
-        <h5 class="modal-title w-100">آیا اطمینان دارید؟</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body text-center">
-        <p>نقش <strong id="deleteRoleName"></strong> به صورت دائمی حذف خواهد شد!</p>
-      </div>
-      <div class="modal-footer justify-content-center">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">خیر</button>
-        <form method="post" id="deleteRoleForm" action="">
-          {% csrf_token %}
-          <button type="submit" class="btn btn-danger">بله، حذف شود</button>
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
-{# — Delete Address Modal — #}
-<div class="modal fade theme-modal" id="deleteAddressModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header d-block text-center">
-        <h5 class="modal-title w-100">آیا اطمینان دارید؟</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body text-center">
-        <p>نشانی <strong id="deleteAddressName"></strong> به صورت دائمی حذف خواهد شد!</p>
-      </div>
-      <div class="modal-footer justify-content-center">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">خیر</button>
-        <form method="post" id="deleteAddressForm" action="">
-          {% csrf_token %}
-          <button type="submit" class="btn btn-danger">بله، حذف شود</button>
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-{# unit_admin/partials/delete_product_modal.html #}
-<div class="modal fade theme-modal" id="deleteProductModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header d-block text-center">
-        <h5 class="modal-title w-100" id="deleteModalTitle">آیا اطمینان دارید؟</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body text-center">
-        <p id="deleteModalBody">
-          محصول <strong id="deleteProductTitle"></strong> حذف خواهد شد!
-        </p>
-      </div>
-      <div class="modal-footer justify-content-center">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">خیر</button>
-        <form method="post" id="deleteProductForm" action="">
-          {% csrf_token %}
-          <button type="submit" class="btn btn-danger" id="deleteModalConfirmBtn">
-            بله، حذف شود
-          </button>
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-{# — Shared Success Modal — #}
-<div class="modal fade theme-modal" id="deleteSuccessModal" tabindex="-1">
+<!-- Delete Confirmation Modal -->
+<div class="modal fade theme-modal" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content text-center p-4">
-      <p class="mb-0">حذف با موفقیت انجام شد!</p>
+      <h5 class="modal-title mb-3" id="deleteModalTitle">آیا اطمینان دارید؟</h5>
+      <p id="deleteModalBody">آیتم <strong id="deleteItemName"></strong> حذف خواهد شد!</p>
+      <div class="mt-auto">
+        <button type="button" class="btn btn-danger ms-2" data-bs-dismiss="modal">خیر</button>
+        <button id="deleteModalConfirmBtn" type="button" class="btn btn-secondary ms-2">بله، حذف شود</button>
+      </div>
     </div>
   </div>
 </div>
-
+<div class="modal fade theme-modal" id="deleteSuccessModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-center p-4">
+      <i class="ri-checkbox-circle-line" style="font-size: 2rem; color: #28a745;"></i>
+      <p class="mt-3 mb-0">حذف با موفقیت انجام شد!</p>
+    </div>
+  </div>
+</div>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  // Helper to handle fetch & JSON
-  function postJson(url, formData, onSuccess, onError) {
-    fetch(url, {
+  const modalEl    = document.getElementById('deleteConfirmModal');
+  const bsModal    = new bootstrap.Modal(modalEl);
+  const confirmBtn = modalEl.querySelector('#deleteModalConfirmBtn');
+  const titleEl   = modalEl.querySelector('#deleteModalTitle');
+  const bodyEl    = modalEl.querySelector('#deleteModalBody');
+  const nameEl    = modalEl.querySelector('#deleteItemName');
+  let deleteUrl;
+
+  modalEl.addEventListener('show.bs.modal', event => {
+    const btn       = event.relatedTarget;
+    const type      = btn.dataset.deleteType;    // 'soft' or 'hard'
+    deleteUrl       = btn.dataset.deleteUrl;
+    const itemName  = btn.dataset.itemName;
+
+    // تنظیم متن مودال بر اساس نوع حذف
+    titleEl.textContent = type === 'hard'
+      ? 'آیا از حذف دائمی مطمئن هستید؟'
+      : 'آیا از حذف نرم مطمئن هستید؟';
+
+    bodyEl.innerHTML = `${type==='hard'?'به‌صورت دائمی': 'به‌صورت نرم'} حذف <strong>${itemName}</strong> انجام می‌شود!`;
+    nameEl.textContent = '';  // چون در body داریم
+  });
+
+  confirmBtn.addEventListener('click', () => {
+    fetch(deleteUrl, {
       method: 'POST',
-      credentials: 'same-origin',
-      headers: { 'X-Requested-With': 'XMLHttpRequest' },
-      body: formData
-    })
-    .then(response => {
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      return response.json();
-    })
-    .then(data => {
-      if (data.status === 'success') onSuccess(data);
-      else onError(data.message || 'خطا در حذف');
-    })
-    .catch(err => onError(err.message || 'خطا در ارسال درخواست'));
-  }
-
-  // — USER DELETE —
-  const userModal  = document.getElementById('deleteUserModal');
-  const userForm   = document.getElementById('deleteUserForm');
-  const userNameEl = document.getElementById('deleteUserName');
-
-  userModal.addEventListener('show.bs.modal', e => {
-    const btn     = e.relatedTarget;
-    const id      = btn.getAttribute('data-user-id');
-    const name    = btn.getAttribute('data-user-name');
-
-    userNameEl.textContent = name;
-    const placeholder = "{% url 'unit_admin:user_delete' 0 %}";  // /unit-admin/users/0/delete/
-    userForm.action = placeholder.replace(/0(?=\/delete\/$)/, id);
-  });
-
-  userForm.addEventListener('submit', e => {
-    e.preventDefault();
-    postJson(
-      userForm.action,
-      new FormData(userForm),
-      () => {
-        bootstrap.Modal.getInstance(userModal).hide();
-        bootstrap.Modal.getOrCreateInstance(document.getElementById('deleteSuccessModal')).show();
-        setTimeout(() => location.reload(), 800);
-      },
-      msg => alert(msg)
-    );
-  });
-
-  // — ROLE DELETE —
-  const roleModal  = document.getElementById('deleteRoleModal');
-  const roleForm   = document.getElementById('deleteRoleForm');
-  const roleNameEl = document.getElementById('deleteRoleName');
-
-  roleModal.addEventListener('show.bs.modal', e => {
-    const btn  = e.relatedTarget;
-    const id   = btn.getAttribute('data-role-id');
-    const name = btn.getAttribute('data-role-name');
-
-    roleNameEl.textContent = name;
-    roleForm.action = "{% url 'unit_admin:delete_role' %}";
-
-    let input = roleForm.querySelector('input[name="role_id"]');
-    if (!input) {
-      input = document.createElement('input');
-      input.type = 'hidden';
-      input.name = 'role_id';
-      roleForm.appendChild(input);
-    }
-    input.value = id;
-  });
-
-  roleForm.addEventListener('submit', e => {
-    e.preventDefault();
-    postJson(
-      roleForm.action,
-      new FormData(roleForm),
-      () => {
-        bootstrap.Modal.getInstance(roleModal).hide();
-        bootstrap.Modal.getOrCreateInstance(document.getElementById('deleteSuccessModal')).show();
-        setTimeout(() => location.reload(), 800);
-      },
-      msg => alert(msg)
-    );
-  });
-});
-document.addEventListener('DOMContentLoaded', function() {
-  const modalEl       = document.getElementById('deleteProductModal');
-  const bsModal       = new bootstrap.Modal(modalEl);
-  const formEl        = document.getElementById('deleteProductForm');
-  const titleEl       = document.getElementById('deleteProductTitle');
-  const bodyEl        = document.getElementById('deleteModalBody');
-  const confirmBtn    = document.getElementById('deleteModalConfirmBtn');
-  const headerTitleEl = document.getElementById('deleteModalTitle');
-
-  // Attach to all delete triggers
-  document.querySelectorAll('[data-bs-target="#deleteProductModal"]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const id    = btn.dataset.productId;
-      const name  = btn.dataset.productTitle;
-      const type  = btn.dataset.deleteType; // "soft" or "hard"
-
-      // Set the product name in modal
-      titleEl.textContent = name;
-
-      // Customize body text
-      if (type === 'soft') {
-        bodyEl.innerHTML = `محصول <strong>${name}</strong> به‌صورت نرم حذف خواهد شد!`;
-      } else {
-        bodyEl.innerHTML = `محصول <strong>${name}</strong> به‌صورت دائمی حذف خواهد شد!`;
+      headers: {
+        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+        'X-Requested-With': 'XMLHttpRequest'
       }
-
-      // Set form action URL accordingly
-      formEl.action = `/unit-admin/products/${id}/${type === 'soft' ? 'delete' : 'hard-delete'}/`;
-
-      // Update confirm button text (optional)
-      confirmBtn.textContent = type === 'soft' ? 'بله، حذف شود' : 'بله، حذف دائمی شود';
-      confirmBtn.className = type === 'soft'
-        ? 'btn btn-danger'
-        : 'btn btn-danger';
-
-      // Show the modal
-      bsModal.show();
-    });
-  });
-
-  // Handle the form submit via AJAX
-  formEl.addEventListener('submit', function(e) {
-    e.preventDefault();
-    fetch(this.action, {
-      method: 'POST',
-      headers: { 'X-CSRFToken': this.querySelector('[name=csrfmiddlewaretoken]').value }
     })
     .then(resp => {
       if (!resp.ok) throw new Error('خطا در حذف');
-      bsModal.hide();
-      // Reload page to reflect deletion
-      window.location.reload();
+      return resp.json();
     })
-    .catch(err => {
-      console.error(err);
-      alert('عملیات حذف با خطا مواجه شد.');
-    });
+    .then(data => {
+      if (data.status === 'success') {
+        // **Always hide via the bsModal instance we created above**
+        bsModal.hide();
+
+        // show success then reload…
+        bootstrap.Modal.getOrCreateInstance(
+          document.getElementById('deleteSuccessModal')
+        ).show();
+        setTimeout(() => location.reload(), 800);
+      } else {
+        alert(data.message || 'حذف با خطا مواجه شد');
+      }
+    })
+    .catch(err => alert(err.message));
   });
 });
 </script>
-
-
+{#<li>#}
+{#<!-- مثال: حذف کاربر نرم -->#}
+{#<button class="btn btn-link text-warning"#}
+{#        data-bs-toggle="modal"#}
+{#        data-bs-target="#deleteConfirmModal"#}
+{#        data-delete-type="soft"#}
+{#        data-delete-url="{% url 'unit_admin:user_soft_delete' user.pk %}"#}
+{#        data-item-name="{{ user.get_full_name }}">#}
+{#  <i class="ri-delete-bin-line"></i>#}
+{#</button>#}
+{#</li>#}
+{#<li>#}
+{#<!-- مثال: حذف نقش سخت -->#}
+{#<button class="btn btn-link text-danger"#}
+{#        data-bs-toggle="modal"#}
+{#        data-bs-target="#deleteConfirmModal"#}
+{#        data-delete-type="hard"#}
+{#        data-delete-url="{% url 'unit_admin:delete_role' %}"#}
+{#        data-item-name="{{ membership.get_role_display }}">#}
+{#  <i class="ri-delete-bin-fill"></i>#}
+{#</button>#}
+{#</li>#}

@@ -69,12 +69,13 @@
                                                         {% endfor %}
                                                     </div>
                                                     {% endif %}
+                                                <small class="form-text text-muted">{{ form.username.help_text }}</small>
                                                 </div>
                                             </div>
                                         <!-- email -->
                                             <div class="mb-4 row align-items-center">
                                                 <div class="col-md-9 col-lg-10">
-                                                    <label class="col-lg-2 col-md-3 col-form-label form-label-title">نام کاربری</label>
+                                                    <label class="col-lg-2 col-md-3 col-form-label form-label-title">ایمیل</label>
                                                     {{ form.email }}
                                                     {% if form.email.errors %}
                                                     <div class="alert alert-danger mt-2">
@@ -84,6 +85,8 @@
                                                     </div>
                                                     {% endif %}
                                                     <small class="form-text text-muted">الزامی. 150 حرف یا کمتر. فقط حروف، اعداد و @/./+/-/_</small>
+                                                    <br>
+                                                    <small class="form-text text-muted">{{ form.email.help_text }}</small>
                                                 </div>
                                             </div>
                                         <!-- password1 -->
@@ -98,6 +101,7 @@
                                                         {% endfor %}
                                                     </div>
                                                     {% endif %}
+                                                <small class="form-text text-muted">{{ form.password1.help_text }}</small>
                                                 </div>
                                             </div>
                                         <!-- password2 -->
@@ -112,6 +116,7 @@
                                                         {% endfor %}
                                                     </div>
                                                     {% endif %}
+                                                <small class="form-text text-muted">{{ form.password2.help_text }}</small>
                                                 </div>
                                             </div>
                                         </div>
@@ -328,6 +333,18 @@
                                                     {% if form.email_verified.errors %}
                                                     <div class="alert alert-danger mt-2">
                                                         {% for error in form.email_verified.errors %}
+                                                            {{ error|escape }}
+                                                        {% endfor %}
+                                                    </div>
+                                                    {% endif %}
+                                                </div>
+                                                <!-- email_verified -->
+                                                <div class="form-check form-switch mb-3">
+                                                    {{ form.is_deleted }}
+                                                    <label class="form-check-label">وضعیت حذف</label>
+                                                    {% if form.is_deleted.errors %}
+                                                    <div class="alert alert-danger mt-2">
+                                                        {% for error in form.is_deleted.errors %}
                                                             {{ error|escape }}
                                                         {% endfor %}
                                                     </div>

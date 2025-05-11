@@ -67,12 +67,14 @@
                                                       </a>
                                                 </li>
                                                 <li>
-                                                    <button class="btn btn-sm btn-danger"
+                                                <!-- مثال: حذف نقش -->
+                                                    <button class="btn btn-link text-danger"
                                                             data-bs-toggle="modal"
-                                                            data-bs-target="#deleteRoleModal"
-                                                            data-role-id="{{ membership.pk }}"
-                                                            data-role-name="{{ membership.user.username }}">
-                                                      حذف نقش
+                                                            data-bs-target="#deleteConfirmModal"
+                                                            data-delete-type="hard"
+                                                            data-delete-url="{% url 'unit_admin:delete_role' membership.pk %}"
+                                                            data-item-name="نقش {{ membership.get_role_display }}">
+                                                      <i class="ri-delete-bin-line"></i>
                                                     </button>
                                                 </li>
                                             </ul>

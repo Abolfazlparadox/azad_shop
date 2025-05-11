@@ -58,12 +58,14 @@
                                                 </a>
                                             </li>
                                             <li>
-                                                <button class="btn btn-sm btn-danger"
+                                                <!-- مثال: حذف آدرس -->
+                                                <button class="btn btn-link text-danger"
                                                         data-bs-toggle="modal"
-                                                        data-bs-target="#deleteAddressModal"
-                                                        data-address-id="{{ addr.pk }}"
-                                                        data-address-name="{{ addr.name }}">
-                                                    حذف
+                                                        data-bs-target="#deleteConfirmModal"
+                                                        data-delete-type="hard"
+                                                        data-delete-url="{% url 'unit_admin:delete_address' addr.pk %}"
+                                                        data-item-name="{{ addr.name }}">
+                                                  <i class="ri-delete-bin-line"></i>
                                                 </button>
                                             </li>
                                         </ul>

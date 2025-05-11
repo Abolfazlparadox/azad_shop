@@ -48,6 +48,6 @@ pip install django-jalali-date
 نصب کردم
  pip install requests
  python manage.py makemigrations cart
-python manage.py migrate cart
+python manage.py migrate product
 
 
