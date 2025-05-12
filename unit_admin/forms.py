@@ -521,6 +521,8 @@ class AdminSettingsForm(forms.ModelForm):
             'username','email','first_name','last_name',
             'mobile','national_code','birthday','avatar',
             'province','city','address','postal_code',
+            'password1',
+            'password2',
             # فیلدهای فقط خواندنی:
             'is_verified', 'is_staff', 'is_active',
             'marketing_consent', 'terms_accepted',
@@ -536,20 +538,21 @@ class AdminSettingsForm(forms.ModelForm):
             'avatar': forms.ClearableFileInput(attrs={'class':'form-control','accept':'image/*'}),
             'province': forms.Select(attrs={'class':'form-select','data-province-select':True}),
             'city': forms.Select(attrs={'class':'form-select','data-city-select':True}),
+
         })
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        readonly = [
-            'is_verified','is_staff','is_active',
-            'marketing_consent','terms_accepted',
-            'email_verified','is_deleted',
+        readonly_fields = [
+            'is_verified', 'is_staff', 'is_active',
+            'marketing_consent', 'terms_accepted',
+            'email_verified', 'is_deleted'
         ]
-        for f in readonly:
+        for f in readonly_fields:
             if f in self.fields:
                 self.fields[f].disabled = True
                 # اختیاری: اضافه کردن کلاس CSS برای نشان دادن حالت غیرفعال
-                self.fields[f].widget.attrs.update({'class': 'form-control-plaintext'})
+                self.fields[f].widget.attrs.update({'class': 'form-check-input m-2'})
         # شهر-استان
         self.fields['province'].queryset = Province.objects.all()
         if 'province' in self.data:

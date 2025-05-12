@@ -472,27 +472,45 @@ class CategoryHardDeleteView(OffiMixin, View):
 class AdminSettingsView(OffiMixin, TemplateView):
     template_name = 'unit_admin/settings/settings.html'
 
+
     def get(self, request, *args, **kwargs):
         user = request.user
         form = AdminSettingsForm(instance=user)
         addresses = Address.objects.filter(user=user)
+
+        # ۱) نام‌های فیلد فقط‌خواندنی:
+        readonly_names = [
+            'is_verified','is_staff','is_active',
+            'marketing_consent','terms_accepted',
+            'email_verified','is_deleted'
+        ]
+        # ۲) ساخت لیست BoundField:
+        readonly_fields = [form[name] for name in readonly_names if name in form.fields]
+
         return render(request, self.template_name, {
             'form': form,
-            'addresses': addresses
+            'addresses': addresses,
+            'readonly_fields': readonly_fields,
         })
 
     def post(self, request, *args, **kwargs):
         user = request.user
         form = AdminSettingsForm(request.POST, request.FILES, instance=user)
         addresses = Address.objects.filter(user=user)
+
+        readonly_names = [ ... ]  # همان لیست بالا
+        readonly_fields = [form[name] for name in readonly_names if name in form.fields]
+
         if form.is_valid():
             form.save()
             messages.success(request, _('اطلاعات با موفقیت به‌روز شد'))
             return redirect('unit_admin:settings')
+
         messages.error(request, _('لطفاً خطاهای فرم را بررسی کنید'))
         return render(request, self.template_name, {
             'form': form,
-            'addresses': addresses
+            'addresses': addresses,
+            'readonly_fields': readonly_fields,
         })
 
 

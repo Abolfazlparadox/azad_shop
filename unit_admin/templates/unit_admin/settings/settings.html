@@ -1,78 +1,80 @@
 {% extends 'unit_admin/base.html' %}
 {% block body %}
 <div class="container-fluid">
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="card">
-            <div class="card-body">
-              <h5>تنظیمات حساب کاربری</h5>
-              <form method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                {{ form.non_field_errors }}
-                {% for field in form %}
-                  <div class="mb-3 row align-items-center">
-                    <label class="col-sm-2 col-form-label">{{ field.label }}</label>
-                    <div class="col-sm-10">
-                      {{ field }}
-                      {% for err in field.errors %}
-                        <div class="text-danger small">{{ err }}</div>
-                      {% endfor %}
-                      {% if field.help_text %}
-                        <div class="form-text">{{ field.help_text }}</div>
-                      {% endif %}
-                    </div>
-                  </div>
-                {% endfor %}
-                <div class="text-end">
-                  <button class="btn btn-theme" type="submit">ذخیره تنظیمات</button>
-                </div>
-              </form>
-            </div>
-            </div>
+  <div class="card mb-4">
+    <div class="card-body">
+      <h5>تنظیمات حساب کاربری</h5>
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
 
-            <div class="card">
-            <div class="card-body">
-                <div class="card-header-2 mb-3">
-                  <h5>آدرس‌های من</h5>
-                </div>
-                <div class="save-details-box">
-                  <div class="row g-4">
-                    {% for addr in addresses %}
-                      <div class="col-xl-4 col-md-6">
-                        <div class="save-details">
-                            <div class="save-name">
-                                abolfazl
-                            </div>
-                            <div class="save-position">
-                                <h6>{{ addr.get_category_display }}</h6>
-                            </div>
-                            <div class="save-address">
-                              <p>{{ addr.address }}</p>
-                              <p>{{ addr.province.name }} - {{ addr.city.name }}</p>
-                              <p>کد پستی: {{ addr.postal_code }}</p>
-
-                            </div>
-                            <div class="mobile">
-                                 <p>تلفن: {{ addr.telephone }}</p>
-                            </div>
-                          <div class="button">
-                            <a href="{% url 'unit_admin:address_edit' addr.pk %}" class="btn btn-sm btn-danger me-2">ویرایش</a>
-                            <form class="me-2" method="post"
-                                  action="{% url 'unit_admin:settings_address_delete' addr.pk %}">
-                              {% csrf_token %}
-                              <button class="btn btn-sm btn-secondary me-2">حذف</button>
-                            </form>
-                          </div>
-                        </div>
-                      </div>
-                    {% empty %}
-                      <p class="text-center text-muted">نشانی ثبت‌نشده است.</p>
-                    {% endfor %}
-                  </div>
-                </div>
-            </div>
-            </div>
+        {# — فیلدهای معمولی (دو به دو) — #}
+        <div class="row">
+          {% for field in form %}
+            {% if not field.is_hidden and field not in readonly_fields %}
+              <div class="col-md-6 mb-3">
+                <label class="form-label">{{ field.label }}</label>
+                {{ field }}
+                {% for err in field.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+                {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+              </div>
+            {% endif %}
+          {% endfor %}
         </div>
+
+        {# — فیلدهای فقط‌خواندنی در یک ردیف — #}
+        <div class="row mb-3">
+          {% for bf in readonly_fields %}
+            <div class="col-md-1">
+              <div class="form-check form-switch mb-3 ">
+                {{ bf }}  {# خودِ CheckboxInput با کلاس form-check-input #}
+                <label class="form-check-label col-md-10 ">{{ bf.label }}</label>
+              </div>
+              {% if bf.errors %}
+                <div class="alert alert-danger mt-1">
+                  {% for err in bf.errors %}
+                    <div>{{ err|escape }}</div>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+
+        <div class="text-end">
+          <button class="btn btn-theme" type="submit">ذخیره تنظیمات</button>
+        </div>
+      </form>
     </div>
-</div>
+  </div>
+
+
+      <div class="card">
+        <div class="card-body">
+          <h5 class="mb-3">آدرس‌های من</h5>
+          <div class="row g-4">
+            {% for addr in addresses %}
+              <div class="col-xl-4 col-md-6">
+                <div class="save-details p-3 border rounded">
+                  <h6>{{ addr.get_category_display }}</h6>
+                  <p>{{ addr.address }}</p>
+                  <p>{{ addr.province.name }} - {{ addr.city.name }}</p>
+                  <p>کد پستی: {{ addr.postal_code }}</p>
+                  <p>تلفن: {{ addr.telephone }}</p>
+                  <div class="d-flex justify-content-end gap-2">
+                    <a href="{% url 'unit_admin:address_edit' addr.pk %}" class="btn btn-sm btn-secondary">ویرایش</a>
+                    <form method="post" action="{% url 'unit_admin:settings_address_delete' addr.pk %}">
+                      {% csrf_token %}
+                      <button class="btn btn-sm btn-danger">حذف</button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            {% empty %}
+              <p class="text-center text-muted">نشانی ثبت‌نشده است.</p>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
 {% endblock %}
