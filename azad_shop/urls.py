@@ -29,7 +29,8 @@ urlpatterns = [
     path('blog/', include('blog.urls')),
     path('products/', include('product.urls')),
     path('accounts/', include('account.urls')),
-    path('about/', include('about.urls')),
+    path('about/', include('about.urls', namespace='about')),
+
 
     path('cart/', include('cart.urls')),
 

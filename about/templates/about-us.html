@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load thumbnail %}
 {% load static%}
 {% block title %}درباره ما{% endblock %}
 {% block body %}
@@ -11,8 +12,7 @@
                     <div class="col-6">
                         <div class="fresh-image-2">
                             <div>
-                                <img src="{% static 'images/inner-page/about-us/1.jpg' %}"
-                                    class="bg-img blur-up lazyload" alt="">
+                                <img src="{{ site_setting.site_logo.url }}" class="bg-img blur-up lazyload" alt="{{ site_setting.name }}">
                             </div>
                         </div>
                     </div>
@@ -20,8 +20,7 @@
                     <div class="col-6">
                         <div class="fresh-image">
                             <div>
-                                <img src="{% static 'images/inner-page/about-us/2.jpg' %}"
-                                    class="bg-img blur-up lazyload" alt="">
+                                <img src="{{ site_setting.secondary_logo.url }}" class="bg-img blur-up lazyload" alt="{{ site_setting.name }}">
                             </div>
                         </div>
                     </div>
@@ -32,61 +31,27 @@
                 <div class="fresh-contain p-center-left">
                     <div>
                         <div class="review-title">
-                            <h4>درباره ما</h4>
-                            <h2>ما مواد غذایی ارگانیک را در بازار تولید می کنیم</h2>
+                              <h4>{{ site_setting.site_name }}</h4>
+                              <h2>{{ site_setting.slogan }}</h2>
                         </div>
 
                         <div class="delivery-list">
-                            <p class="text-content">لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است و برای شرایط فعلی تکنولوژی مورد نیاز و کاربردهای متنوع با هدف بهبود ابزارهای کاربردی می باشد.</p>
-
+                            <p class="text-content">{{ site_setting.about_us_text|linebreaks }}</p>
                             <ul class="delivery-box">
-                                <li>
+                                {% for opt in site_options %}
+                                  <li>
                                     <div class="delivery-box">
-                                        <div class="delivery-icon">
-                                            <img src="{% static 'svg/3/delivery.svg' %}" class="blur-up lazyload" alt="">
-                                        </div>
-
-                                        <div class="delivery-detail">
-                                            <h5 class="text">ارسال رایگان برای تمام سفارش ها</h5>
-                                        </div>
+                                      <div class="delivery-icon">
+                                        {% if opt.logo %}
+                                          <img src="{{ opt.logo.url }}" class="blur-up lazyload" alt="{{ opt.name }}">
+                                        {% endif %}
+                                      </div>
+                                      <div class="delivery-detail">
+                                        <h5 class="text">{{ opt.name }}</h5>
+                                      </div>
                                     </div>
-                                </li>
-
-                                <li>
-                                    <div class="delivery-box">
-                                        <div class="delivery-icon">
-                                            <img src="{% static 'svg/3/leaf.svg' %}" class="blur-up lazyload" alt="">
-                                        </div>
-
-                                        <div class="delivery-detail">
-                                            <h5 class="text">فقط غذاهای تازه</h5>
-                                        </div>
-                                    </div>
-                                </li>
-
-                                <li>
-                                    <div class="delivery-box">
-                                        <div class="delivery-icon">
-                                            <img src="{% static 'svg/3/delivery.svg' %}" class="blur-up lazyload" alt="">
-                                        </div>
-
-                                        <div class="delivery-detail">
-                                            <h5 class="text">ارسال رایگان برای تمام سفارش ها</h5>
-                                        </div>
-                                    </div>
-                                </li>
-
-                                <li>
-                                    <div class="delivery-box">
-                                        <div class="delivery-icon">
-                                            <img src="{% static 'svg/3/leaf.svg' %}" class="blur-up lazyload" alt="">
-                                        </div>
-
-                                        <div class="delivery-detail">
-                                            <h5 class="text">فقط غذاهای تازه</h5>
-                                        </div>
-                                    </div>
-                                </li>
+                                  </li>
+                                {% endfor %}
                             </ul>
                         </div>
                     </div>
@@ -150,562 +115,142 @@
 
 <!-- Team Section Start -->
 <section class="team-section section-lg-space">
-    <div class="container-fluid-lg">
-        <div class="about-us-title text-center">
-            <h4 class="text-content">تیم خلاق ما</h4>
-            <h2 class="center">اعضای تیم فست کارت</h2>
-        </div>
-        <div class="row">
-            <div class="col-12">
-                <div class="slider-user product-wrapper">
+  <div class="container-fluid-lg">
+    <div class="about-us-title text-center">
+      <h4 class="text-content">تیم خلاق ما</h4>
+      <h2 class="center">اعضای تیم دبیر رفاهی واحد</h2>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="slider-user product-wrapper">
+                {% for member in team %}
                     <div>
-                        <div class="team-box">
-                            <div class="team-image">
-                                <img src="{% static 'images/inner-page/user/1.jpg' %}" class="img-fluid blur-up lazyload"
-                                    alt="">
-                            </div>
-
-                            <div class="team-name">
-                                <h3>آنا بارانوف</h3>
-                                <h5>بازار یابی</h5>
-                                <p>پنیر روی نان تست موزارلا باواریا برگکاسه پنیر بدبو پای پنیری.</p>
-                                <ul class="team-media">
-                                    <li>
-                                        <a href="https://www.facebook.com/" class="fb-bg">
-                                            <i class="fa-brands fa-facebook-f"></i>
-                                        </a>
-                                    </li>
-
-                                    <li>
-                                        <a href="https://in.pinterest.com/" class="pint-bg">
-                                            <i class="fa-brands fa-pinterest-p"></i>
-                                        </a>
-                                    </li>
-
-                                    <li>
-                                        <a href="https://twitter.com/" class="twitter-bg">
-                                            <i class="fa-brands fa-twitter"></i>
-                                        </a>
-                                    </li>
-
-                                    <li>
-                                        <a href="https://www.instagram.com/" class="insta-bg">
-                                            <i class="fa-brands fa-instagram"></i>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
+                      <div class="team-box">
+                        <div class="team-image">
+                          <img class="img-fluid blur-up lazyload" src="{{ member.user.avatar.url }}" alt="{{ member.user.get_full_name }}">
                         </div>
-                    </div>
+                        <div class="team-name">
+                          <h3>{{ member.user.get_full_name }}</h3>
+                          <h5>{{ member.role_display }}</h5>
+                          <p>{{ member.user.email }}</p>
+                          <p>{{ member.university_name }}</p>
+                            <ul class="team-media">
+                                <li>
+                                    <a href="https://www.facebook.com/" class="fb-bg">
+                                        <i class="fa-brands fa-facebook-f"></i>
+                                    </a>
+                                </li>
 
-                    <div>
-                        <div class="team-box">
-                            <div class="team-image">
-                                <img src="{% static 'images/inner-page/user/2.jpg' %}" class="img-fluid blur-up lazyload"
-                                    alt="">
-                            </div>
+                                <li>
+                                    <a href="https://in.pinterest.com/" class="pint-bg">
+                                        <i class="fa-brands fa-pinterest-p"></i>
+                                    </a>
+                                </li>
 
-                            <div class="team-name">
-                                <h3>آنا بارانوف</h3>
-                                <h5>بازار یابی</h5>
-                                <p>پنیر روی نان تست موزارلا باواریا برگکاسه پنیر بدبو پای پنیری.</p>
-                                <ul class="team-media">
-                                    <li>
-                                        <a href="https://www.facebook.com/" class="fb-bg">
-                                            <i class="fa-brands fa-facebook-f"></i>
-                                        </a>
-                                    </li>
+                                <li>
+                                    <a href="https://twitter.com/" class="twitter-bg">
+                                        <i class="fa-brands fa-twitter"></i>
+                                    </a>
+                                </li>
 
-                                    <li>
-                                        <a href="https://in.pinterest.com/" class="pint-bg">
-                                            <i class="fa-brands fa-pinterest-p"></i>
-                                        </a>
-                                    </li>
-
-                                    <li>
-                                        <a href="https://twitter.com/" class="twitter-bg">
-                                            <i class="fa-brands fa-twitter"></i>
-                                        </a>
-                                    </li>
-
-                                    <li>
-                                        <a href="https://www.instagram.com/" class="insta-bg">
-                                            <i class="fa-brands fa-instagram"></i>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
+                                <li>
+                                    <a href="https://www.instagram.com/" class="insta-bg">
+                                        <i class="fa-brands fa-instagram"></i>
+                                    </a>
+                                </li>
+                            </ul>
                         </div>
+                      </div>
                     </div>
-
-                    <div>
-                        <div class="team-box">
-                            <div class="team-image">
-                                <img src="{% static 'images/inner-page/user/3.jpg' %}" class="img-fluid blur-up lazyload"
-                                    alt="">
-                            </div>
-
-                            <div class="team-name">
-                                <h3>آنا بارانوف</h3>
-                                <h5>بازار یابی</h5>
-                                <p>پنیر روی نان تست موزارلا باواریا برگکاسه پنیر بدبو پای پنیری.</p>
-                                <ul class="team-media">
-                                    <li>
-                                        <a href="https://www.facebook.com/" class="fb-bg">
-                                            <i class="fa-brands fa-facebook-f"></i>
-                                        </a>
-                                    </li>
-
-                                    <li>
-                                        <a href="https://in.pinterest.com/" class="pint-bg">
-                                            <i class="fa-brands fa-pinterest-p"></i>
-                                        </a>
-                                    </li>
-
-                                    <li>
-                                        <a href="https://twitter.com/" class="twitter-bg">
-                                            <i class="fa-brands fa-twitter"></i>
-                                        </a>
-                                    </li>
-
-                                    <li>
-                                        <a href="https://www.instagram.com/" class="insta-bg">
-                                            <i class="fa-brands fa-instagram"></i>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <div class="team-box">
-                            <div class="team-image">
-                                <img src="{% static 'images/inner-page/user/4.jpg' %}" class="img-fluid blur-up lazyload"
-                                    alt="">
-                            </div>
-
-                            <div class="team-name">
-                                <h3>آنا بارانوف</h3>
-                                <h5>بازار یابی</h5>
-                                <p>پنیر روی نان تست موزارلا باواریا برگکاسه پنیر بدبو پای پنیری.</p>
-                                <ul class="team-media">
-                                    <li>
-                                        <a href="https://www.facebook.com/" class="fb-bg">
-                                            <i class="fa-brands fa-facebook-f"></i>
-                                        </a>
-                                    </li>
-
-                                    <li>
-                                        <a href="https://in.pinterest.com/" class="pint-bg">
-                                            <i class="fa-brands fa-pinterest-p"></i>
-                                        </a>
-                                    </li>
-
-                                    <li>
-                                        <a href="https://twitter.com/" class="twitter-bg">
-                                            <i class="fa-brands fa-twitter"></i>
-                                        </a>
-                                    </li>
-
-                                    <li>
-                                        <a href="https://www.instagram.com/" class="insta-bg">
-                                            <i class="fa-brands fa-instagram"></i>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <div class="team-box">
-                            <div class="team-image">
-                                <img src="{% static 'images/inner-page/user/1.jpg' %}" class="img-fluid blur-up lazyload"
-                                    alt="">
-                            </div>
-
-                            <div class="team-name">
-                                <h3>آنا بارانوف</h3>
-                                <h5>بازار یابی</h5>
-                                <p>پنیر روی نان تست موزارلا باواریا برگکاسه پنیر بدبو پای پنیری.</p>
-                                <ul class="team-media">
-                                    <li>
-                                        <a href="https://www.facebook.com/" class="fb-bg">
-                                            <i class="fa-brands fa-facebook-f"></i>
-                                        </a>
-                                    </li>
-
-                                    <li>
-                                        <a href="https://in.pinterest.com/" class="pint-bg">
-                                            <i class="fa-brands fa-pinterest-p"></i>
-                                        </a>
-                                    </li>
-
-                                    <li>
-                                        <a href="https://twitter.com/" class="twitter-bg">
-                                            <i class="fa-brands fa-twitter"></i>
-                                        </a>
-                                    </li>
-
-                                    <li>
-                                        <a href="https://www.instagram.com/" class="insta-bg">
-                                            <i class="fa-brands fa-instagram"></i>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                {% endfor %}
             </div>
         </div>
     </div>
+  </div>
 </section>
 <!-- Team Section End -->
 
 <!-- Review Section Start -->
 <section class="review-section section-lg-space">
-    <div class="container-fluid">
-        <div class="about-us-title text-center">
-            <h4 class="text-content">آخرین دیدگاه ها</h4>
-            <h2 class="center">مشتریان ما چه می‌گویند؟</h2>
-        </div>
-        <div class="row">
-            <div class="col-12">
-                <div class="slider-4-half product-wrapper">
-                    <div>
-                        <div class="reviewer-box">
-                            <i class="fa-solid fa-quote-right"></i>
-                            <div class="product-rating">
-                                <ul class="rating">
-                                    <li>
-                                        <i data-feather="star" class="fill"></i>
-                                    </li>
-                                    <li>
-                                        <i data-feather="star" class="fill"></i>
-                                    </li>
-                                    <li>
-                                        <i data-feather="star" class="fill"></i>
-                                    </li>
-                                    <li>
-                                        <i data-feather="star" class="fill"></i>
-                                    </li>
-                                    <li>
-                                        <i data-feather="star"></i>
-                                    </li>
-                                </ul>
-                            </div>
-
-                            <h3>کیفیت بالا، موقعیت مکانی زیبا</h3>
-
-                            <p>"لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است و برای شرایط فعلی تکنولوژی مورد نیاز"</p>
-
-                            <div class="reviewer-profile">
-                                <div class="reviewer-image">
-                                    <img src="{% static 'images/inner-page/user/1.jpg' %}" class="blur-up lazyload"
-                                        alt="">
-                                </div>
-
-                                <div class="reviewer-name">
-                                    <h4>بتی جی ترنر</h4>
-                                    <h6>سئو کار</h6>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <div class="reviewer-box">
-                            <i class="fa-solid fa-quote-right"></i>
-                            <div class="product-rating">
-                                <ul class="rating">
-                                    <li>
-                                        <i data-feather="star" class="fill"></i>
-                                    </li>
-                                    <li>
-                                        <i data-feather="star" class="fill"></i>
-                                    </li>
-                                    <li>
-                                        <i data-feather="star" class="fill"></i>
-                                    </li>
-                                    <li>
-                                        <i data-feather="star" class="fill"></i>
-                                    </li>
-                                    <li>
-                                        <i data-feather="star"></i>
-                                    </li>
-                                </ul>
-                            </div>
-
-                            <h3>کیفیت بالا، موقعیت مکانی زیبا</h3>
-
-                            <p>"لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است و برای شرایط فعلی تکنولوژی مورد نیاز"</p>
-
-                            <div class="reviewer-profile">
-                                <div class="reviewer-image">
-                                    <img src="{% static 'images/inner-page/user/2.jpg' %}" class="blur-up lazyload"
-                                        alt="">
-                                </div>
-
-                                <div class="reviewer-name">
-                                    <h4> آلفردو اس. روشا</h4>
-                                    <h6>مدیر پروژه</h6>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <div class="reviewer-box">
-                            <i class="fa-solid fa-quote-right"></i>
-                            <div class="product-rating">
-                                <ul class="rating">
-                                    <li>
-                                        <i data-feather="star" class="fill"></i>
-                                    </li>
-                                    <li>
-                                        <i data-feather="star" class="fill"></i>
-                                    </li>
-                                    <li>
-                                        <i data-feather="star" class="fill"></i>
-                                    </li>
-                                    <li>
-                                        <i data-feather="star" class="fill"></i>
-                                    </li>
-                                    <li>
-                                        <i data-feather="star"></i>
-                                    </li>
-                                </ul>
-                            </div>
-
-                            <h3>کیفیت بالا، موقعیت مکانی زیبا</h3>
-
-                            <p>"لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است و برای شرایط فعلی تکنولوژی مورد نیاز"</p>
-
-                            <div class="reviewer-profile">
-                                <div class="reviewer-image">
-                                    <img src="{% static 'images/inner-page/user/3.jpg' %}" class="blur-up lazyload"
-                                        alt="">
-                                </div>
-
-                                <div class="reviewer-name">
-                                    <h4>دونالد سی اسپور</h4>
-                                    <h6>نمایندگان فروش</h6>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <div class="reviewer-box">
-                            <i class="fa-solid fa-quote-right"></i>
-                            <div class="product-rating">
-                                <ul class="rating">
-                                    <li>
-                                        <i data-feather="star" class="fill"></i>
-                                    </li>
-                                    <li>
-                                        <i data-feather="star" class="fill"></i>
-                                    </li>
-                                    <li>
-                                        <i data-feather="star" class="fill"></i>
-                                    </li>
-                                    <li>
-                                        <i data-feather="star" class="fill"></i>
-                                    </li>
-                                    <li>
-                                        <i data-feather="star"></i>
-                                    </li>
-                                </ul>
-                            </div>
-
-                            <h3>کیفیت بالا، موقعیت مکانی زیبا</h3>
-
-                            <p>"لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است و برای شرایط فعلی تکنولوژی مورد نیاز"</p>
-
-                            <div class="reviewer-profile">
-                                <div class="reviewer-image">
-                                    <img src="{% static 'images/inner-page/user/4.jpg' %}" class="blur-up lazyload"
-                                        alt="">
-                                </div>
-
-                                <div class="reviewer-name">
-                                    <h4>تری جی. فین</h4>
-                                    <h6>عکاس</h6>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <div class="reviewer-box">
-                            <i class="fa-solid fa-quote-right"></i>
-                            <div class="product-rating">
-                                <ul class="rating">
-                                    <li>
-                                        <i data-feather="star" class="fill"></i>
-                                    </li>
-                                    <li>
-                                        <i data-feather="star" class="fill"></i>
-                                    </li>
-                                    <li>
-                                        <i data-feather="star" class="fill"></i>
-                                    </li>
-                                    <li>
-                                        <i data-feather="star" class="fill"></i>
-                                    </li>
-                                    <li>
-                                        <i data-feather="star"></i>
-                                    </li>
-                                </ul>
-                            </div>
-
-                            <h3>کیفیت بالا، موقعیت مکانی زیبا</h3>
-
-                            <p>"لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است و برای شرایط فعلی تکنولوژی مورد نیاز"</p>
-
-                            <div class="reviewer-profile">
-                                <div class="reviewer-image">
-                                    <img src="{% static 'images/inner-page/user/1.jpg' %}" class="blur-up lazyload"
-                                        alt="">
-                                </div>
-
-                                <div class="reviewer-name">
-                                    <h4>گوئن جی. گایگر</h4>
-                                    <h6>طراح</h6>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <div class="reviewer-box">
-                            <i class="fa-solid fa-quote-right"></i>
-                            <div class="product-rating">
-                                <ul class="rating">
-                                    <li>
-                                        <i data-feather="star" class="fill"></i>
-                                    </li>
-                                    <li>
-                                        <i data-feather="star" class="fill"></i>
-                                    </li>
-                                    <li>
-                                        <i data-feather="star" class="fill"></i>
-                                    </li>
-                                    <li>
-                                        <i data-feather="star" class="fill"></i>
-                                    </li>
-                                    <li>
-                                        <i data-feather="star"></i>
-                                    </li>
-                                </ul>
-                            </div>
-
-                            <h3>کیفیت بالا، موقعیت مکانی زیبا</h3>
-
-                            <p>"لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است و برای شرایط فعلی تکنولوژی مورد نیاز"</p>
-
-
-                            <div class="reviewer-profile">
-                                <div class="reviewer-image">
-                                    <img src="{% static 'images/inner-page/user/2.jpg' %}" class="blur-up lazyload"
-                                        alt="">
-                                </div>
-
-                                <div class="reviewer-name">
-                                    <h4>کنستانس کی وانگ</h4>
-                                    <h6>مدیر عامل، شرکت</h6>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <div class="reviewer-box">
-                            <i class="fa-solid fa-quote-right"></i>
-                            <div class="product-rating">
-                                <ul class="rating">
-                                    <li>
-                                        <i data-feather="star" class="fill"></i>
-                                    </li>
-                                    <li>
-                                        <i data-feather="star" class="fill"></i>
-                                    </li>
-                                    <li>
-                                        <i data-feather="star" class="fill"></i>
-                                    </li>
-                                    <li>
-                                        <i data-feather="star" class="fill"></i>
-                                    </li>
-                                    <li>
-                                        <i data-feather="star"></i>
-                                    </li>
-                                </ul>
-                            </div>
-
-                            <h3>کیفیت بالا، موقعیت مکانی زیبا</h3>
-
-                            <p>"لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است و برای شرایط فعلی تکنولوژی مورد نیاز"</p>
-
-                            <div class="reviewer-profile">
-                                <div class="reviewer-image">
-                                    <img src="{% static 'images/inner-page/user/3.jpg' %}" class="blur-up lazyload"
-                                        alt="">
-                                </div>
-
-                                <div class="reviewer-name">
-                                    <h4>کریستوفر آر لی</h4>
-                                    <h6>مدیر عامل</h6>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <div class="reviewer-box">
-                            <i class="fa-solid fa-quote-right"></i>
-                            <div class="product-rating">
-                                <ul class="rating">
-                                    <li>
-                                        <i data-feather="star" class="fill"></i>
-                                    </li>
-                                    <li>
-                                        <i data-feather="star" class="fill"></i>
-                                    </li>
-                                    <li>
-                                        <i data-feather="star" class="fill"></i>
-                                    </li>
-                                    <li>
-                                        <i data-feather="star" class="fill"></i>
-                                    </li>
-                                    <li>
-                                        <i data-feather="star"></i>
-                                    </li>
-                                </ul>
-                            </div>
-
-                            <h3>کیفیت بالا، موقعیت مکانی زیبا</h3>
-
-                            <p>"لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است و برای شرایط فعلی تکنولوژی مورد نیاز"</p>
-
-                            <div class="reviewer-profile">
-                                <div class="reviewer-image">
-                                    <img src="{% static 'images/inner-page/user/4.jpg' %}" class="blur-up lazyload"
-                                        alt="">
-                                </div>
-
-                                <div class="reviewer-name">
-                                    <h4>آیلین آر. چو</h4>
-                                    <h6>مدیر بازاریابی</h6>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <div class="container-fluid">
+    <div class="about-us-title text-center">
+      <h4 class="text-content">آخرین دیدگاه‌ها</h4>
+      <h2 class="center">مشتریان ما چه می‌گویند؟</h2>
     </div>
+    <div class="row">
+      <div class="col-12">
+        <div class="slider-4-half product-wrapper">
+          {% for cm in comments %}
+            <div>
+              <div class="reviewer-box">
+                <i class="fa-solid fa-quote-right"></i>
+                <div class="product-rating">
+                  <ul class="rating">
+                    {% for i in "12345" %}
+                      <li><i data-feather="star"{% if forloop.counter <= cm.rating %} class="fill"{% endif %}></i></li>
+                    {% endfor %}
+                  </ul>
+                </div>
+                <h3>{{ cm.user.get_full_name }}</h3>
+                <p>"{{ cm.content }}"</p>
+                <div class="reviewer-profile">
+                  <div class="reviewer-image">
+                    {% if cm.user.avatar %}
+                      <img src="{{ cm.user.avatar.url }}" class="blur-up lazyload" alt="{{ cm.user.get_full_name }}">
+                    {% endif %}
+                  </div>
+                  <div class="reviewer-name">
+                    <h4>{{ cm.user.get_full_name }}</h4>
+                    <h6>{{ cm.user.active_role_display }}</h6>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
 <!-- Review Section End -->
+
+<!-- Blog Section Start -->
+<section class="section-lg-space">
+  <div class="container-fluid-lg">
+    <div class="about-us-title text-center">
+      <h4 class="text-content">وبلاگ ما</h4>
+      <h2 class="center">آخرین مطالب وبلاگ ما</h2>
+    </div>
+    <div class="row">
+      {% for post in latest_blog_posts %}
+        <div class="col-xl-4 col-md-6 mb-4">
+          <div class="blog-box">
+            <div class="blog-box-image">
+              <div class="blog-image">
+                <a href="{% url 'blog:post_detail' post.slug %}" class="rounded-3">
+                  {% thumbnail post.banner_image "200x250" crop="center" as im %}
+                    <img src="{{ im.url }}" class="bg-img blur-up lazyload" alt="{{ post.title }}">
+                  {% endthumbnail %}
+                </a>
+              </div>
+            </div>
+            <div class="blog-detail p-3">
+              <a href="{% url 'blog:post_detail' post.slug %}" class="text-decoration-none">
+                <h5 class="mb-2">{{ post.title }}</h5>
+              </a>
+              <p class="small text-muted">
+                {{ post.published_at|date:"Y/m/d" }} |
+                {{ post.views }} بازدید
+              </p>
+            </div>
+          </div>
+        </div>
+      {% empty %}
+        <p class="text-center text-muted">هیچ پست وبلاگی یافت نشد.</p>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+<!-- Blog Section End -->
+
 {% endblock %}
