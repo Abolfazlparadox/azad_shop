@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}1{% endblock %}</title>
+    <title>{% block title %}{% endblock %}</title>
     <style>
         #darkButton.active, #lightButton.active {
         box-shadow: inset 0 0 5px rgba(0,0,0,0.3);
@@ -15,7 +15,7 @@
     {% block head %}{% endblock %}
 
 </head>
-<body>
+<body class="paradox">
     {% if messages %}
       <div class="alerts">
         {% for message in messages %}
@@ -64,6 +64,26 @@
             });
           }, 2000);
         });
+    </script>
+        <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const body = document.body;
+        const html = document.documentElement;
+        const isDark = html.classList.contains('dark-theme');
+
+        const imageUrl = isDark
+          ? "/static/images/azadshopbg.jpg  "
+          : "/static/images/azadbgwhite.jpg";
+
+        body.style.setProperty('background-image', `url('${imageUrl}')`, 'important');
+        body.style.setProperty('background-image', "url('/static/images/azadbg.jpg')", 'important');
+        body.style.setProperty('background-size', 'contain', 'important');
+        body.style.setProperty('background-repeat', 'repeat', 'important');
+        body.style.setProperty('background-position', 'center center', 'important');
+        body.style.setProperty('background-attachment', 'scroll', 'important');
+        body.style.setProperty('background-blend-mode', 'overlay', 'important');
+
+      });
     </script>
 
 </body>
