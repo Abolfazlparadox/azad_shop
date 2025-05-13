@@ -5,8 +5,8 @@ python.exe -m pip install --upgrade pip
 pip install django
 django-admin startproject main
 pip install mysqlclient
-python manage.py makemigrations account
-python manage.py migrate
+python manage.py makemigrations contact
+python manage.py migrate contact
 python manage.py migrate account
 python manage.py makemigrations
 pip install django-iranian-cities

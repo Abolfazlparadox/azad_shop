@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'product.apps.ProductConfig',
     'university.apps.UniversityConfig',
     'home.apps.HomeConfig',
+    'contact',
     'account',
     'comment',
     'about',

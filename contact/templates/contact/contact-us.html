@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+{% load thumbnail %}
+{% load static %}
+{% block title %}تماس با ما{% endblock %}
+{% block body %}
+<!-- Contact Box Section Start -->
+<section class="contact-box-section">
+    <div class="container-fluid-lg">
+        <div class="row g-lg-5 g-3">
+            <!-- سمت چپ: اطلاعات تماس از تنظیمات سایت -->
+            <div class="col-lg-6">
+              <div class="left-sidebar-box">
+                <div class="row">
+                  <div class="col-xl-12">
+                    <div class="contact-image">
+                      <img src="{% static 'images/inner-page/contact-us.png' %}"
+                           class="img-fluid blur-up lazyloaded" alt="Contact Us">
+                    </div>
+                  </div>
+                  <div class="col-xl-12">
+                    <div class="contact-title">
+                      <h3>با ما در تماس باشید</h3>
+                    </div>
+                    <div class="contact-detail">
+                      <div class="row g-4">
+                        {# تلفن تماس #}
+                        <div class="col-xxl-6 col-lg-12 col-sm-6">
+                          <div class="contact-detail-box">
+                            <div class="contact-icon">
+                              <i class="fa-solid fa-phone"></i>
+                            </div>
+                            <div class="contact-detail-title">
+                              <h4>تلفن تماس</h4>
+                            </div>
+                            <div class="contact-detail-contain">
+                              <p>{{ site.phone }}</p>
+                            </div>
+                          </div>
+                        </div>
+                        {# ایمیل #}
+                        <div class="col-xxl-6 col-lg-12 col-sm-6">
+                          <div class="contact-detail-box">
+                            <div class="contact-icon">
+                              <i class="fa-solid fa-envelope"></i>
+                            </div>
+                            <div class="contact-detail-title">
+                              <h4>ایمیل</h4>
+                            </div>
+                            <div class="contact-detail-contain">
+                              <p>{{ site.email }}</p>
+                            </div>
+                          </div>
+                        </div>
+                        {# آدرس دفتر اصلی #}
+                        <div class="col-xxl-6 col-lg-12 col-sm-6">
+                          <div class="contact-detail-box">
+                            <div class="contact-icon">
+                              <i class="fa-solid fa-location-dot"></i>
+                            </div>
+                            <div class="contact-detail-title">
+                              <h4>دفتر اصلی</h4>
+                            </div>
+                            <div class="contact-detail-contain">
+                              <p>{{ site.address }}</p>
+                            </div>
+                          </div>
+                        </div>
+                        {# در صورت وجود فکس یا آدرس دوم، می‌توانید مشابه اضافه کنید #}
+                        {% if site.fax %}
+                        <div class="col-xxl-6 col-lg-12 col-sm-6">
+                          <div class="contact-detail-box">
+                            <div class="contact-icon">
+                              <i class="fa-solid fa-fax"></i>
+                            </div>
+                            <div class="contact-detail-title">
+                              <h4>فکس</h4>
+                            </div>
+                            <div class="contact-detail-contain">
+                              <p>{{ site.fax }}</p>
+                            </div>
+                          </div>
+                        </div>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- سمت راست: فرم تماس -->
+            <div class="col-lg-6">
+                <div class="title d-xxl-none d-block mb-4">
+                    <h2>تماس با ما</h2>
+                </div>
+                <div class="right-sidebar-box">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            {% for field in form %}
+                                <div class="{% if field.name == 'message' %}col-xxl-12 col-lg-12 col-sm-12{% else %}col-xxl-6 col-lg-12 col-sm-6{% endif %}">
+                                    <div class="custom-form mb-md-4 mb-3">
+                                        <label class="form-label">{{ field.label }}</label>
+                                        <div class="custom-input  {% if field.widget.input_type == 'textarea' %}-textarea{% endif %}">
+                                            {{ field }}
+                                            <i class="fa-solid
+                                               {% if field.name == 'first_name' or field.name == 'last_name' %}
+                                                   fa-user
+                                               {% elif field.name == 'email' %}
+                                                   fa-envelope
+                                               {% elif field.name == 'phone_number' %}
+                                                   fa-mobile-screen-button
+                                               {% elif field.name == 'message' %}
+                                                   fa-message
+                                               {% else %}
+                                                   fa-paperclip
+                                               {% endif %}"></i>
+                                        </div>
+                                        {% for err in field.errors %}
+                                            <div class="text-danger small">{{ err }}</div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                            <div class="col-12 text-end">
+                                <button type="submit" class="btn btn-animation btn-md fw-bold">ارسال پیام</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Contact Box Section End -->
+
+<!-- Map Section Start -->
+<section class="map-section">
+    <div class="container-fluid p-0">
+        <div class="map-box">
+            <iframe
+                src="https://www.google.com/maps/embed?pb=!1m23!1m12!1m3!1d2994.3803116994895!2d55.29773782339708!3d25.222534631321!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!4m8!3e6!4m5!1s0x3e5f43496ad9c645%3A0xbde66e5084295162!2sDubai%20-%20United%20Arab%20Emirates!3m2!1d25.2048493!2d55.2707828!4m0!5e1!3m2!1sen!2sin!4v1652217109535!5m2!1sen!2sin"
+                style="border:0;" allowfullscreen="" loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+    </div>
+</section>
+<!-- Map Section End -->
+{% endblock %}
