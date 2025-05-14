@@ -1,0 +1,25 @@
+@font-face {
+	font-family: aviny;
+	font-style: normal;
+	src: url('../../fonts/aviny/aviny.woff2') format('woff2'),  /* FF39+,Chrome36+, Opera24+*/
+		 url('../../fonts/aviny/aviny.woff') format('woff'),  /* FF3.6+, IE9, Chrome6+, Saf5.1+*/
+		 url('../../fonts/aviny/aviny.ttf') format('truetype');
+}
+
+[dir="rtl"] .home-contain .home-detail h1 , .vendore-breadscrumb-section .breadscrumb-contain h2 {
+    font-family: aviny !important;
+    font-size: calc(30px + (42 - 16) * ((100vw - 320px) / (1920 - 320)));
+}
+.home-contain .home-detail h3 , .contact-box-section .left-sidebar-box .contact-title h3 {
+    font-family: aviny !important;
+    font-size: calc(30px + (26 - 20) * ((100vw - 320px) / (1920 - 320)));
+    font-weight: normal !important;
+}
+.user-dashboard-section .dashboard-left-sidebar .profile-box .profile-contain .profile-name h3, .seller-title h2, .text-russo, .aviny , .text-kaushan , .about-us-title h4 , .title h2 , .faq-box-contain .faq-contain h2 , .text-qwitcher{
+	font-family: aviny !important;
+}
+.title h2 , .breadcrumb-section .breadcrumb-contain h2 {
+	font-weight: 500;
+	font-size: calc(35px + 6 * ((100vw - 320px) / 1600));
+	font-family: aviny !important;
+}

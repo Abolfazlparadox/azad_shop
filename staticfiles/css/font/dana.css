@@ -1,0 +1,128 @@
+/**
+*
+*	Name:			DANA Fonts
+*	Version:			3.0
+*	Author:			Moslem Ebrahimi (moslemebrahimi.com)
+*	Created on:		nov 12, 2021
+*	Updated on:		nov 12, 2021
+*	Website:			http://fontiran.com
+*	Copyright:		Commercial/Proprietary Software
+--------------------------------------------------------------------------------------
+فونت دانا یک نرم افزار مالکیتی محسوب می شود. جهت آگاهی از قوانین استفاده از این فونت ها لطفا به وب سایت (فونت ایران دات کام) مراجعه نمایید
+--------------------------------------------------------------------------------------
+DANA fonts are considered a proprietary software. To gain information about the laws regarding the use of these fonts, please visit www.fontiran.com 
+--------------------------------------------------------------------------------------
+This set of fonts are used in this project under the license: (.....)
+------------------------------------------------------------------------------------- fonts/-
+*	
+**/
+
+@font-face {
+	font-family: dana;
+	font-style: normal;
+	font-weight: 10;
+	src: url('../../fonts/dana/woff2/Dana-Hairline.woff2') format('woff2'),  /* FF39+,Chrome36+, Opera24+*/
+		 url('../../fonts/dana/woff/Dana-Hairline.woff') format('woff');  /* FF3.6+, IE9, Chrome6+, Saf5.1+*/
+}
+@font-face {
+	font-family: dana;
+	font-style: normal;
+	font-weight: 100;
+	src: url('../../fonts/dana/woff2/Dana-Thin.woff2') format('woff2'),  /* FF39+,Chrome36+, Opera24+*/
+		 url('../../fonts/dana/woff/Dana-Thin.woff') format('woff');  /* FF3.6+, IE9, Chrome6+, Saf5.1+*/
+}
+@font-face {
+	font-family: dana;
+	font-style: normal;
+	font-weight: 200;
+	src: url('../../fonts/dana/woff2/Dana-UltraLight.woff2') format('woff2'),  /* FF39+,Chrome36+, Opera24+*/
+		 url('../../fonts/dana/woff/Dana-UltraLight.woff') format('woff');  /* FF3.6+, IE9, Chrome6+, Saf5.1+*/
+}
+@font-face {
+	font-family: dana;
+	font-style: normal;
+	font-weight: 300;
+	src: url('../../fonts/dana/woff2/Dana-Light.woff2') format('woff2'),  /* FF39+,Chrome36+, Opera24+*/
+		 url('../../fonts/dana/woff/Dana-Light.woff') format('woff');  /* FF3.6+, IE9, Chrome6+, Saf5.1+*/
+}
+@font-face {
+	font-family: dana;
+	font-style: normal;
+	font-weight: 500;
+	src: url('../../fonts/dana/woff2/Dana-Medium.woff2') format('woff2'),  /* FF39+,Chrome36+, Opera24+*/
+		 url('../../fonts/dana/woff/Dana-Medium.woff') format('woff');  /* FF3.6+, IE9, Chrome6+, Saf5.1+*/
+}
+@font-face {
+	font-family: dana;
+	font-style: normal;
+	font-weight: 600;
+	src: url('../../fonts/dana/woff2/Dana-DemiBold.woff2') format('woff2'),  /* FF39+,Chrome36+, Opera24+*/
+		 url('../../fonts/dana/woff/Dana-DemiBold.woff') format('woff');  /* FF3.6+, IE9, Chrome6+, Saf5.1+*/
+}
+@font-face {
+	font-family: dana;
+	font-style: normal;
+	font-weight: 800;
+	src: url('../../fonts/dana/woff2/Dana-ExtraBold.woff2') format('woff2'),  /* FF39+,Chrome36+, Opera24+*/
+		 url('../../fonts/dana/woff/Dana-ExtraBold.woff') format('woff');  /* FF3.6+, IE9, Chrome6+, Saf5.1+*/
+}
+@font-face {
+	font-family: dana;
+	font-style: normal;
+	font-weight: 900;
+	src: url('../../fonts/dana/woff2/Dana-Black.woff2') format('woff2'),  /* FF39+,Chrome36+, Opera24+*/
+		 url('../../fonts/dana/woff/Dana-Black.woff') format('woff');  /* FF3.6+, IE9, Chrome6+, Saf5.1+*/
+}
+@font-face {
+	font-family: dana;
+	font-style: normal;
+	font-weight: 930;
+	src: url('../../fonts/dana/woff2/Dana-ExtraBlack.woff2') format('woff2'),  /* FF39+,Chrome36+, Opera24+*/
+		 url('../../fonts/dana/woff/Dana-ExtraBlack.woff') format('woff');  /* FF3.6+, IE9, Chrome6+, Saf5.1+*/
+}
+@font-face {
+	font-family: dana;
+	font-style: normal;
+	font-weight: 960;
+	src: url('../../fonts/dana/woff2/Dana-Heavy.woff2') format('woff2'),  /* FF39+,Chrome36+, Opera24+*/
+		 url('../../fonts/dana/woff/Dana-Heavy.woff') format('woff');  /* FF3.6+, IE9, Chrome6+, Saf5.1+*/
+}
+@font-face {
+	font-family: dana;
+	font-style: normal;
+	font-weight: 990;
+	src: url('../../fonts/dana/woff2/Dana-Fat.woff2') format('woff2'),  /* FF39+,Chrome36+, Opera24+*/
+		 url('../../fonts/dana/woff/Dana-Fat.woff') format('woff');  /* FF3.6+, IE9, Chrome6+, Saf5.1+*/
+}
+@font-face {
+	font-family: dana;
+	font-style: normal;
+	font-weight: bold;
+	src: url('../../fonts/dana/woff2/Dana-ExtraBold.woff2') format('woff2'),  /* FF39+,Chrome36+, Opera24+*/
+		 url('../../fonts/dana/woff/Dana-ExtraBold.woff') format('woff');  /* FF3.6+, IE9, Chrome6+, Saf5.1+*/
+}
+@font-face {
+	font-family: dana;
+	font-style: normal;
+	font-weight: normal;
+	src: url('../../fonts/dana/woff2/Dana-Regular.woff2') format('woff2'),  /* FF39+,Chrome36+, Opera24+*/
+		 url('../../fonts/dana/woff/Dana-Regular.woff') format('woff');  /* FF3.6+, IE9, Chrome6+, Saf5.1+*/
+}
+
+[dir="rtl"] .home-contain .home-detail h1 , .vendore-breadscrumb-section .breadscrumb-contain h2 {
+    font-family: dana !important;
+    font-size: calc(30px + (42 - 16) * ((100vw - 320px) / (1920 - 320)));
+}
+.home-contain .home-detail h3 {
+    font-family: dana !important;
+    font-size: calc(30px + (26 - 20) * ((100vw - 320px) / (1920 - 320)));
+    font-weight: normal !important;
+}
+.user-dashboard-section .dashboard-left-sidebar .profile-box .profile-contain .profile-name h3, .seller-title h2, .text-russo, .aviny , .text-kaushan , .about-us-title h4 , .title h2 , .faq-box-contain .faq-contain h2 , .text-qwitcher{
+	font-family: dana !important;
+}
+.title h2{
+	font-weight: 500;
+	font-size: calc(35px + 6 * ((100vw - 320px) / 1600));
+	font-family: dana !important;
+}

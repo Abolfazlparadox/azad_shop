@@ -1,0 +1,24 @@
+/*body {*/
+/*    background-image: url('/static/images/azad4.png') !important;*/
+/*    background-size: 99% 95% !important;               !* عرض 60%، ارتفاع 40% *!*/
+/*    background-repeat: no-repeat !important;      !* تکرار نشه *!*/
+/*    background-position: center center !important;!* وسط‌چین شه *!*/
+/*    background-attachment: fixed !important;      !* موقع اسکرول ثابت بمونه *!*/
+/*    background-blend-mode: overlay !important;    !* افکت ملایم برای هماهنگی با رنگ *!*/
+/*    background-color: rgba(0, 0, 0, 0.4) !important; !* یک رنگ تیره روی بک‌گراند برای خوانایی بهتر متن *!*/
+/*    color: white !important;                      !* رنگ متن رو سفید کنیم برای خوانایی بهتر *!*/
+/*}*/
+
+
+
+
+.red-text {
+    color: red !important;
+}
+.red-text.ml-space {
+    margin-left: 8px !important; /* یا هر مقدار دلخواه مثل 10px */
+}
+select:not(:-internal-list-box):not([multiple]) option {
+    background-color: #1d1d22 !important;  /* اضافه کردن رنگ پس‌زمینه با اولویت */
+    color: white !important; /* تغییر رنگ متن با اولویت */
+}
