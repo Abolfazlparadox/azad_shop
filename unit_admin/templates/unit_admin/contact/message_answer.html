@@ -1,0 +1,18 @@
+{% extends "unit_admin/base.html" %}
+{% block body %}
+<div class="container-fluid">
+  <div class="card">
+    <div class="card-body">
+      <h5>پاسخ به تیکت #{{ message.pk }}</h5>
+      <p><strong>ارسال‌کننده:</strong> {{ message.first_name }} {{ message.last_name }}</p>
+      <p><strong>ایمیل:</strong> {{ message.email }}</p>
+      <p><strong>متن پیام:</strong><br>{{ message.message }}</p>
+      <form method="post">
+        {% csrf_token %}
+        {{ form.answer }}
+        <button type="submit" class="btn btn-theme mt-3">ارسال پاسخ</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

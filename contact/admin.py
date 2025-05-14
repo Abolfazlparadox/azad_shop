@@ -34,10 +34,7 @@ class ContactMessageAdmin(admin.ModelAdmin):
     list_filter = ('subject', 'university', 'status')
     search_fields = ('first_name', 'last_name', 'email', 'message')
     autocomplete_fields = ('subject', 'university')
-    readonly_fields = (
-        'first_name', 'last_name', 'email',
-        'university', 'created_at'
-    )
+    readonly_fields = ('created_at',)
     actions = [make_answered]
     ordering = ('-created_at',)
     date_hierarchy = 'created_at'

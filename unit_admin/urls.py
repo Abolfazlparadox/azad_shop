@@ -10,7 +10,7 @@ from .views import (
     AddressCreateView, AddressUpdateView, AddressDeleteView, ProductListView, ProductCreateView,
     ProductSoftDeleteView, ProductHardDeleteView, CategoryListView, CategoryCreateView, CategoryUpdateView,
     CategorySoftDeleteView, CategoryHardDeleteView, UserSoftDeleteView, UserHardDeleteView, AdminSettingsView,
-    AdminAddressDeleteView,
+    AdminAddressDeleteView, ContactMessageListView, ContactMessageAnswerView,
 )
 
 app_name = 'unit_admin'
@@ -50,7 +50,8 @@ urlpatterns = [
     path('categories/<int:pk>/hard-delete/',CategoryHardDeleteView.as_view(), name='category_hard_delete'),
 
     path('settings/', AdminSettingsView.as_view(), name='settings'),
-    path('settings/address/<int:pk>/delete/',
-         AdminAddressDeleteView.as_view(),
-         name='settings_address_delete'),
+    path('settings/address/<int:pk>/delete/',AdminAddressDeleteView.as_view(),name='settings_address_delete'),
+
+    path("contact/", ContactMessageListView.as_view(), name="contact_list"),
+    path("contact/<int:pk>/answer/", ContactMessageAnswerView.as_view(), name="contact_answer"),
 ]

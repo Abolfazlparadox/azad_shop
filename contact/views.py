@@ -2,7 +2,7 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, DetailView
 from django.contrib import messages
 from django.core.mail import mail_admins
-
+from django.utils.translation import gettext_lazy as _
 from home.models import SiteSetting
 from .models import ContactMessage
 from .forms import ContactForm

@@ -28,6 +28,7 @@ class ContactMessage(models.Model):
                                        null=True, blank=True, verbose_name=_('موضوع'))
     other_subject  = models.CharField(max_length=200, blank=True, verbose_name=_('موضوع دیگر'))
     message        = models.TextField(verbose_name=_('متن پیام'))
+    answer =models.TextField(verbose_name=_('متن پاسخ'),blank=True, null=True)
     attachment     = models.FileField(upload_to='contact/attachments/', blank=True, null=True,
                                       verbose_name=_('ضمیمه'))
     university     = models.ForeignKey(University, on_delete=models.SET_NULL,

@@ -1,0 +1,55 @@
+{% load static %}
+<table class="table all-package theme-table" id="table_id">
+  <thead>
+    <tr>
+      <th>#</th><th>تاریخ</th><th>ارسال‌کننده</th><th>عنوان</th><th>وضعیت</th><th>عملیات</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for msg in messages %}
+    <tr>
+      <td>{{ msg.pk }}</td>
+      <td>{{ msg.created_at|date:"Y/m/d H:i" }}</td>
+      <td>{{ msg.first_name }} {{ msg.last_name }}</td>
+      <td>{% if msg.subject.title %}{{ msg.subject.title }}
+      	{% else %}
+          {{ msg.other_subject }}
+      {% endif %} </td>
+      <td class="{% if msg.status == 'pending' %}badge bg-secondary{% else %}badge bg-success{% endif %}">
+
+        {{ msg.get_status_display }}
+      </td>
+      <td>
+        <a href="{% url 'unit_admin:contact_answer' msg.pk %}">
+          <i class="ri-pencil-line"></i>
+        </a>
+      </td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="6" class="text-center">پیامی یافت نشد.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+{# صفحه‌بندی #}
+{% if is_paginated %}
+<nav>
+  <ul class="pagination">
+    {% if page_obj.has_previous %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">«</a>
+      </li>
+    {% endif %}
+    {% for num in paginator.page_range %}
+      <li class="page-item {% if num == page_obj.number %}active{% endif %}">
+        <a class="page-link" href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">{{ num }}</a>
+      </li>
+    {% endfor %}
+    {% if page_obj.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">»</a>
+      </li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}

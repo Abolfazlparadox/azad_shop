@@ -1,0 +1,34 @@
+{% extends "unit_admin/base.html" %}
+{% block title %}پنل مدیریت ادمین - تیکت پشتیبانی{% endblock %}
+{% block body %}
+  <div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card card-table">
+                <div class="card-body">
+                    <div class="title-header option-title">
+                      <h5>  تیکت پشتیبانی {{ request.user.memberships.first.university.name }} </h5>
+                      <input type="text" id="search-input" class="form-control w-25" placeholder="جستجو..." />
+                    </div>
+                    <div class="table-responsive table-product mt-3" id="message-table">
+                            {% include "unit_admin/contact/_message_table.html" %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+  </div>
+
+<script>
+document.getElementById("search-input").addEventListener("input", function(){
+  const q = this.value;
+  fetch(`?q=${encodeURIComponent(q)}`, {
+    headers: { "X-Requested-With": "XMLHttpRequest" }
+  })
+    .then(r => r.text())
+    .then(html => {
+      document.getElementById("message-table").innerHTML = html;
+    });
+});
+</script>
+{% endblock %}

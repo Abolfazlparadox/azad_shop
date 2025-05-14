@@ -12,6 +12,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
+from contact.models import ContactMessage
 from product.models import Product, ProductCategory
 
 User = get_user_model()
@@ -460,48 +461,64 @@ class ProductForm(forms.ModelForm):
 class CategoryForm(forms.ModelForm):
     class Meta:
         model = ProductCategory
+        # حذف slug از فیلدهای قابل ویرایش
         fields = [
-            'title', 'slug', 'parent', 'university',
-            'icon', 'is_active', 'is_deleted'
+            'title', 'parent', 'icon',
+            'is_active', 'is_deleted'
         ]
         widgets = {
             'title':      forms.TextInput(attrs={'class':'form-control'}),
-            'slug':       forms.TextInput(attrs={'class':'form-control'}),
             'parent':     forms.Select(attrs={'class':'form-select'}),
-            'university': forms.Select(attrs={'class':'form-select', 'disabled': True}),
             'icon':       forms.ClearableFileInput(attrs={'class':'form-control','accept':'.svg,.png'}),
-            'is_active':  forms.CheckboxInput(attrs={'class':'form-check-input'}),
-            'is_deleted': forms.CheckboxInput(attrs={'class':'form-check-input'}),
+            'is_active':  forms.CheckboxInput(attrs={'class':'form-check-input','role':'switch'}),
+            'is_deleted': forms.CheckboxInput(attrs={'class':'form-check-input','role':'switch'}),
         }
         labels = {
             'title':      _('عنوان'),
-            'slug':       _('نامک'),
-            'parent':     _('والد'),
-            'university': _('دانشگاه'),
-            'icon':       _('آیکن (SVG/PNG)'),
+            'parent':     _('دسته والد'),
+            'icon':       _('آیکون (SVG/PNG)'),
             'is_active':  _('فعال'),
-            'is_deleted': _('حذف شده (نرم)'),
+            'is_deleted': _('حذف نرم'),
         }
         help_texts = {
-            'slug': _('در صورت خالی، خودکار از عنوان ساخته می‌شود'),
-            'university': _('تنظیم می‌شود براساس دانشگاه دبیر'),
+            'title': _('نماد یگانگی: دو دسته با همین عنوان در یک دانشگاه مجاز نیست.'),
         }
 
     def __init__(self, *args, **kwargs):
-        uni = kwargs.pop('university', None)
+        # دریافت یونیورسیتی از ویو
+        self.university = kwargs.pop('university', None)
         super().__init__(*args, **kwargs)
-        if uni:
-            self.fields['university'].initial = uni
-        # والد فقط دسته‌های همان دانشگاه
-        if uni:
-            qs = ProductCategory.objects.filter(university=uni, is_deleted=False)
-            self.fields['parent'].queryset = qs
+        # فقط والد‌های همان دانشگاه
+        if self.university:
+            self.fields['parent'].queryset = ProductCategory.objects.filter(
+                university=self.university,
+                is_deleted=False
+            )
 
-    def clean_slug(self):
-        slug = self.cleaned_data['slug']
-        if not slug:
-            slug = slugify(self.cleaned_data.get('title'))
-        return slug
+    def clean_title(self):
+        title = self.cleaned_data['title']
+        qs = ProductCategory.objects.filter(
+            title=title,
+            university=self.university
+        )
+        # اگر در ویرایش، رکورد خودش را کنار بگذارد
+        if self.instance.pk:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise ValidationError(_('یک دسته با این عنوان در دانشگاه شما قبلاً ثبت شده است.'))
+        return title
+
+    def save(self, commit=True):
+        # قبل از ذخیره، slug و university را تنظیم می‌کنیم
+        instance = super().save(commit=False)
+        if not instance.slug or instance.title != self.instance.title:
+            instance.slug = slugify(instance.title, allow_unicode=True)
+        if self.university:
+            instance.university = self.university
+        if commit:
+            instance.save()
+            # برای M2M ندارد
+        return instance
 
 class AdminSettingsForm(forms.ModelForm):
     password1 = forms.CharField(
@@ -587,3 +604,28 @@ class AdminSettingsForm(forms.ModelForm):
         if commit:
             user.save()
         return user
+
+
+class ContactAnswerForm(forms.ModelForm):
+    class Meta:
+        model = ContactMessage
+        fields = ['answer']
+        widgets = {
+            'answer': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 6,
+                'placeholder': _('متن پاسخ خود را اینجا بنویسید...')
+            }),
+        }
+        labels = {
+            'answer': _('متن پاسخ'),
+        }
+        help_texts = {
+            'answer': _('پس از ارسال، وضعیت پیام به «پاسخ‌داده‌شده» تغییر می‌کند و تاریخ پاسخ ثبت می‌شود.'),
+        }
+
+    def clean_answer(self):
+        ans = self.cleaned_data.get('answer', '').strip()
+        if not ans:
+            raise forms.ValidationError(_('متن پاسخ نمی‌تواند خالی باشد.'))
+        return ans

@@ -9,9 +9,11 @@ from django.views.generic.edit import CreateView,DeleteView
 from django.urls import reverse_lazy
 from django.views import View
 from django.core.paginator import Paginator
+from django.db.models import Q
+from contact.models import ContactMessage
 from product.models import Product,ProductCategory
 from unit_admin.forms import CustomUserCreationForm, RoleCreationForm, AddressForm, ProductForm, CategoryForm, \
-    AdminSettingsForm
+    AdminSettingsForm, ContactAnswerForm
 from django.contrib import messages
 from django.utils import timezone
 from django.shortcuts import redirect, get_object_or_404, render
@@ -21,6 +23,9 @@ User = get_user_model()
 
 class OffiMixin(LoginRequiredMixin):
     login_url = reverse_lazy('login')
+
+    def is_ajax(self):
+        return self.request.headers.get('x-requested-with') == 'XMLHttpRequest'
 
     def dispatch(self, request, *args, **kwargs):
         try:
@@ -33,7 +38,6 @@ class OffiMixin(LoginRequiredMixin):
             raise PermissionDenied(_('شما دسترسی ندارید'))
         self.university = offi.university
         return super().dispatch(request, *args, **kwargs)
-
 class UnitAdminIndexView(OffiMixin, TemplateView):
     template_name = 'unit_admin/index.html'
     login_url = 'login'       # adjust if your login URL name differs
@@ -54,7 +58,7 @@ class UnitAdminIndexView(OffiMixin, TemplateView):
         # ctx['stats'] = ... هر داده‌ی دیگری که می‌خواهید به تمپلیت بدهید
         return ctx
 
-#user
+#User
 class UserListView(OffiMixin, ListView):
     model = User
     template_name = "unit_admin/users/all-users.html"
@@ -70,7 +74,6 @@ class UserListView(OffiMixin, ListView):
             university = admin_membership.university
             return User.objects.filter(
                 memberships__university=university,
-                memberships__is_confirmed=True
             ).exclude(id=self.request.user.id).distinct()
         except Membership.DoesNotExist:
             raise PermissionDenied("Access denied.")
@@ -130,7 +133,6 @@ class UserUpdateView(OffiMixin,UpdateView):
     def form_invalid(self, form):
         messages.error(self.request, _('لطفاً خطاهای فرم را بررسی کنید'))
         return self.render_to_response(self.get_context_data(form=form))
-
 class UserSoftDeleteView(OffiMixin, View):
     """
     حذف نرم کاربر: فقط فیلد is_deleted=True می‌شود، نقش‌ها دست‌نخورده باقی می‌مانند.
@@ -153,7 +155,6 @@ class UserSoftDeleteView(OffiMixin, View):
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse({'status': 'success'})
         return redirect('unit_admin:user_list')
-
 class UserHardDeleteView(OffiMixin, View):
     """
     حذف سخت کاربر: اول Membershipهایش حذف می‌شوند، سپس خود رکورد User.
@@ -175,7 +176,8 @@ class UserHardDeleteView(OffiMixin, View):
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse({'status': 'success'})
         return redirect('unit_admin:user_list')
-#city:
+
+# city
 def get_cities(request):
     province_id = request.GET.get('province_id')
 
@@ -188,8 +190,8 @@ def get_cities(request):
         cities = []
 
     return render(request, 'unit_admin/includes/city_options.html', {'cities': cities})
-#role
 
+#Role
 class RoleListView(OffiMixin, ListView):
     model = Membership
     template_name = "unit_admin/roles/all-roll.html"
@@ -263,8 +265,8 @@ class RoleDeleteView(OffiMixin, View):
             return JsonResponse({'status': 'success'})
         messages.success(request, "نقش با موفقیت حذف شد")
         return redirect('unit_admin:role_list')
-#address
 
+#Address
 class AddressListView(OffiMixin, ListView):
     model = Address
     template_name = 'unit_admin/addresses/address_list.html'
@@ -325,7 +327,7 @@ class AddressDeleteView(OffiMixin, View):
         messages.success(request, "نشانی با موفقیت حذف شد")
         return redirect('unit_admin:address_list')
 
-#product
+# Product
 class ProductListView( OffiMixin, ListView):
     model = Product
     template_name = 'unit_admin/products/products.html'
@@ -384,7 +386,7 @@ class ProductHardDeleteView( OffiMixin, DeleteView):
         return super().delete(request, *args, **kwargs)
 
 
-# Views
+# Category
 class CategoryListView(OffiMixin, ListView):
     template_name = "unit_admin/categories/categories-list.html"
     paginate_by = 5
@@ -415,20 +417,23 @@ class CategoryListView(OffiMixin, ListView):
         # 'object_list' is already the paginated slice of rows
         ctx['rows'] = ctx['object_list']
         return ctx
-
 class CategoryCreateView(OffiMixin, CreateView):
     model = ProductCategory
     form_class = CategoryForm
     template_name = "unit_admin/categories/category-form.html"
     success_url = reverse_lazy('unit_admin:category_list')
 
+    def get_form_kwargs(self):
+        kws = super().get_form_kwargs()
+        kws['university'] = self.university
+        return kws
+
     def form_valid(self, form):
-        form.instance.university = self.university
-        messages.success(self.request, _('دسته جدید با موفقیت ایجاد شد'))
+        messages.success(self.request, _('دسته‌بندی جدید با موفقیت ایجاد شد'))
         return super().form_valid(form)
 
     def form_invalid(self, form):
-        messages.error(self.request, _('لطفاً خطاها را برطرف کنید'))
+        messages.error(self.request, _('لطفاً خطاهای فرم را برطرف کنید'))
         return super().form_invalid(form)
 
 class CategoryUpdateView(OffiMixin, UpdateView):
@@ -444,10 +449,14 @@ class CategoryUpdateView(OffiMixin, UpdateView):
             university=self.university
         )
 
+    def get_form_kwargs(self):
+        kws = super().get_form_kwargs()
+        kws['university'] = self.university
+        return kws
+
     def form_valid(self, form):
         messages.success(self.request, _('دسته‌بندی با موفقیت به‌روز شد'))
         return super().form_valid(form)
-
 class CategorySoftDeleteView(OffiMixin, View):
     def post(self, request, pk):
         obj = get_object_or_404(
@@ -458,7 +467,6 @@ class CategorySoftDeleteView(OffiMixin, View):
         obj.save(update_fields=['is_deleted'])
         messages.success(request, _('حذف نرم انجام شد'))
         return redirect('unit_admin:category_list')
-
 class CategoryHardDeleteView(OffiMixin, View):
     def post(self, request, pk):
         obj = get_object_or_404(
@@ -512,8 +520,6 @@ class AdminSettingsView(OffiMixin, TemplateView):
             'addresses': addresses,
             'readonly_fields': readonly_fields,
         })
-
-
 class AdminAddressDeleteView(OffiMixin, View):
     """
     حذف سخت یک آدرس از لیست تنظیمات
@@ -523,6 +529,52 @@ class AdminAddressDeleteView(OffiMixin, View):
         addr.delete()
         messages.success(request, _('نشانی حذف شد'))
         return redirect('unit_admin:settings')
+
+
+class ContactMessageListView(OffiMixin, ListView):
+    model = ContactMessage
+    template_name = "unit_admin/contact/message_list.html"
+    context_object_name = "messages"
+    paginate_by = 5
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        # فقط تیکت‌های دانشگاه خود OFFI
+        qs = qs.filter(university=self.university)
+        # جستجو در نام، نام خانوادگی یا ایمیل
+        q = self.request.GET.get("q", "").strip()
+        if q:
+            qs = qs.filter(
+                Q(first_name__icontains=q) |
+                Q(last_name__icontains=q) |
+                Q(email__icontains=q)
+            )
+        return qs.order_by("-created_at")
+
+    def render_to_response(self, context, **response_kwargs):
+        # اگر AJAX باشد، فقط جدول را برگردان
+        if self.is_ajax():
+            return render(self.request, "unit_admin/contact/_message_table.html", context)
+        return super().render_to_response(context, **response_kwargs)
+class ContactMessageAnswerView(OffiMixin, UpdateView):
+    model = ContactMessage
+    form_class = ContactAnswerForm
+    template_name = "unit_admin/contact/message_answer.html"
+    context_object_name = "message"
+    pk_url_kwarg = "pk"
+    success_url = reverse_lazy("unit_admin:contact_list")
+
+    def get_object(self, queryset=None):
+        obj = get_object_or_404(ContactMessage, pk=self.kwargs["pk"], university=self.university)
+        return obj
+
+    def form_valid(self, form):
+        msg = form.save(commit=False)
+        msg.status = "answered"
+        msg.responded_at = timezone.now()
+        msg.save()
+        messages.success(self.request, "پیام با موفقیت پاسخ داده شد.")
+        return super().form_valid(form)
 
 class OrdersListView( OffiMixin, ListView):
     model = ProductCategory  # Replace with your actual model
@@ -535,11 +587,6 @@ class TaxListView( OffiMixin, ListView):
     template_name = "unit_admin/tax/list.html"
     context_object_name = 'taxes'
     ordering = ['-rate']
-class TicketsListView( OffiMixin, ListView):
-    model = ProductCategory  # Replace with your actual model
-    template_name = "unit_admin/tickets/list.html"
-    context_object_name = 'tickets'
-    ordering = ['-created_at']
 class ReportsListView( OffiMixin, ListView):
     model = ProductCategory  # Replace with your actual model
     template_name = "unit_admin/reports/list.html"

@@ -1,10 +1,19 @@
 from django.views.generic import TemplateView
 from django.http import JsonResponse
 from iranian_cities.models import Province
+from blog.models import BlogPost
+from comment.models import Comment
+
 
 class HomeTemplateView(TemplateView):
     template_name = 'home/index.html'
-
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        last_blog_post  = BlogPost.objects.filter(is_published=True).order_by('-published_at')[0:5]
+        last_comment = Comment.objects.filter(is_approved=True , content_type=18).order_by('-created_at').first()
+        ctx['last_blog_post'] = last_blog_post
+        ctx['last_comment'] = last_comment
+        return ctx
 #hi
 def search_location(request):
     q = request.GET.get('q', '').strip()

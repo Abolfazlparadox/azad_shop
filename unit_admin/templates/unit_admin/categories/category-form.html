@@ -1,0 +1,70 @@
+{% extends 'unit_admin/base.html' %}
+{% load static i18n %}
+{% block title %}{% if form.instance.pk %}ویرایش دسته{% else %}افزودن دسته{% endif %}{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-sm-8 m-auto">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="mb-4">{% if form.instance.pk %}ویرایش دسته{% else %}افزودن دسته{% endif %}</h5>
+          <form method="post" enctype="multipart/form-data" class="theme-form">
+            {% csrf_token %}
+            {# عنوان #}
+            <div class="mb-3 row">
+              <label class="col-sm-3 col-form-label">{% trans "عنوان" %}</label>
+              <div class="col-sm-9">
+                {{ form.title }}
+                {% for err in form.title.errors %}
+                  <div class="text-danger small">{{ err }}</div>
+                {% endfor %}
+              </div>
+            </div>
+            {# والد #}
+            <div class="mb-3 row">
+              <label class="col-sm-3 col-form-label">{% trans "دسته والد" %}</label>
+              <div class="col-sm-9">
+                {{ form.parent }}
+                {% for err in form.parent.errors %}
+                  <div class="text-danger small">{{ err }}</div>
+                {% endfor %}
+              </div>
+            </div>
+            {# آیکون #}
+            <div class="mb-3 row">
+              <label class="col-sm-3 col-form-label">{% trans "آیکون" %}</label>
+              <div class="col-sm-9">
+                {{ form.icon }}
+                {% for err in form.icon.errors %}
+                  <div class="text-danger small">{{ err }}</div>
+                {% endfor %}
+              </div>
+            </div>
+            {# فعال/غیرفعال و حذف نرم #}
+            <div class="mb-3 row">
+              <div class="col-sm-3"></div>
+              <div class="col-sm-9 d-flex gap-4">
+                <div class="form-check form-switch">
+                  {{ form.is_active }}
+                  <label class="form-check-label">{% trans "فعال" %}</label>
+                </div>
+                <div class="form-check form-switch">
+                  {{ form.is_deleted }}
+                  <label class="form-check-label">{% trans "حذف نرم" %}</label>
+                </div>
+              </div>
+            </div>
+            {# دکمه ارسال #}
+            <div class="text-end">
+              <button type="submit" class="btn btn-theme">
+                {% if form.instance.pk %}{% trans "ذخیره تغییرات" %}{% else %}{% trans "ایجاد دسته" %}{% endif %}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
