@@ -30,3 +30,10 @@ def three_digits_currency(value: int):
 @register.simple_tag
 def multiply(quantity, price, *args, **kwargs):
     return three_digits_currency(quantity * price)
+
+
+
+@register.filter
+def get_item(dictionary, key):
+    return dictionary.get(key)
+

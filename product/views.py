@@ -11,36 +11,42 @@ from django.utils import timezone
 from django.shortcuts import get_object_or_404, render
 from django.contrib import messages
 from django.template.loader import render_to_string
-
+from collections import defaultdict
+from django.db.models import Prefetch
+from django.utils import timezone
+from django.views.generic import ListView
 from product.models import University  # if needed
 
 class ProductBaseView:
     """Base view with common functionality."""
 
     def get_price_range(self):
-        """Get min/max prices from database with caching."""
+        """Get min/max prices from ProductVariant with caching."""
         cache_key = 'product_price_range'
         price_range = cache.get(cache_key)
         if not price_range:
-            price_range = Product.objects.aggregate(
-                max_price=Max('price'),
-                min_price=Min('price')
+            price_range = ProductVariant.objects.aggregate(
+                max_price=Max('price_override'),
+                min_price=Min('price_override')
             )
             cache.set(cache_key, price_range, 60 * 60)
         return price_range
 
     def get_max_available_price(self):
-        """Get highest available product price."""
-        cache_key = 'max_product_price'
+        """Get highest available product variant price."""
+        cache_key = 'max_product_variant_price'
         max_price = cache.get(cache_key)
         if not max_price:
-            max_price = Product.objects.aggregate(
-                max_price=Max('price')
-            )['max_price'] or Decimal('1000000')
+            max_price = ProductVariant.objects.aggregate(
+                max_price=Max('price_override')
+            )['max_price'] or Decimal('1000000')  # Default to a high value if no variants found
             cache.set(cache_key, max_price, 60 * 60)
         return max_price
 
-class ProductListView(ProductBaseView, ListView):
+
+
+
+class ProductListView(ListView):
     model = Product
     template_name = 'product/product-list.html'
     context_object_name = 'products'
@@ -48,107 +54,110 @@ class ProductListView(ProductBaseView, ListView):
     ordering = ['-created_at']
 
     def get_queryset(self):
-        qs = super().get_queryset().select_related('brand').filter(is_active=True)
-        qs = qs.prefetch_related(
-            Prefetch('categories', queryset=ProductCategory.objects.only('title', 'slug')),
-            Prefetch('images', queryset=ProductImage.objects.order_by('order')),
-            Prefetch('variants', queryset=ProductVariant.objects.only('color', 'size', 'price_modifier'))
-        )
-
-        # --- Search ---
-        search = self.request.GET.get('search')
-        if search:
-            qs = qs.filter(title__icontains=search)
-
-        # --- Price filtering ---
-        try:
-            raw_min = self.request.GET.get('min_price')
-            raw_max = self.request.GET.get('max_price')
-            min_price = Decimal(raw_min) if raw_min else Decimal(0)
-            max_price = Decimal(raw_max) if raw_max else self.get_max_available_price()
-            if min_price < 0 or max_price < 0:
-                raise ValidationError("Prices cannot be negative")
-            if min_price > max_price:
-                raise ValidationError("Minimum price cannot exceed maximum price")
-            qs = qs.filter(price__gte=min_price, price__lte=max_price)
-        except (ValueError, TypeError, ValidationError, DecimalException) as e:
-            messages.warning(self.request, f"Invalid price range: {e}")
-
-        # --- Category filtering ---
-        category_slug = self.kwargs.get('category_slug')
-        if category_slug:
-            qs = qs.filter(categories__slug=category_slug)
-
-        # --- Rating filtering ---
-        ratings = self.request.GET.getlist('rating')
-        if ratings:
-            try:
-                min_rating = min(map(int, ratings))
-                qs = qs.annotate(avg_rating=Avg('reviews__rating')) \
-                       .filter(avg_rating__gte=min_rating)
-            except Exception as ex:
-                messages.warning(self.request, f"Rating filter error: {ex}")
-
-        # --- Discount filtering ---
-        discounts = self.request.GET.getlist('discount')
-        if discounts:
-            try:
-                threshold = max(map(int, discounts))
-                qs = qs.annotate(
-                    discount_pct=F('old_price') - F('price')
-                ).filter(discount_pct__gt=0)
-            except Exception as ex:
-                messages.warning(self.request, f"Discount filter error: {ex}")
-
-        # --- Weight filtering ---
-        weights = self.request.GET.getlist('weight')
-        if weights:
-            try:
-                w_vals = [Decimal(w) for w in weights if w.replace('.', '', 1).isdigit()]
-                qs = qs.filter(weight__in=w_vals)
-            except Exception as ex:
-                messages.warning(self.request, f"Weight filter error: {ex}")
-
-        return qs.distinct()
+        print("شروع دریافت queryset...")  # پرینت برای شروع گرفتن داده‌ها
+        qs = super().get_queryset().filter(is_active=True)
+        qs = qs.select_related('brand', 'university') \
+            .prefetch_related(
+                Prefetch('categories', queryset=ProductCategory.objects.only('title', 'slug')),
+                Prefetch('images', queryset=ProductImage.objects.order_by('order')),
+                Prefetch('variants', queryset=ProductVariant.objects.select_related('discount')
+                         .prefetch_related('attributes'))
+            )
+        print(f"تعداد محصولات یافت‌شده: {qs.count()}")  # پرینت تعداد محصولات یافت‌شده
+        return qs
 
     def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        qs = self.get_queryset()
-
-        total = qs.count()
-        discounted = qs.filter(old_price__isnull=False, price__lt=F('old_price')).count()
-        non_discounted = total - discounted
-
-        price_range = self.get_price_range()
+        print("شروع پردازش context...")  # پرینت برای شروع پردازش context
+        context = super().get_context_data(**kwargs)
         now = timezone.now()
-
-        # حذف پارامتر page از query برای استفاده در لینک‌های صفحه‌بندی
         querydict = self.request.GET.copy()
+
         if 'page' in querydict:
             querydict.pop('page')
 
-        ctx.update({
-            # 'products': qs,
-            'discounted_products_count': discounted,
-            'non_discounted_products_count': non_discounted,
-            'price_range': price_range,
-            'all_categories': ProductCategory.objects.all(),
-            'discount_options': [5, 10, 15, 25],
-            'weight_options': ['0.4', '0.5', '0.7', '1'],
-            'current_search': self.request.GET.get('search', ''),
-            'current_category': [self.kwargs.get('category_slug')] if self.kwargs.get('category_slug') else [],
-            'current_rating': self.request.GET.getlist('rating'),
-            'current_discount': self.request.GET.getlist('discount'),
-            'current_weight': self.request.GET.getlist('weight'),
-            'query_string': querydict.urlencode(),
-            'now': now,
-            'banner': {
-                'image': 'images/shop/1.jpg',
-                'title': 'میوه‌ها و سبزیجات سالم، مغذی و خوش‌طعم',
-                'discount': 'تخفیف تا 50٪'
+        qs = self.get_queryset()
+
+        sizes = set()
+        colors = set()
+        product_variant_map = {}
+
+        # پرینت برای شروع پردازش محصولات
+        print("شروع پردازش محصولات...")
+
+        for product in qs:
+            print(f"در حال پردازش محصول: {product.title}")  # پرینت نام هر محصول
+            color_to_sizes = defaultdict(set)
+            size_to_colors = defaultdict(set)
+            variants_list = []
+
+            for variant in product.variants.all():
+                print(f"  در حال پردازش واریانت: {variant.pk}")
+                color = None
+                sizes_in_variant = []
+
+                for attr in variant.attributes.all():
+                    if attr.type.name == 'رنگ' and not color:
+                        color = attr.color
+                        colors.add(color)
+                        print(f"    رنگ: {color}")
+                    elif attr.type.name == 'سایز':
+                        size = attr.value
+                        sizes.add(size)
+                        sizes_in_variant.append(size)
+                        print(f"    سایز: {size}")
+
+                # نگاشت‌ها براساس وجود رنگ یا سایز ساخته می‌شن
+                if color:
+                    if sizes_in_variant:
+                        for size in sizes_in_variant:
+                            color_to_sizes[str(color)].add(size)
+                            size_to_colors[size].add(str(color))
+                    else:
+                        # اگر فقط رنگ وجود داشت
+                        color_to_sizes[str(color)].add(None)
+
+                if sizes_in_variant and not color:
+                    for size in sizes_in_variant:
+                        size_to_colors[size].add(None)
+
+                variants_list.append({
+                    'variant_id': variant.pk,
+                    'color': str(color) if color else None,
+                    'sizes': sizes_in_variant,
+                    'price': variant.price_override or variant.product.price,
+                    'stock': variant.stock,
+                    'discount': variant.discount.amount if variant.discount else None,
+                })
+
+            color_to_sizes = {k: list(v) for k, v in color_to_sizes.items()}
+            size_to_colors = {k: list(v) for k, v in size_to_colors.items()}
+
+            # پرینت اطلاعات مربوط به رنگ‌ها و سایزها
+            print(f"    رنگ‌ها به سایزها: {color_to_sizes}")
+            print(f"    سایزها به رنگ‌ها: {size_to_colors}")
+
+            product_variant_map[product.pk] = {
+                'color_to_sizes': color_to_sizes,
+                'size_to_colors': size_to_colors,
+                'variants': variants_list,
             }
+
+        # پرینت اطلاعات نهایی
+        print(f"رنگ‌ها: {colors}")
+        print(f"سایزها: {sizes}")
+        print(f"مجموعه واریانت‌ها: {product_variant_map}")
+
+        context.update({
+            'now': now,
+            'query_string': querydict.urlencode(),
+            'sizes': sizes,
+            'colors': list(colors),
+            'product_variant_map': product_variant_map,  # ✅ کافی است فقط همین را داشته باشید
         })
-        return ctx
+
+        return context
+
+
 
 
 class ProductDetailView(ProductBaseView, DetailView):

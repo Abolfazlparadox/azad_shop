@@ -123,3 +123,126 @@
 #             return render(request, 'cart_module/payment_result.html', {
 #                 'error': 'پرداخت با خطا مواجه شد / کاربر از پرداخت ممانعت کرد'
 #             })
+
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class ProductListView(ProductBaseView, ListView):
+    model = Product
+    template_name = 'product/product-list.html'
+    context_object_name = 'products'
+    paginate_by = 10
+    ordering = ['-created_at']
+
+    def get_max_available_price(self):
+        """Get the maximum price across all product variants."""
+        max_price = ProductVariant.objects.aggregate(Max('price_override'))['price_override__max']
+        return max_price or Decimal(0)
+
+    def get_queryset(self):
+        qs = super().get_queryset().select_related('brand').filter(is_active=True)
+        qs = qs.prefetch_related(
+            Prefetch('categories', queryset=ProductCategory.objects.only('title', 'slug')),
+            Prefetch('images', queryset=ProductImage.objects.order_by('order')),
+            Prefetch('variants', queryset=ProductVariant.objects.only('color', 'size', 'price_override', 'stock'))
+        )
+
+        # --- جستجو ---
+        search = self.request.GET.get('search')
+        if search:
+            qs = qs.filter(title__icontains=search)
+
+        # --- فیلتر کردن بر اساس قیمت ---
+        try:
+            raw_min = self.request.GET.get('min_price')
+            raw_max = self.request.GET.get('max_price')
+            min_price = Decimal(raw_min) if raw_min else Decimal(0)
+            max_price = Decimal(raw_max) if raw_max else self.get_max_available_price()
+            if min_price < 0 or max_price < 0:
+                raise ValidationError("قیمت‌ها نباید منفی باشند")
+            if min_price > max_price:
+                raise ValidationError("قیمت حداقل نباید بیشتر از قیمت حداکثر باشد")
+            # اصلاح فیلتر قیمت برای استفاده از variants__price_override
+            qs = qs.filter(variants__price_override__gte=min_price, variants__price_override__lte=max_price)
+        except (ValueError, TypeError, ValidationError, DecimalException) as e:
+            messages.warning(self.request, f"محدوده قیمت نامعتبر: {e}")
+
+        # --- فیلتر کردن تخفیف‌ها ---
+        discounts = self.request.GET.getlist('discount')
+        if discounts:
+            try:
+                threshold = max(map(int, discounts))
+                # در اینجا باید تخفیف را بر اساس تفاوت در price_override محاسبه کنید
+                qs = qs.annotate(
+                    discount_pct=F('variants__price_override') - F('variants__price_override')
+                    # اینجا باید منطق تخفیف را وارد کنید
+                ).filter(discount_pct__gt=0)
+            except Exception as ex:
+                messages.warning(self.request, f"خطای فیلتر تخفیف: {ex}")
+
+        # --- فیلتر کردن وزن ---
+        weights = self.request.GET.getlist('weight')
+        if weights:
+            try:
+                w_vals = [Decimal(w) for w in weights if w.replace('.', '', 1).isdigit()]
+                qs = qs.filter(weight__in=w_vals)
+            except Exception as ex:
+                messages.warning(self.request, f"خطای فیلتر وزن: {ex}")
+
+        return qs.distinct()
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        qs = self.get_queryset()
+
+        total = qs.count()
+        discounted = qs.filter(variants__price_override__lt=F('price')).count()  # Adjust based on your model
+        non_discounted = total - discounted
+
+        price_range = self.get_price_range()
+        now = timezone.now()
+
+        querydict = self.request.GET.copy()
+        if 'page' in querydict:
+            querydict.pop('page')
+
+        # --- Add Product Variant information to context ---
+        product_data = []
+        for product in qs:
+            variants = product.variants.all()  # Get all variants of the product
+            variant_info = []
+            for variant in variants:
+                variant_info.append({
+                    'color': variant.color,
+                    'size': variant.size,
+                    'price': variant.price_override,
+                    'stock': variant.stock
+                })
+            product_data.append({
+                'product': product,
+                'variants': variant_info
+            })
+
+        ctx.update({
+            'discounted_products_count': discounted,
+            'non_discounted_products_count': non_discounted,
+            'price_range': price_range,
+            'all_categories': ProductCategory.objects.all(),
+            'discount_options': [5, 10, 15, 25],
+            'weight_options': ['0.4', '0.5', '0.7', '1'],
+            'current_search': self.request.GET.get('search', ''),
+            'current_category': [self.kwargs.get('category_slug')] if self.kwargs.get('category_slug') else [],
+            'current_rating': self.request.GET.getlist('rating'),
+            'current_discount': self.request.GET.getlist('discount'),
+            'current_weight': self.request.GET.getlist('weight'),
+            'query_string': querydict.urlencode(),
+            'now': now,
+            'banner': {
+                'image': 'images/shop/1.jpg',
+                'title': 'میوه‌ها و سبزیجات سالم، مغذی و خوش‌طعم',
+                'discount': 'تخفیف تا 50٪'
+            },
+            'product_data': product_data  # Add the product data including variants
+        })
+        return ctx

@@ -22,3 +22,74 @@ select:not(:-internal-list-box):not([multiple]) option {
     background-color: #1d1d22 !important;  /* اضافه کردن رنگ پس‌زمینه با اولویت */
     color: white !important; /* تغییر رنگ متن با اولویت */
 }
+
+/* ثابت نگه داشتن عنوان‌ها و اطلاعات قیمت و موجودی */
+.product-package {
+    position: relative !important;
+}
+
+.product-title,
+.product-footer,
+#price-{{ product.pk }}
+#stock-{{ product.pk }} {
+    position: -webkit-sticky !important;
+    position: sticky !important;
+    top: 10px !important; /* فاصله از بالای صفحه */
+    z-index: 10 !important; /* اطمینان از بالاتر بودن از سایر محتوا */
+    background-color: #fff !important;
+    padding: 10px !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important; /* سایه برای زیبایی */
+    width: 100% !important; /* عرض کامل برای جلوگیری از جابجایی */
+}
+
+.product-footer {
+    display: block !important; /* اطمینان از اینکه اطلاعات ثابت پایین نروند */
+    position: relative !important;
+}
+
+/* تنظیم ارتفاع برای لیست‌های رنگ و سایز */
+.color-options,
+.size-options {
+    max-height: 300px !important; /* حداکثر ارتفاع لیست‌ها */
+    overflow-y: auto !important; /* فعال‌سازی اسکرول برای لیست‌های بزرگ */
+    padding-right: 10px !important;
+    margin-bottom: 10px !important;
+}
+
+/* استایل برای هر دایره رنگ */
+.color-options li input[type="radio"] {
+    display: none !important; /* مخفی کردن دکمه‌های رادیویی */
+}
+
+.color-options li label span {
+    display: block !important;
+    width: 30px !important;
+    height: 30px !important;
+    border-radius: 50% !important;
+    margin: 5px !important;
+}
+
+/* استایل برای انتخاب رنگ‌ها */
+.color-options li input[type="radio"]:checked + label span {
+    border: 3px solid #333 !important; /* مرز برای انتخاب رنگ */
+}
+
+/* استایل برای انتخاب سایزها */
+.size-options li input[type="radio"]:checked + label {
+    font-weight: bold !important; /* برجسته کردن انتخاب‌ها */
+}
+
+.low-stock {
+    color: red !important;
+    font-weight: bold !important;
+}
+
+.blinking {
+    animation: blink-animation 1s steps(2, start) infinite !important;
+}
+
+@keyframes blink-animation {
+    to {
+        visibility: hidden !important;
+    }
+}

@@ -18,9 +18,6 @@ class ProductVariantInline(admin.TabularInline):
     model = ProductVariant
     extra = 1
     fields = ('attributes','price_override','stock' ,'discount',)
-class ProductAttributeInline(admin.TabularInline):
-    model = ProductAttribute
-    extra = 1  # تعداد ردیف‌های خالی برای اضافه کردن ویژگی‌ها
 
 @admin.register(ProductAttributeType)
 class ProductAttributeTypeAdmin(admin.ModelAdmin):
@@ -31,10 +28,12 @@ class ProductAttributeTypeAdmin(admin.ModelAdmin):
 
 @admin.register(ProductAttribute)
 class ProductAttributeAdmin(admin.ModelAdmin):
+    class Media:
+        js = ('admin/js/admin.js',)
     list_display = ['id', 'type', 'value']
-    list_filter = ['type']
+    list_filter = ['type','id']
     search_fields = ['value']
-    ordering = ['type', 'value']
+    ordering = ['id']
 
 
 @admin.register(ProductVariant)
@@ -175,24 +174,26 @@ class ProductAdmin(UniversityAccessAdmin):
     )
     search_fields = ('title', 'sku', 'brand__title', 'short_description')
     prepopulated_fields = {'slug': ('title',)}
-    inlines = [ProductImageInline, ProductDescriptionInline, ProductAttributeInline, ProductVariantInline]
+    inlines = [ProductImageInline, ProductDescriptionInline, ProductVariantInline]
     autocomplete_fields = ['categories', 'tags']
-    readonly_fields = ( 'sku',)
+    readonly_fields = ('sku',)
     filter_horizontal = ('categories',)
     raw_id_fields = ('brand',)
     actions = ['restock_products', 'toggle_active']
 
     fieldsets = (
         (None, {'fields': ('title', 'slug', 'brand', 'categories', 'tags')}),
-        (_('موجودی'), {'fields': ( 'weight', 'dimensions')}),
+        (_('موجودی'), {'fields': ('weight', 'dimensions')}),
         (_('توضیحات'), {'fields': ('main_image', 'short_description',)}),
         (_('وضعیت'), {'fields': ('is_active', 'is_deleted')}),
     )
+
     def get_readonly_fields(self, request, obj=None):
         ro_fields = list(super().get_readonly_fields(request, obj))
-        if obj:  # حالت ادیت
+        if obj:
             ro_fields.append('university')
         return ro_fields
+
     def save_model(self, request, obj, form, change):
         if not change:
             membership = request.user.memberships.filter(role='OFFI', is_confirmed=True).first()
@@ -211,17 +212,22 @@ class ProductAdmin(UniversityAccessAdmin):
     category_list.short_description = _('دسته‌بندی‌ها')
 
     def stock_status(self, obj):
-        if obj.stock == 0:
+        total_stock = sum(variant.stock for variant in obj.variants.all() if variant.stock is not None)
+        if total_stock == 0:
             return format_html('<span style="color:red;">{}</span>', _('ناموجود'))
-        if obj.stock < 10:
+        elif total_stock < 10:
             return format_html('<span style="color:orange;">{}</span>', _('کم موجود'))
         return format_html('<span style="color:green;">{}</span>', _('موجود'))
     stock_status.short_description = _('وضعیت موجودی')
 
     @admin.action(description=_("افزایش موجودی +100"))
     def restock_products(self, request, queryset):
-        queryset.update(stock=F('stock') + 100)
-        self.message_user(request, _('موجودی محصولات انتخابی افزایش یافت.'))
+        for product in queryset:
+            for variant in product.variants.all():
+                if variant.stock is not None:
+                    variant.stock += 100
+                    variant.save()
+        self.message_user(request, _('موجودی تنوع‌های محصولات انتخابی افزایش یافت.'))
 
     @admin.action(description=_("تغییر وضعیت فعال/غیرفعال"))
     def toggle_active(self, request, queryset):
@@ -229,8 +235,6 @@ class ProductAdmin(UniversityAccessAdmin):
             p.is_active = not p.is_active
             p.save()
         self.message_user(request, _('وضعیت محصولات تغییر یافت.'))
-
-
 
 # --------------------------------------------------------------------------
 # Reviews, Discounts, Views
