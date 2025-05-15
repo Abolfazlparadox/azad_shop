@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'phonenumber_field',
     'django_extensions',
     'jalali_date',
+    'widget_tweaks',
     'colorfield',
 ]
 

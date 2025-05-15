@@ -1,0 +1,135 @@
+{# unit_admin/templates/unit_admin/products/product_list.html #}
+{% extends 'unit_admin/base.html' %}
+{% load static i18n thumbnail %}
+{% load poll_extras %}
+
+{% block title %}پنل مدیریت – لیست محصولات{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+  <div class="row mb-3 align-items-center">
+    <div class="col-md-10">
+      <h5>لیست محصولات دانشگاه {{ offi_university.name }}</h5>
+    </div>
+    <div class="col-md-2 text-end">
+      <input id="product-search" type="text" class="form-control d-inline-block w-auto"
+             placeholder="جستجوی محصول..." />
+      <a href="{% url 'unit_admin:product_add' %}" class="btn btn-theme ms-2">
+        <i class="ri-add-line"></i> افزودن محصول
+      </a>
+    </div>
+  </div>
+
+  <div class="card card-table">
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover table-striped theme-table" id="product-table">
+          <thead>
+            <tr>
+              <th>{% trans "تصویر" %}</th>
+              <th>{% trans "نام محصول" %}</th>
+              <th>{% trans "دسته‌بندی" %}</th>
+              <th>{% trans "موجودی کل" %}</th>
+              <th>{% trans "قیمت (تومان)" %}</th>
+              <th>{% trans "وضعیت" %}</th>
+              <th>{% trans "عملیات" %}</th>
+            </tr>
+          </thead>
+          <tbody id="product-tbody">
+            {% for p in products %}
+            <tr>
+              <td>
+                {% if p.main_image %}
+                  {% thumbnail p.main_image "80x80" crop="center" as thumb %}
+                    <img src="{{ thumb.url }}" class="img-fluid rounded" alt="{{ p.title }}">
+                  {% endthumbnail %}
+                {% endif %}
+              </td>
+              <td>{{ p.title }}</td>
+              <td>{{ p.categories.first.title }}</td>
+              <td>{{ p.total_stock|default:"—" }}</td>
+              <td>
+                {% if p.min_price and p.max_price %}
+                  {% if p.min_price == p.max_price %}
+                    {{ p.min_price|three_digits_currency }}
+                  {% else %}
+                    {{ p.min_price|three_digits_currency }} – {{ p.max_price|three_digits_currency }}
+                  {% endif %}
+                {% else %}
+                  —
+                {% endif %}
+              </td>
+              <td>
+                {% if p.is_active %}
+                  <span class="badge bg-success">{% trans "فعال" %}</span>
+                {% else %}
+                  <span class="badge bg-secondary">{% trans "غیرفعال" %}</span>
+                {% endif %}
+              </td>
+              <td>
+                <ul class="list-inline mb-0">
+                  <li class="list-inline-item">
+                    <a href="{% url 'product:product-detail' p.slug %}" target="_blank" class="btn btn-sm btn-outline-light">
+                      <i class="ri-eye-line"></i>
+                    </a>
+                  </li>
+                  <li class="list-inline-item">
+                    <a href="{% url 'unit_admin:product_edit' p.pk %}" class="btn btn-sm btn-outline-primary">
+                      <i class="ri-pencil-line"></i>
+                    </a>
+                  </li>
+                  <li class="list-inline-item">
+                    <button class="btn btn-sm btn-outline-info"
+                            data-bs-toggle="modal"
+                            data-bs-target="#deleteConfirmModal"
+                            data-delete-type="soft"
+                            data-delete-url="{% url 'unit_admin:product_soft_delete' p.pk %}"
+                            data-item-name="{{ p.title }}">
+                      <i class="ri-delete-bin-line"></i>
+                    </button>
+                  </li>
+                  <li class="list-inline-item">
+                    <button class="btn btn-sm btn-outline-secondary"
+                            data-bs-toggle="modal"
+                            data-bs-target="#deleteConfirmModal"
+                            data-delete-type="hard"
+                            data-delete-url="{% url 'unit_admin:product_hard_delete' p.pk %}"
+                            data-item-name="{{ p.title }}">
+                      <i class="ri-delete-bin-fill"></i>
+                    </button>
+                  </li>
+                </ul>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="7" class="text-center text-muted py-4">
+                {% trans "محصولی یافت نشد." %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      {% include 'partials/pagination.html' with page_obj=page_obj %}
+    </div>
+  </div>
+</div>
+
+{% include 'unit_admin/includes/delete.html' %}
+
+<script>
+// AJAX Search بدون ریفرش
+document.getElementById('product-search').addEventListener('keyup', function() {
+  const q = this.value;
+  fetch(`?ajax=1&q=${encodeURIComponent(q)}`, {
+    headers: {'X-Requested-With':'XMLHttpRequest'}
+  })
+  .then(r=>r.text())
+  .then(html=>{
+    document.getElementById('product-tbody').innerHTML = html;
+  });
+});
+</script>
+{% endblock %}

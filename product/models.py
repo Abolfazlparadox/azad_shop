@@ -185,8 +185,6 @@ class Discount(models.Model):
         if instance.valid_to <= instance.valid_from:
             raise ValidationError("تاریخ پایان تخفیف باید بعد از تاریخ شروع باشد.")
 
-
-
 class ProductAttributeType(models.Model):
     name = models.CharField(max_length=100, verbose_name='نوع ویژگی')
 
@@ -197,7 +195,6 @@ class ProductAttributeType(models.Model):
 
     def __str__(self):
         return self.name
-
 
 class ProductAttribute(models.Model):
     type = models.ForeignKey(ProductAttributeType, on_delete=models.CASCADE, verbose_name='نوع ویژگی', null=True, blank=True)
@@ -374,7 +371,6 @@ class ProductVariant(models.Model):
     def __str__(self):
         return f" - {', '.join([str(attr) for attr in self.attributes.all()])} - تخفیف: {self.discount.code if self.discount else 'بدون تخفیف'}"
 
-
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images', verbose_name='محصول')
     image = models.ImageField(upload_to='products/gallery/%Y/%m/%d/', verbose_name='تصویر')
@@ -401,7 +397,6 @@ class ProductReview(BaseModel):
         unique_together = ('product', 'user')
         verbose_name = 'نقد و بررسی'
         verbose_name_plural = 'نقد و بررسی‌ها'
-
 
 class ProductView(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='views', verbose_name='محصول')

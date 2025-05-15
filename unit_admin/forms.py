@@ -11,12 +11,74 @@ from account.models import User, Membership, AdminActionLog, Address
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
-
+from django.forms import inlineformset_factory
 from contact.models import ContactMessage
-from product.models import Product, ProductCategory
+from django.forms import ModelForm
+from product.models import ProductAttributeType, ProductAttribute, Discount, Product, ProductDescription, \
+    ProductVariant, ProductCategory
 
 User = get_user_model()
 
+
+class ProductVariantForm(forms.ModelForm):
+    class Meta:
+        model = ProductVariant
+        fields = ['attributes', 'stock', 'price_override', 'discount']
+        widgets = {
+            'attributes': forms.SelectMultiple(attrs={'class': 'form-select'}),
+            'discount':   forms.Select(attrs={'class': 'form-select'}),
+        }
+        labels = {
+            'attributes':    _('ویژگی‌ها'),
+            'stock':         _('موجودی'),
+            'price_override': _('قیمت ویژه'),
+            'discount':      _('تخفیف'),
+        }
+        error_messages = {
+            'attributes': {
+                'required': _('لطفاً حداقل یک ویژگی انتخاب کنید.'),
+            },
+            'stock': {
+                'required': _('وارد کردن موجودی الزامی است.'),
+                'invalid':  _('موجودی باید عددی صحیح باشد.'),
+            },
+            'price_override': {
+                'invalid': _('قیمت ویژه باید عددی صحیح باشد.'),
+            },
+        }
+class ProductDescriptionForm(forms.ModelForm):
+    class Meta:
+        model = ProductDescription
+        fields = ['Image', 'title_description', 'description']
+        widgets = {
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+        }
+        labels = {
+            'Image':             _('تصویر توضیح'),
+            'title_description': _('تیتر توضیح'),
+            'description':       _('متن توضیح'),
+        }
+        error_messages = {
+            'title_description': {
+                'max_length': _('تیتر توضیح نمی‌تواند بیشتر از ۵۰ کاراکتر باشد.'),
+            },
+            'description': {
+                'required': _('متن توضیح را وارد کنید.'),
+            },
+        }
+ProductVariantFormSet = inlineformset_factory(
+    Product, ProductVariant,
+    form=ProductVariantForm,
+    extra=1,
+    can_delete=True
+)
+
+ProductDescriptionFormSet = inlineformset_factory(
+    Product, ProductDescription,
+    form=ProductDescriptionForm,
+    extra=1,
+    can_delete=True
+)
 class CustomAdminAuthForm(AuthenticationForm):
     def confirm_login_allowed(self, user):
         if not user.is_active:
@@ -402,60 +464,121 @@ class AddressForm(forms.ModelForm):
                 ).exclude(pk=addr.pk).update(active=False)
         return addr
 
+class ProductAttributeTypeForm(ModelForm):
+    class Meta:
+        model = ProductAttributeType
+        fields = ['name']
+
+class ProductAttributeForm(ModelForm):
+    class Meta:
+        model = ProductAttribute
+        fields = ['type', 'value', 'color', 'image']
+
+class DiscountForm(ModelForm):
+    class Meta:
+        model = Discount
+        fields = ['code','description','discount_type','amount','max_discount',
+                  'valid_from','valid_to','max_usage','products','categories']
+        widgets = {
+            'products': forms.SelectMultiple(attrs={'class':'form-select'}),
+            'categories': forms.SelectMultiple(attrs={'class':'form-select'}),
+        }
+
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
-        # Exclude auto and system fields
         exclude = [
-            'slug', 'sku',
-            'university', 'created_at',
-            'updated_at','old_price'
+            'slug', 'sku', 'university',
+            'created_at', 'updated_at', 'old_price'
         ]
         widgets = {
-            'title': forms.TextInput(attrs={'class':'form-control', 'placeholder': _('عنوان محصول')}),
+            'title': forms.TextInput(attrs={
+                'class':'form-control',
+                'placeholder': _('عنوان محصول را وارد کنید')
+            }),
             'categories': forms.SelectMultiple(attrs={'class':'form-select'}),
-            'main_image': forms.ClearableFileInput(attrs={'class':'form-control', 'accept':'image/*'}),
+            'main_image': forms.ClearableFileInput(attrs={
+                'class':'form-control','accept':'image/*'
+            }),
             'brand': forms.Select(attrs={'class':'form-select'}),
-            'price': forms.NumberInput(attrs={'class':'form-control', 'min':0}),
-            'short_description': forms.Textarea(attrs={'class':'form-control', 'rows':3}),
-            'stock': forms.NumberInput(attrs={'class':'form-control', 'min':0}),
-            'weight': forms.NumberInput(attrs={'class':'form-control', 'step':'0.01', 'min':0}),
-            'dimensions': forms.TextInput(attrs={'class':'form-control', 'placeholder': _('طول×عرض×ارتفاع')}),
+            'weight': forms.NumberInput(attrs={
+                'class':'form-control','step':'0.01','min':0
+            }),
+            'dimensions': forms.TextInput(attrs={
+                'class':'form-control',
+                'placeholder': _('طول×عرض×ارتفاع (سانتی‌متر)')
+            }),
+            'short_description':forms.Textarea(attrs={
+                'class':'form-control',
+                'placeholder': _('توضیحات کوتاه')}),
             'tags': forms.SelectMultiple(attrs={'class':'form-select'}),
-            'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'is_deleted': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'is_active': forms.CheckboxInput(attrs={'class':'form-check-input'}),
+            'is_deleted': forms.CheckboxInput(attrs={'class':'form-check-input'}),
         }
         labels = {
             'title': _('عنوان'),
             'categories': _('دسته‌بندی‌ها'),
             'main_image': _('تصویر اصلی'),
             'brand': _('برند'),
-            'price': _('قیمت'),
-            'short_description': _('توضیحات کوتاه'),
-            'stock': _('موجودی'),
             'weight': _('وزن (کیلوگرم)'),
             'dimensions': _('ابعاد'),
+            'short_description':_('توضیحات کوتاه'),
             'tags': _('تگ‌ها'),
             'is_active': _('فعال/غیرفعال'),
-            'is_deleted': _('حذف شده'),
+            'is_deleted': _('حذف نرم'),
         }
         help_texts = {
-            'is_active': _('با برداشتن تیک، محصول از صفحه فروش حذف می‌شود'),
-            'is_deleted': _('نشان‌دهنده‌ی حذف نرم (soft delete) است'),
-            'weight':     _('وزن محصول را به کیلوگرم وارد کنید'),
-            'dimensions': _('ابعاد را به صورت طول×عرض×ارتفاع به سانتی‌متر وارد کنید'),
+            'is_active': _('با برداشتن تیک، محصول از فروشگاه پنهان می‌شود.'),
+            'is_deleted': _('با تیک‌زدن، محصول به صورت نرم حذف می‌شود.'),
+            'weight': _('وزن را بر حسب کیلوگرم وارد کنید.'),
+            'dimensions': _('ابعاد را به صورت طول×عرض×ارتفاع وارد کنید.'),
+        }
+        error_messages = {
+            'title': {
+                'required': _('وارد کردن عنوان محصول الزامی است.'),
+                'max_length': _('عنوان نباید بیش از ۳۰۰ کاراکتر باشد.'),
+            },
+            'categories': {
+                'required': _('لطفاً حداقل یک دسته‌بندی انتخاب نمایید.'),
+            },
+            'main_image': {
+                'required': _('بارگذاری تصویر اصلی محصول الزامی است.'),
+                'invalid': _('لطفاً یک فایل تصویر معتبر انتخاب کنید.'),
+            },
+            'brand': {
+                'invalid_choice': _('برند انتخاب شده معتبر نیست.'),
+            },
+            'weight': {
+                'invalid': _('وزن باید عددی صحیح یا اعشاری باشد.'),
+            },
+            'dimensions': {
+                'max_length': _('طول توضیحات بیش از حد مجاز است.'),
+            },
+            'short_description':{
+                'required': _('این فیلد نیاز است ')
+            }
         }
 
-    def clean_price(self):
-        price = self.cleaned_data['price']
-        if price < 0:
-            raise forms.ValidationError(_('قیمت نمی‌تواند منفی باشد'))
-        return price
+    def clean_weight(self):
+        weight = self.cleaned_data.get('weight')
+        if weight is None:
+            return weight
+        if weight < 0:
+            raise forms.ValidationError(
+                _('وزن نمی‌تواند منفی باشد.'),
+                code='invalid_weight'
+            )
+        return weight
 
     def clean_stock(self):
-        stock = self.cleaned_data['stock']
+        stock = self.cleaned_data.get('stock')
+        if stock is None:
+            return stock
         if stock < 0:
-            raise forms.ValidationError(_('موجودی نمی‌تواند منفی باشد'))
+            raise forms.ValidationError(
+                _('موجودی نمی‌تواند منفی باشد.'),
+                code='invalid_stock'
+            )
         return stock
 
 class CategoryForm(forms.ModelForm):

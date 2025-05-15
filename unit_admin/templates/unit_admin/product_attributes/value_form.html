@@ -1,0 +1,78 @@
+{# unit_admin/templates/unit_admin/attributes/attribute_value_form.html #}
+{% extends 'unit_admin/base.html' %}
+{% load static i18n %}
+
+{% block body %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-sm-8 m-auto">
+      <div class="card">
+        <div class="card-body">
+          <div class="card-header-2">
+            <h5>
+              {% if form.instance.pk %}ویرایش مقدار ویژگی{% else %}مقدار ویژگی جدید{% endif %}
+            </h5>
+          </div>
+          <form method="post" enctype="multipart/form-data" class="theme-form theme-form-2 mega-form">
+            {% csrf_token %}
+
+            <div class="mb-4 row align-items-center">
+              <label class="form-label-title col-sm-3 mb-0">نوع ویژگی</label>
+              <div class="col-sm-9">
+                {{ form.type }}
+                {% for err in form.type.errors %}
+                  <div class="text-danger small">{{ err }}</div>
+                {% endfor %}
+              </div>
+            </div>
+
+            <div class="mb-4 row align-items-center">
+              <label class="form-label-title col-sm-3 mb-0">مقدار</label>
+              <div class="col-sm-9">
+                {{ form.value }}
+                {% for err in form.value.errors %}
+                  <div class="text-danger small">{{ err }}</div>
+                {% endfor %}
+              </div>
+            </div>
+
+            {# رنگ عکس یا نمونه رنگ #}
+            <div class="mb-4 row align-items-center">
+              <label class="form-label-title col-sm-3 mb-0">عکس رنگ</label>
+              <div class="col-sm-9">
+                {{ form.image }}
+                {% for err in form.image.errors %}
+                  <div class="text-danger small">{{ err }}</div>
+                {% endfor %}
+                {% if form.image.help_text %}
+                  <div class="form-text">{{ form.image.help_text }}</div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="mb-4 row align-items-center">
+              <label class="form-label-title col-sm-3 mb-0">رنگ استاتیک</label>
+              <div class="col-sm-9">
+                {{ form.color }}
+                {% for err in form.color.errors %}
+                  <div class="text-danger small">{{ err }}</div>
+                {% endfor %}
+                {% if form.color.help_text %}
+                  <div class="form-text">{{ form.color.help_text }}</div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="text-end">
+              <button type="submit" class="btn btn-theme">
+                <i data-feather="save"></i>
+                {% if form.instance.pk %}ذخیره تغییرات{% else %}ایجاد{% endif %}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

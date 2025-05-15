@@ -11,6 +11,9 @@ from .views import (
     ProductSoftDeleteView, ProductHardDeleteView, CategoryListView, CategoryCreateView, CategoryUpdateView,
     CategorySoftDeleteView, CategoryHardDeleteView, UserSoftDeleteView, UserHardDeleteView, AdminSettingsView,
     AdminAddressDeleteView, ContactMessageListView, ContactMessageAnswerView,
+    AttributeTypeCreateView, AttributeTypeUpdateView, AttributeTypeDeleteView, AttributeCreateView,
+    AttributeUpdateView, AttributeDeleteView, DiscountListView, DiscountCreateView, DiscountUpdateView,
+    DiscountDeleteView, ProductUpdateView, ProductAttributeTypeListView, ProductAttributeListView,
 )
 
 app_name = 'unit_admin'
@@ -36,11 +39,26 @@ urlpatterns = [
     path('addresses/<int:pk>/delete/', AddressDeleteView.as_view(), name='delete_address'),
 
     #products
+    # Attributes
+    path('attributes/types/', ProductAttributeTypeListView.as_view(), name='attribute_type_list'),
+    path('attr-types/add/', AttributeTypeCreateView.as_view(), name='attribute_type_add'),
+    path('attr-types/<int:pk>/edit/', AttributeTypeUpdateView.as_view(), name='attribute_type_edit'),
+    path('attr-types/<int:pk>/delete/', AttributeTypeDeleteView.as_view(), name='attribute_type_delete'),
+    # Attribute values
+    path('attributes/values/', ProductAttributeListView.as_view(), name='attribute_value_list'),
+    path('attributes/add/', AttributeCreateView.as_view(), name='attribute_add'),
+    path('attributes/<int:pk>/edit/', AttributeUpdateView.as_view(), name='attribute_edit'),
+    path('attributes/<int:pk>/delete/', AttributeDeleteView.as_view(), name='attribute_delete'),
+    # Discounts
+    path('discounts/', DiscountListView.as_view(), name='discount_list'),
+    path('discounts/add/', DiscountCreateView.as_view(), name='discount_add'),
+    path('discounts/<int:pk>/edit/', DiscountUpdateView.as_view(), name='discount_edit'),
+    path('discounts/<int:pk>/delete/', DiscountDeleteView.as_view(), name='discount_delete'),
+    # Products
     path('products/', ProductListView.as_view(), name='product_list'),
     path('products/add/', ProductCreateView.as_view(), name='product_add'),
-    # Soft delete via POST from a button/form
+    path('products/<int:pk>/edit/', ProductUpdateView.as_view(), name='product_edit'),
     path('products/<int:pk>/delete/', ProductSoftDeleteView.as_view(), name='product_soft_delete'),
-    # Hard delete (if you ever need it)
     path('products/<int:pk>/hard-delete/', ProductHardDeleteView.as_view(), name='product_hard_delete'),
 
     path('categories/',              CategoryListView.as_view(),       name='category_list'),

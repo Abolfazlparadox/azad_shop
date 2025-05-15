@@ -109,7 +109,43 @@
                             </li>
                         </ul>
                     </li>
+                    <li class="sidebar-list">
+                        <a class="linear-icon-link sidebar-link sidebar-title" href="javascript:void(0)">
+                            <i class="ri-list-settings-line"></i>
+                            <span>ویژگی ها</span>
+                        </a>
+                        <ul class="sidebar-submenu">
+                            <li>
+                                <a href="{% url 'unit_admin:attribute_type_list' %}">ویژگی ها</a>
+                            </li>
 
+                            <li>
+                                <a href="{% url 'unit_admin:attribute_type_add' %}">افزودن جدید</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'unit_admin:attribute_value_list' %}">ویژگی ها</a>
+                            </li>
+
+                            <li>
+                                <a href="{% url 'unit_admin:attribute_add' %}">افزودن جدید</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="sidebar-list">
+                        <a class="linear-icon-link sidebar-link sidebar-title" href="javascript:void(0)">
+                            <i class="ri-price-tag-3-line"></i>
+                            <span>کد تخفیف</span>
+                        </a>
+                        <ul class="sidebar-submenu">
+                            <li>
+                                <a href="{% url 'unit_admin:discount_list' %}">لیست تخفیف ها</a>
+                            </li>
+
+                            <li>
+                                <a href="{% url 'unit_admin:discount_add' %}">افزودن</a>
+                            </li>
+                        </ul>
+                    </li>
                     <li class="sidebar-list">
                         <a class="linear-icon-link sidebar-link sidebar-title" href="javascript:void(0)">
                             <i class="ri-list-check-2"></i>

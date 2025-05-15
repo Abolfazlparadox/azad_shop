@@ -1,0 +1,110 @@
+{# unit_admin/templates/unit_admin/discounts/discount_form.html #}
+{% extends 'unit_admin/base.html' %}
+{% load static i18n %}
+
+{% block body %}
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-8 m-auto">
+          <div class="card">
+            <div class="card-body">
+              <div class="card-header-2">
+                <h5>
+                  {% if form.instance.pk %}ویرایش تخفیف{% else %}ایجاد تخفیف جدید{% endif %}
+                </h5>
+              </div>
+              <form method="post" class="theme-form theme-form-2 mega-form">
+                {% csrf_token %}
+
+                {% comment %} کد و نوع تخفیف {% endcomment %}
+                <div class="mb-4 row align-items-center">
+                  <label class="form-label-title col-sm-3 mb-0">کد تخفیف</label>
+                  <div class="col-sm-9">
+                    {{ form.code }}
+                    {% for err in form.code.errors %}
+                      <div class="text-danger small">{{ err }}</div>
+                    {% endfor %}
+                  </div>
+                </div>
+                <div class="mb-4 row align-items-center">
+                  <label class="form-label-title col-sm-3 mb-0">نوع</label>
+                  <div class="col-sm-9">
+                    {{ form.discount_type }}
+                    {% for err in form.discount_type.errors %}
+                      <div class="text-danger small">{{ err }}</div>
+                    {% endfor %}
+                  </div>
+                </div>
+
+                <div class="mb-4 row align-items-center">
+                  <label class="form-label-title col-sm-3 mb-0">مقدار</label>
+                  <div class="col-sm-9">
+                    {{ form.amount }}
+                    {% for err in form.amount.errors %}
+                      <div class="text-danger small">{{ err }}</div>
+                    {% endfor %}
+                  </div>
+                </div>
+                <div class="mb-4 row align-items-center">
+                  <label class="form-label-title col-sm-3 mb-0">حداکثر تخفیف</label>
+                  <div class="col-sm-9">
+                    {{ form.max_discount }}
+                    {% for err in form.max_discount.errors %}
+                      <div class="text-danger small">{{ err }}</div>
+                    {% endfor %}
+                  </div>
+                </div>
+
+                {# بازه زمانی #}
+                <div class="mb-4 row align-items-center">
+                  <label class="form-label-title col-sm-3 mb-0">تاریخ شروع</label>
+                  <div class="col-sm-9">
+                    {{ form.valid_from }}
+                    {% for err in form.valid_from.errors %}
+                      <div class="text-danger small">{{ err }}</div>
+                    {% endfor %}
+                  </div>
+                </div>
+                <div class="mb-4 row align-items-center">
+                  <label class="form-label-title col-sm-3 mb-0">تاریخ پایان</label>
+                  <div class="col-sm-9">
+                    {{ form.valid_to }}
+                    {% for err in form.valid_to.errors %}
+                      <div class="text-danger small">{{ err }}</div>
+                    {% endfor %}
+                  </div>
+                </div>
+
+                {# محصول و دسته‌بندی مرتبط #}
+                <div class="mb-4 row align-items-center">
+                  <label class="col-sm-3 col-form-label">محصولات مرتبط</label>
+                  <div class="col-sm-9">
+                    {{ form.products }}
+                    {% for err in form.products.errors %}
+                      <div class="text-danger small">{{ err }}</div>
+                    {% endfor %}
+                  </div>
+                </div>
+                <div class="mb-4 row align-items-center">
+                  <label class="col-sm-3 col-form-label">دسته‌بندی‌های مرتبط</label>
+                  <div class="col-sm-9">
+                    {{ form.categories }}
+                    {% for err in form.categories.errors %}
+                      <div class="text-danger small">{{ err }}</div>
+                    {% endfor %}
+                  </div>
+                </div>
+
+                <div class="text-end">
+                  <button type="submit" class="btn btn-theme">
+                    <i data-feather="save"></i>
+                    {% if form.instance.pk %}ذخیره تغییرات{% else %}ایجاد{% endif %}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+{% endblock %}

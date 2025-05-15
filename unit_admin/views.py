@@ -9,16 +9,19 @@ from django.views.generic.edit import CreateView,DeleteView
 from django.urls import reverse_lazy
 from django.views import View
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import Q, F,Sum, Min, Max
 from contact.models import ContactMessage
-from product.models import Product,ProductCategory
+from product.models import Product, ProductCategory, ProductAttribute, ProductAttributeType, Discount
 from unit_admin.forms import CustomUserCreationForm, RoleCreationForm, AddressForm, ProductForm, CategoryForm, \
-    AdminSettingsForm, ContactAnswerForm
+    AdminSettingsForm, ContactAnswerForm, ProductAttributeForm, ProductAttributeTypeForm, DiscountForm, \
+    ProductVariantFormSet, ProductDescriptionFormSet
 from django.contrib import messages
 from django.utils import timezone
 from django.shortcuts import redirect, get_object_or_404, render
 from django.http import JsonResponse, HttpResponseBadRequest
+import logging
 
+logger = logging.getLogger(__name__)
 User = get_user_model()
 
 class OffiMixin(LoginRequiredMixin):
@@ -327,35 +330,182 @@ class AddressDeleteView(OffiMixin, View):
         messages.success(request, "نشانی با موفقیت حذف شد")
         return redirect('unit_admin:address_list')
 
-# Product
-class ProductListView( OffiMixin, ListView):
-    model = Product
-    template_name = 'unit_admin/products/products.html'
-    context_object_name = 'products'
-    paginate_by = 2
-    def get_form_kwargs(self):
-        kws = super().get_form_kwargs()
-        kws['current_user'] = self.request.user
-        kws['university'] = self.university
-        return kws
+class ProductAttributeTypeListView(OffiMixin, ListView):
+    model = ProductAttributeType
+    template_name = 'unit_admin/product_attributes/type_list.html'
+    context_object_name = 'types'
+    paginate_by = 10
+
     def get_queryset(self):
-        return Product.objects.filter(
-            university=self.university,
-        ).order_by('-created_at')
-class ProductCreateView( OffiMixin, CreateView):
+        # اگر نیاز به فیلتر دانشگاه دارید:
+        return ProductAttributeType.objects.all().order_by('name')
+class AttributeTypeCreateView(OffiMixin, CreateView):
+    model = ProductAttributeType
+    form_class = ProductAttributeTypeForm
+    template_name = 'unit_admin/product_attributes/type_form.html'
+    success_url = reverse_lazy('unit_admin:attribute_type_list')
+class AttributeTypeUpdateView(AttributeTypeCreateView, UpdateView):
+    success_url = reverse_lazy('unit_admin:attribute_type_list')
+class AttributeTypeDeleteView(OffiMixin, DeleteView):
+    model = ProductAttributeType
+    success_url = reverse_lazy('unit_admin:attribute_type_list')
+
+# مشابه برای ProductAttribute
+class ProductAttributeListView(OffiMixin, ListView):
+    model = ProductAttribute
+    template_name = 'unit_admin/product_attributes/value_list.html'
+    context_object_name = 'attributes'
+    paginate_by = 10
+
+    def get_queryset(self):
+        # فیلتر به‌اختیار؛ اینجا همه را نمایش می‌دهیم
+        return ProductAttribute.objects.select_related('type').order_by('type__name', 'value')
+class AttributeCreateView(OffiMixin, CreateView):
+    model = ProductAttribute
+    form_class = ProductAttributeForm
+    template_name = 'unit_admin/product_attributes/value_form.html'
+    success_url = reverse_lazy('unit_admin:attribute_list')
+class AttributeUpdateView(AttributeCreateView, UpdateView):
+    success_url = reverse_lazy('unit_admin:attribute_list')
+class AttributeDeleteView(OffiMixin, DeleteView):
+    model = ProductAttribute
+    success_url = reverse_lazy('unit_admin:attribute_list')
+
+# و برای Discount
+class DiscountListView(OffiMixin, ListView):
+    model = Discount
+    template_name = 'unit_admin/discounts/discount_list.html'
+    context_object_name = 'discounts'
+    paginate_by = 10
+
+    def get_queryset(self):
+        # فیلتر تخفیف‌های مرتبط با دانشگاه مدیر
+        return Discount.objects.filter(
+            Q(products__university=self.university) |
+            Q(categories__university=self.university)
+        ).distinct().order_by('-valid_to')
+class DiscountCreateView(OffiMixin, CreateView):
+    model = Discount
+    form_class = DiscountForm
+    template_name = 'unit_admin/discounts/discount_form.html'
+    success_url = reverse_lazy('unit_admin:discount_list')
+
+    def form_valid(self, form):
+        # used_count را صفر نگه می‌داریم؛ ارتباط با سفارش بعداً
+        return super().form_valid(form)
+class DiscountUpdateView(DiscountCreateView, UpdateView):
+    success_url = reverse_lazy('unit_admin:discount_list')
+class DiscountDeleteView(OffiMixin, DeleteView):
+    model = Discount
+    success_url = reverse_lazy('unit_admin:discount_list')
+# Product
+class ProductListView(OffiMixin, ListView):
+    model = Product
+    template_name = 'unit_admin/products/product_list.html'
+    context_object_name = 'products'
+    paginate_by = 10
+
+    def get_queryset(self):
+        qs = Product.objects.filter(university=self.university).annotate(
+            total_stock=Sum('variants__stock'),
+            min_price=Min(
+                'variants__price_override',
+                filter=Q(variants__price_override__isnull=False)
+            ),
+            max_price=Max(
+                'variants__price_override',
+                filter=Q(variants__price_override__isnull=False)
+            )
+        ).order_by('-created_at').distinct()
+        return qs
+class ProductCreateView(OffiMixin, CreateView):
     model = Product
     form_class = ProductForm
     template_name = 'unit_admin/products/product_form.html'
     success_url = reverse_lazy('unit_admin:product_list')
 
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        # اگر یک instance قبلاً ساخته شده باشد (بعد از save فرم اصلی)
+        obj = getattr(self, 'object', None)
+        if self.request.method == 'POST':
+            ctx['variant_formset']     = ProductVariantFormSet(self.request.POST, instance=obj)
+            ctx['description_formset'] = ProductDescriptionFormSet(self.request.POST, self.request.FILES, instance=obj)
+        else:
+            ctx['variant_formset']     = ProductVariantFormSet(instance=obj)
+            ctx['description_formset'] = ProductDescriptionFormSet(instance=obj)
+        return ctx
+
     def form_valid(self, form):
+        # ذخیرهٔ اولیهٔ محصول
         form.instance.university = self.university
-        messages.success(self.request, _('محصول با موفقیت ایجاد شد'))
-        return super().form_valid(form)
+        self.object = form.save()
+
+        # بارگذاری فرم‌ست‌ها از request
+        variant_fs     = ProductVariantFormSet(self.request.POST, instance=self.object)
+        description_fs = ProductDescriptionFormSet(self.request.POST, self.request.FILES, instance=self.object)
+
+        # اعتبارسنجی هر دو فرم‌ست
+        if variant_fs.is_valid() and description_fs.is_valid():
+            variant_fs.save()
+            description_fs.save()
+            messages.success(self.request, _('محصول با موفقیت ایجاد شد'))
+            return redirect(self.success_url)
+        else:
+            # اگر فرم‌ست‌ها خطا دارند، خطاها را به قالب بفرست
+            messages.error(self.request, _('خطا در تنوع‌ها یا توضیحات محصول'))
+            return self.render_to_response(self.get_context_data(form=form))
+
+
 
     def form_invalid(self, form):
-        messages.error(self.request, _('لطفاً خطاهای فرم را اصلاح کنید'))
-        return super().form_invalid(form)
+        ctx = self.get_context_data(form=form)
+        variant_fs = ctx['variant_formset']
+        description_fs = ctx['description_formset']
+
+        logger.error("MAIN FORM ERRORS: %s", form.errors)
+        logger.error("VARIANT FS ERRORS: %s", variant_fs.errors)
+        logger.error("DESCRIPTION FS ERRORS: %s", description_fs.errors)
+
+        messages.error(self.request, _('لطفاً خطاهای فرم اصلی و فرم‌ست‌ها را بررسی کنید'))
+        return self.render_to_response(ctx)
+class ProductUpdateView(OffiMixin, UpdateView):
+    model = Product
+    form_class = ProductForm
+    template_name = 'unit_admin/products/product_form.html'
+    success_url = reverse_lazy('unit_admin:product_list')
+
+    def get_object(self):
+        return get_object_or_404(Product, pk=self.kwargs['pk'], university=self.university)
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        if self.request.POST:
+            variant_fs = ProductVariantFormSet(self.request.POST, instance=self.object)
+            desc_fs = ProductDescriptionFormSet(self.request.POST, self.request.FILES, instance=self.object)
+        else:
+            variant_fs = ProductVariantFormSet(instance=self.object)
+            desc_fs = ProductDescriptionFormSet(instance=self.object)
+        ctx['variant_formset'] = variant_fs
+        ctx['variant_empty_form'] = variant_fs.empty_form
+        ctx['description_formset'] = desc_fs
+        ctx['description_empty_form'] = desc_fs.empty_form
+        return ctx
+
+    def form_valid(self, form):
+        ctx = self.get_context_data()
+        variant_fs     = ctx['variant_formset']
+        description_fs = ctx['description_formset']
+        if variant_fs.is_valid() and description_fs.is_valid():
+            self.object = form.save()
+            variant_fs.instance = self.object
+            variant_fs.save()
+            description_fs.instance = self.object
+            description_fs.save()
+            messages.success(self.request, _('محصول با موفقیت به‌روز شد'))
+            return redirect(self.success_url)
+        else:
+            return self.render_to_response(self.get_context_data(form=form))
 class ProductSoftDeleteView( OffiMixin, View):
     """Soft-delete: set is_deleted=True"""
     def post(self, request, pk):

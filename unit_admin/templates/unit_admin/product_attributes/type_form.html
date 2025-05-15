@@ -1,0 +1,41 @@
+{# unit_admin/templates/unit_admin/attributes/attribute_type_form.html #}
+{% extends 'unit_admin/base.html' %}
+{% load static i18n %}
+
+{% block body %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-sm-6 m-auto">
+      <div class="card">
+        <div class="card-body">
+          <div class="card-header-2">
+            <h5>
+              {% if form.instance.pk %}ویرایش نوع ویژگی{% else %}نوع ویژگی جدید{% endif %}
+            </h5>
+          </div>
+          <form method="post" class="theme-form theme-form-2 mega-form">
+            {% csrf_token %}
+
+            <div class="mb-4 row align-items-center">
+              <label class="form-label-title col-sm-3 mb-0">نام نوع ویژگی</label>
+              <div class="col-sm-9">
+                {{ form.name }}
+                {% for err in form.name.errors %}
+                  <div class="text-danger small">{{ err }}</div>
+                {% endfor %}
+              </div>
+            </div>
+
+            <div class="text-end">
+              <button type="submit" class="btn btn-theme">
+                <i data-feather="save"></i>
+                {% if form.instance.pk %}ذخیره تغییرات{% else %}ایجاد{% endif %}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

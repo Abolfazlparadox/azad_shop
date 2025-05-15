@@ -1,0 +1,22 @@
+{# unit_admin/product_attributes/type_list.html #}
+{% extends 'unit_admin/base.html' %}
+{% block body %}
+<h5>لیست انواع ویژگی‌ها</h5>
+<table class="table">
+  <thead><tr><th>نام نوع</th><th>عملیات</th></tr></thead>
+  <tbody>
+    {% for t in types %}
+      <tr>
+        <td>{{ t.name }}</td>
+        <td>
+          <a href="{% url 'unit_admin:attribute_type_edit' t.pk %}">ویرایش</a>
+          <a href="{% url 'unit_admin:attribute_type_delete' t.pk %}">حذف</a>
+        </td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="2">هیچ موردی یافت نشد.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% include 'partials/pagination.html' with page_obj=page_obj %}
+{% endblock %}

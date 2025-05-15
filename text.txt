@@ -50,4 +50,6 @@ pip install django-jalali-date
  python manage.py makemigrations cart
 python manage.py migrate product
 
+i install :
+pip install django-widget-tweaks
 

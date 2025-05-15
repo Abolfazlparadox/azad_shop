@@ -1,0 +1,23 @@
+{# unit_admin/product_attributes/value_list.html #}
+{% extends 'unit_admin/base.html' %}
+{% block body %}
+<h5>لیست مقادیر ویژگی‌ها</h5>
+<table class="table">
+  <thead><tr><th>نوع ویژگی</th><th>مقدار</th><th>عملیات</th></tr></thead>
+  <tbody>
+    {% for a in attributes %}
+      <tr>
+        <td>{{ a.type.name }}</td>
+        <td>{{ a.value }}</td>
+        <td>
+          <a href="{% url 'unit_admin:attribute_edit' a.pk %}">ویرایش</a>
+          <a href="{% url 'unit_admin:attribute_delete' a.pk %}">حذف</a>
+        </td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="3">هیچ موردی یافت نشد.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% include 'partials/pagination.html' with page_obj=page_obj %}
+{% endblock %}
