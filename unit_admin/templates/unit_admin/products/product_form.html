@@ -1,294 +1,210 @@
-{# unit_admin/templates/unit_admin/products/product_form.html #}
 {% extends 'unit_admin/base.html' %}
-{% load static i18n %}
-{% load widget_tweaks %}
-{% load custom_filters %}
+{% load static i18n thumbnail poll_extras widget_tweaks %}
+
 {% block body %}
-{% if form.non_field_errors %}
-  <div class="alert alert-danger">
-    {{ form.non_field_errors }}
-  </div>
-{% endif %}
-
-{% for field in form %}
-  {% if field.errors %}
-    <div class="alert alert-danger">
-      <strong>{{ field.label }}:</strong> {{ field.errors|join:", " }}
-    </div>
-  {% endif %}
-{% endfor %}
-
-{# Variant formset errors #}
-{% if variant_formset.non_form_errors %}
-  <div class="alert alert-danger">
-    {{ variant_formset.non_form_errors }}
-  </div>
-{% endif %}
-{% for sub in variant_formset %}
-  {% if sub.errors %}
-    <div class="alert alert-danger">
-      <strong>Variant #{{ forloop.counter }} errors:</strong> {{ sub.errors }}
-    </div>
-  {% endif %}
-{% endfor %}
-
-{# Description formset errors #}
-{% if description_formset.non_form_errors %}
-  <div class="alert alert-danger">
-    {{ description_formset.non_form_errors }}
-  </div>
-{% endif %}
-{% for sub in description_formset %}
-  {% if sub.errors %}
-    <div class="alert alert-danger">
-      <strong>Description #{{ forloop.counter }} errors:</strong> {{ sub.errors }}
-    </div>
-  {% endif %}
-{% endfor %}
-<div class="container-fluid">
-  <div class="row">
-    <div class="col-12">
-      <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
+<form method="post" enctype="multipart/form-data" id="product-form">
+  {% csrf_token %}
+  <div class="container-fluid">
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
         <div class="card mb-4">
-          <div class="card-body">
-            <div class="title-header option-title d-flex justify-content-between align-items-center">
-              <h5>
-                {% if form.instance.pk %}
-                  ویرایش محصول – {{ request.user.memberships.first.university.name }}
-                {% else %}
-                  ایجاد محصول جدید – {{ request.user.memberships.first.university.name }}
-                {% endif %}
-              </h5>
-              <button type="submit" class="btn btn-theme d-flex align-items-center">
-                <i data-feather="save" class="me-1"></i>
-                {% if form.instance.pk %}ذخیره تغییرات{% else %}ایجاد محصول{% endif %}
-              </button>
-            </div>
-
-            {# Nav Tabs #}
-            <ul class="nav nav-tabs mb-3" id="prodTab" role="tablist">
-              <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="tab-basic" data-bs-toggle="tab" data-bs-target="#basic"
-                        type="button" role="tab">اطلاعات پایه</button>
-              </li>
-              <li class="nav-item" role="presentation">
-                <button class="nav-link" id="tab-variant" data-bs-toggle="tab" data-bs-target="#variants"
-                        type="button" role="tab">تنوع‌ها</button>
-              </li>
-              <li class="nav-item" role="presentation">
-                <button class="nav-link" id="tab-desc" data-bs-toggle="tab" data-bs-target="#descriptions"
-                        type="button" role="tab">توضیحات کامل</button>
-              </li>
-            </ul>
-
-            <div class="tab-content" id="prodTabContent">
-              {# === Tab 1: Basic Info === #}
-              <div class="tab-pane fade show active" id="basic" role="tabpanel">
-                <div class="row g-3">
-                  <div class="col-md-6">
-                    <label class="form-label">{{ form.title.label }}</label>
-                    {{ form.title|add_class:"form-control" }}
-                    {{ form.title.errors }}
-                  </div>
-                  <div class="col-md-6">
-                    <label class="form-label">{{ form.categories.label }}</label>
-                    {{ form.categories|add_class:"form-select" }}
-                    {{ form.categories.errors }}
-                  </div>
-                  <div class="col-md-6">
-                    <label class="form-label">{{ form.brand.label }}</label>
-                    {{ form.brand|add_class:"form-select" }}
-                    {{ form.brand.errors }}
-                  </div>
-                  <div class="col-md-6">
-                    <label class="form-label">{{ form.main_image.label }}</label>
-                    {{ form.main_image|add_class:"form-control" }}
-                    {{ form.main_image.errors }}
-                  </div>
-                  <div class="col-md-12">
-                    <label class="form-label">{{ form.short_description.label }}</label>
-                    {{ form.short_description|add_class:"form-control" }}
-                    {{ form.short_description.errors }}
-                  </div>
-                  <div class="col-md-4 form-check form-switch">
-                    {{ form.is_active|add_class:"form-check-input" }}
-                    <label class="form-check-label">{{ form.is_active.label }}</label>
-                    <div class="form-text small">{{ form.is_active.help_text }}</div>
-                  </div>
-                  <div class="col-md-4 form-check form-switch">
-                    {{ form.is_deleted|add_class:"form-check-input" }}
-                    <label class="form-check-label">{{ form.is_deleted.label }}</label>
-                    <div class="form-text small">{{ form.is_deleted.help_text }}</div>
-                  </div>
-                </div>
-              </div>
-
-              {# === Tab 2: Variants === #}
-              <div class="tab-pane fade" id="variants" role="tabpanel">
-                <div id="variants-container">
-                  {{ variant_formset.management_form }}
-                  {% for sub in variant_formset %}
-                    <div class="variant-row mb-3 row align-items-center border-bottom pb-3">
-                      <div class="col-md-4">
-                        {{ sub.attributes.label_tag }}
-                        {{ sub.attributes|add_class:"form-select" }}
-                        {{ sub.attributes.errors }}
-                      </div>
-                      <div class="col-md-2">
-                        {{ sub.stock.label_tag }}
-                        {{ sub.stock|add_class:"form-control" }}
-                        {{ sub.stock.errors }}
-                      </div>
-                      <div class="col-md-2">
-                        {{ sub.price_override.label_tag }}
-                        {{ sub.price_override|add_class:"form-control" }}
-                        {{ sub.price_override.errors }}
-                      </div>
-                      <div class="col-md-3">
-                        {{ sub.discount.label_tag }}
-                        {{ sub.discount|add_class:"form-select" }}
-                        {{ sub.discount.errors }}
-                      </div>
-                      <div class="col-md-1">
-                        {% if sub.DELETE %}
-                          {{ sub.DELETE }} <small class="text-danger">حذف</small>
-                        {% endif %}
-                      </div>
-                    </div>
-                  {% endfor %}
-                </div>
-                <button type="button" id="add-variant" class="btn btn-sm btn-outline-primary mt-2">
-                  <i data-feather="plus-circle" class="me-1"></i>افزودن تنوع
-                </button>
-              </div>
-
-              {# === Tab 3: Descriptions === #}
-              <div class="tab-pane fade" id="descriptions" role="tabpanel">
-                <div id="descriptions-container">
-                  {{ description_formset.management_form }}
-                  {% for sub in description_formset %}
-                    <div class="row g-3 align-items-start border-bottom py-2 description-row">
-                      <div class="col-md-3">
-                        {{ sub.title_description.label_tag }}
-                        {{ sub.title_description|add_class:"form-control" }}
-                        {{ sub.title_description.errors }}
-                      </div>
-                      <div class="col-md-5">
-                        {{ sub.description.label_tag }}
-                        {{ sub.description|add_class:"form-control" }}
-                        {{ sub.description.errors }}
-                      </div>
-                      <div class="col-md-3">
-                        {{ sub.Image.label_tag }}
-                        {{ sub.Image|add_class:"form-control" }}
-                        {{ sub.Image.errors }}
-                      </div>
-                      <div class="col-md-1">
-                        {% if sub.DELETE %}
-                          {{ sub.DELETE }} <small class="text-danger">حذف</small>
-                        {% endif %}
-                      </div>
-                    </div>
-                  {% endfor %}
-                </div>
-                <button type="button" id="add-description" class="btn btn-sm btn-outline-primary mt-2">
-                  <i data-feather="plus-circle" class="me-1"></i>افزودن توضیح
-                </button>
-              </div>
-            </div>
-
+          <div class="card-body d-flex justify-content-between align-items-center">
+            <h5>
+              {% if form.instance.pk %}
+                ویرایش محصول – {{ request.user.memberships.first.university.name }}
+              {% else %}
+                ایجاد محصول جدید – {{ request.user.memberships.first.university.name }}
+              {% endif %}
+            </h5>
+            <button type="submit" class="btn btn-theme">
+              <i data-feather="save" class="me-1"></i>
+              {% if form.instance.pk %}ذخیره تغییرات{% else %}ایجاد محصول{% endif %}
+            </button>
           </div>
         </div>
-      </form>
+
+        {# Nav Tabs #}
+        <ul class="nav nav-tabs mb-3" id="prodFormTab" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="tab-basic" data-bs-toggle="tab" data-bs-target="#basic"
+                    type="button" role="tab">{% trans "اطلاعات پایه" %}</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tab-variant" data-bs-toggle="tab" data-bs-target="#variants"
+                    type="button" role="tab">{% trans "تنوع‌ها" %}</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tab-desc" data-bs-toggle="tab" data-bs-target="#descriptions"
+                    type="button" role="tab">{% trans "توضیحات" %}</button>
+          </li>
+        </ul>
+
+        <div class="tab-content" id="prodFormTabContent">
+          {# === Tab 1: Basic Info === #}
+          <div class="tab-pane fade show active" id="basic" role="tabpanel">
+            <div class="card mb-4">
+              <div class="card-body row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">{{ form.title.label }}</label>
+                  {{ form.title|add_class:"form-control" }}
+                  {{ form.title.errors }}
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">{{ form.categories.label }}</label>
+                  {{ form.categories|add_class:"form-select" }}
+                  {{ form.categories.errors }}
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">{{ form.brand.label }}</label>
+                  {{ form.brand|add_class:"form-select" }}
+                  {{ form.brand.errors }}
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">{{ form.main_image.label }}</label>
+                  {{ form.main_image|add_class:"form-control" }}
+                  {{ form.main_image.errors }}
+                </div>
+                <div class="col-md-4 form-check form-switch">
+                  {{ form.is_active|add_class:"form-check-input" }}
+                  <label class="form-check-label">{{ form.is_active.label }}</label>
+                  <div class="form-text small">{{ form.is_active.help_text }}</div>
+                </div>
+                <div class="col-md-4 form-check form-switch">
+                  {{ form.is_deleted|add_class:"form-check-input" }}
+                  <label class="form-check-label">{{ form.is_deleted.label }}</label>
+                  <div class="form-text small">{{ form.is_deleted.help_text }}</div>
+                </div>
+                <div class="col-12">
+                  <label class="form-label">{{ form.short_description.label }}</label>
+                  {{ form.short_description|add_class:"form-control" }}
+                  {{ form.short_description.errors }}
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">{{ form.weight.label }}</label>
+                  {{ form.weight|add_class:"form-control" }}
+                  {{ form.weight.errors }}
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">{{ form.dimensions.label }}</label>
+                  {{ form.dimensions|add_class:"form-control" }}
+                  {{ form.dimensions.errors }}
+                </div>
+                <div class="col-12">
+                  <label class="form-label">{{ form.tags.label }}</label>
+                  {{ form.tags|add_class:"form-select" }}
+                  {{ form.tags.errors }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {# === Tab 2: Variants === #}
+          <div class="tab-pane fade" id="variants" role="tabpanel">
+            <div class="card mb-4">
+              <div class="card-header d-flex justify-content-between">
+                {% trans "تنوع‌های محصول" %}
+                <button type="button" class="btn btn-sm btn-success" id="add-variant">
+                  <i data-feather="plus"></i> {% trans "افزودن تنوع" %}
+                </button>
+              </div>
+              <div class="card-body" id="variants-container">
+                {{ variant_formset.management_form }}
+                {% for sub in variant_formset %}
+                  <div class="row g-3 align-items-center mb-3 border-bottom py-2 variant-row">
+                    <div class="col-md-4">
+                      {{ sub.attributes.label_tag }}
+                      {{ sub.attributes|add_class:"form-select" }}
+                    </div>
+                    <div class="col-md-2">
+                      {{ sub.stock.label_tag }}
+                      {{ sub.stock|add_class:"form-control" }}
+                    </div>
+                    <div class="col-md-2">
+                      {{ sub.price_override.label_tag }}
+                      {{ sub.price_override|add_class:"form-control" }}
+                    </div>
+                    <div class="col-md-3">
+                      {{ sub.discount.label_tag }}
+                      {{ sub.discount|add_class:"form-select" }}
+                    </div>
+                    <div class="col-md-1">
+                      {% if sub.DELETE %}
+                        {{ sub.DELETE|add_class:"form-check-input" }}<label class="small text-danger">حذف</label>
+                      {% endif %}
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+
+          {# === Tab 3: Descriptions === #}
+          <div class="tab-pane fade" id="descriptions" role="tabpanel">
+            <div class="card mb-4">
+              <div class="card-header d-flex justify-content-between">
+                {% trans "توضیحات تکمیلی" %}
+                <button type="button" class="btn btn-sm btn-success" id="add-description">
+                  <i data-feather="plus"></i> {% trans "افزودن توضیح" %}
+                </button>
+              </div>
+              <div class="card-body" id="descriptions-container">
+                {{ description_formset.management_form }}
+                {% for sub in description_formset %}
+                  <div class="row g-3 align-items-start mb-3 border-bottom py-2 description-row">
+                    <div class="col-md-3">
+                      {{ sub.title_description.label_tag }}
+                      {{ sub.title_description|add_class:"form-control" }}
+                    </div>
+                    <div class="col-md-5">
+                      {{ sub.description.label_tag }}
+                      {{ sub.description|add_class:"form-control" }}
+                    </div>
+                    <div class="col-md-3">
+                      {{ sub.Image.label_tag }}
+                      {{ sub.Image|add_class:"form-control" }}
+                    </div>
+                    <div class="col-md-1">
+                      {% if sub.DELETE %}
+                        {{ sub.DELETE|add_class:"form-check-input" }}<label class="small text-danger">حذف</label>
+                      {% endif %}
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
     </div>
   </div>
+</form>
+
+{# Empty templates for JS cloning #}
+<div id="empty-variant" class="d-none">
+  {{ variant_formset.empty_form.as_p|safe }}
 </div>
-
-{# === Empty template for Variants (hidden) === #}
-<div id="variant-empty" class="d-none">
-  <div class="variant-row mb-3 row align-items-center border-bottom pb-3">
-    <div class="col-md-4">
-      {{ variant_formset.empty_form.attributes.label_tag }}
-      {{ variant_formset.empty_form.attributes|add_class:"form-select" }}
-    </div>
-    <div class="col-md-2">
-      {{ variant_formset.empty_form.stock.label_tag }}
-      {{ variant_formset.empty_form.stock|add_class:"form-control" }}
-    </div>
-    <div class="col-md-2">
-      {{ variant_formset.empty_form.price_override.label_tag }}
-      {{ variant_formset.empty_form.price_override|add_class:"form-control" }}
-    </div>
-    <div class="col-md-3">
-      {{ variant_formset.empty_form.discount.label_tag }}
-      {{ variant_formset.empty_form.discount|add_class:"form-select" }}
-    </div>
-    <div class="col-md-1">
-      {{ variant_formset.empty_form.DELETE }}
-      <small class="text-danger">حذف</small>
-    </div>
-  </div>
+<div id="empty-description" class="d-none">
+  {{ description_formset.empty_form.as_p|safe }}
 </div>
+{% endblock %}
 
-{# unit_admin/templates/unit_admin/products/product_form.html #}
-{# … پایین صفحه … #}
-
-{# === Empty template for Descriptions (hidden) === #}
-<div id="description-empty" class="d-none">
-  <div class="description-row row g-3 align-items-start border-bottom py-2">
-    <div class="col-md-3">
-      {{ description_formset.empty_form.title_description.label_tag }}
-      {{ description_formset.empty_form.title_description|add_class:"form-control" }}
-    </div>
-    <div class="col-md-5">
-      {{ description_formset.empty_form.description.label_tag }}
-      {{ description_formset.empty_form.description|add_class:"form-control" }}
-    </div>
-    <div class="col-md-3">
-      {{ description_formset.empty_form.Image.label_tag }}
-      {{ description_formset.empty_form.Image|add_class:"form-control" }}
-    </div>
-    <div class="col-md-1">
-      {{ description_formset.empty_form.DELETE }}
-      <small class="text-danger">حذف</small>
-    </div>
-  </div>
-</div>
-
-
-
-
+{% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  // تابع به‌روزرسانی TOTAL_FORMS
-  function updateTotal(prefix) {
-    document.getElementById(`id_${prefix}-TOTAL_FORMS`).value =
-      document.querySelectorAll(`.${prefix}-row`).length;
+  function cloneInline(prefix, containerId, emptyId) {
+    const container = document.getElementById(containerId);
+    const totalF    = document.getElementById(`id_${prefix}-TOTAL_FORMS`);
+    const idx       = parseInt(totalF.value, 10);
+    let html        = document.getElementById(emptyId).innerHTML.replace(/__prefix__/g, idx);
+    container.insertAdjacentHTML('beforeend', html);
+    totalF.value = idx + 1;
+    feather.replace();
   }
-
-  // اضافه کردن یک وارینت جدید
-  document.getElementById('add-variant').addEventListener('click', () => {
-    const container = document.getElementById('variants-container');
-    const emptyTpl  = document.getElementById('variant-empty').innerHTML;
-    const index     = container.querySelectorAll('.variant-row').length;
-    const newHtml   = emptyTpl.replace(/__prefix__/g, index);
-    container.insertAdjacentHTML('beforeend', newHtml);
-    updateTotal('variant');
-    feather.replace();
-  });
-
-  // اضافه کردن یک توضیح جدید
-  document.getElementById('add-description').addEventListener('click', () => {
-    const container = document.getElementById('descriptions-container');
-    const emptyTpl  = document.getElementById('description-empty').innerHTML;
-    const index     = container.querySelectorAll('.description-row').length;
-    const newHtml   = emptyTpl.replace(/__prefix__/g, index);
-    container.insertAdjacentHTML('beforeend', newHtml);
-    updateTotal('description');
-    feather.replace();
-  });
+  document.getElementById('add-variant')
+    .addEventListener('click', () => cloneInline('variants', 'variants-container', 'empty-variant'));
+  document.getElementById('add-description')
+    .addEventListener('click', () => cloneInline('descriptions', 'descriptions-container', 'empty-description'));
 });
 </script>
-
 {% endblock %}

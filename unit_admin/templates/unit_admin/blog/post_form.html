@@ -1,0 +1,40 @@
+{% extends 'unit_admin/base.html' %}
+{% load i18n static %}
+
+{% block body %}
+<div class="container-fluid">
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5>
+          {% if form.instance.pk %}{% trans "ویرایش پست" %}{% else %}{% trans "ایجاد پست جدید" %}{% endif %}
+        </h5>
+      </div>
+      <div class="card-body">
+        {{ form.non_field_errors }}
+        {% for field in form.visible_fields %}
+          <div class="mb-3 row align-items-center">
+            <label class="col-sm-3 col-form-label">{{ field.label_tag }}</label>
+            <div class="col-sm-9">
+              {{ field }}
+              {% for err in field.errors %}
+                <div class="text-danger small">{{ err }}</div>
+              {% endfor %}
+              {% if field.help_text %}
+                <div class="form-text">{{ field.help_text }}</div>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+      <div class="card-footer text-end">
+        <button type="submit" class="btn btn-theme">
+          <i data-feather="save"></i>
+          {% if form.instance.pk %}{% trans "ذخیره" %}{% else %}{% trans "ایجاد" %}{% endif %}
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}

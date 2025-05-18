@@ -1,126 +1,52 @@
 {% extends 'unit_admin/base.html' %}
-{% load static %}
-{% block title %}پنل مدیریت ادمین - لیست نشانی‌ها{% endblock %}
+{% load static i18n %}
+{% block title %}لیست نشانی‌ها{% endblock %}
+
 {% block body %}
-<!-- Container-fluid starts-->
-<!-- All Address Table Start -->
 <div class="container-fluid">
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="card card-table">
-                <div class="card-body">
-                    <div class="title-header option-title d-flex justify-content-between align-items-center">
-                        <h5>لیست نشانی‌های کاربران {{ request.user.memberships.first.university.name }}</h5>
-                        <a href="{% url 'unit_admin:address_add' %}" class="btn btn-theme d-flex align-items-center">
-                            <i data-feather="plus"></i> افزودن نشانی جدید
-                        </a>
-                    </div>
-
-                    <div class="table-responsive table-product mt-3">
-                        <table class="table all-package theme-table" id="table_id">
-                        <thead>
-                                <tr>
-                                    <th>عنوان</th>
-                                    <th>کاربر</th>
-                                    <th>دسته‌بندی</th>
-                                    <th>استان</th>
-                                    <th>شهر</th>
-                                    <th>نشانی</th>
-                                    <th>کد پستی</th>
-                                    <th>تلفن</th>
-                                    <th>پیش‌فرض</th>
-                                    <th>تنظیمات</th>
-                                </tr>
-                        </thead>
-                            <tbody>
-                                {% for addr in addresses %}
-                                <tr>
-                                    <td>{{ addr.name }}</td>
-                                    <td>{{ addr.user }}</td>
-                                    <td>{{ addr.get_category_display }}</td>
-                                    <td>{{ addr.province.name }}</td>
-                                    <td>{{ addr.city.name }}</td>
-                                    <td>{{ addr.address|truncatechars:30 }}</td>
-                                    <td>{{ addr.postal_code }}</td>
-                                    <td>{{ addr.telephone }}</td>
-                                    <td>
-                                        {% if addr.active %}
-                                            <span class="badge bg-success">بله</span>
-                                        {% else %}
-                                            <span class="badge bg-secondary">خیر</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        <ul class="list-unstyled d-flex mb-0">
-                                            <li class="me-2">
-                                                <a href="{% url 'unit_admin:address_edit' addr.pk %}">
-                                                    <i class="ri-pencil-line"></i>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <!-- مثال: حذف آدرس -->
-                                                <button class="btn btn-link text-danger"
-                                                        data-bs-toggle="modal"
-                                                        data-bs-target="#deleteConfirmModal"
-                                                        data-delete-type="hard"
-                                                        data-delete-url="{% url 'unit_admin:delete_address' addr.pk %}"
-                                                        data-item-name="{{ addr.name }}">
-                                                  <i class="ri-delete-bin-line"></i>
-                                                </button>
-                                            </li>
-                                        </ul>
-                                    </td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="9" class="text-center text-danger">
-                                        هیچ نشانی‌ای یافت نشد!
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-
-                        {% if is_paginated %}
-                        <nav class="mt-4">
-                            <ul class="pagination justify-content-center">
-                                {% if page_obj.has_previous %}
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">قبلی</a>
-                                </li>
-                                {% else %}
-                                <li class="page-item disabled"><span class="page-link">قبلی</span></li>
-                                {% endif %}
-
-                                {% for num in page_obj.paginator.page_range %}
-                                    {% if page_obj.number == num %}
-                                        <li class="page-item active">
-                                            <a class="page-link" href="#">{{ num }}</a>
-                                        </li>
-                                    {% else %}
-                                        <li class="page-item">
-                                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-                                        </li>
-                                    {% endif %}
-                                {% endfor %}
-
-                                {% if page_obj.has_next %}
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">بعدی</a>
-                                </li>
-                                {% else %}
-                                <li class="page-item disabled"><span class="page-link">بعدی</span></li>
-                                {% endif %}
-                            </ul>
-                        </nav>
-                        {% endif %}
-
-                    </div>
-                </div>
-            </div>
+  <div class="card card-table">
+    <div class="card-body">
+      <div class="title-header option-title d-flex justify-content-between align-items-center">
+        <h5>لیست نشانی‌های کاربران – {{ request.user.memberships.first.university.name }}</h5>
+        <div class="d-flex">
+          <input
+            type="text"
+            id="address-search"
+            class="form-control me-2"
+            style="width:200px;"
+            placeholder="جستجو بر اساس نام یا کدپستی..."
+          />
+          <a href="{% url 'unit_admin:address_add' %}" class="btn btn-theme">
+            <i data-feather="plus"></i> افزودن
+          </a>
         </div>
+      </div>
+
+      <div class="table-responsive mt-3" id="address-table">
+        {% include 'unit_admin/addresses/_address_table.html' %}
+      </div>
     </div>
+  </div>
 </div>
-<!-- All Address Table Ends-->
-<!-- Container-fluid end -->
+
+{% include 'partials/delete_modal.html' %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  const input = document.getElementById('address-search');
+  input.addEventListener('input', function(){
+    const q = this.value.trim();
+    fetch(`?q=${encodeURIComponent(q)}`, {
+      headers: {'X-Requested-With':'XMLHttpRequest'}
+    })
+    .then(r=>r.text())
+    .then(html=>{
+      document.getElementById('address-table').innerHTML = html;
+      feather.replace();
+    });
+  });
+});
+</script>
 {% endblock %}

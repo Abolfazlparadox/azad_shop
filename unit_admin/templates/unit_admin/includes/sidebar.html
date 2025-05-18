@@ -120,14 +120,14 @@
                             </li>
 
                             <li>
-                                <a href="{% url 'unit_admin:attribute_type_add' %}">افزودن جدید</a>
+                                <a href="{% url 'unit_admin:attribute_type_add' %}">افزودن ویژگی جدید</a>
                             </li>
                             <li>
-                                <a href="{% url 'unit_admin:attribute_value_list' %}">ویژگی ها</a>
+                                <a href="{% url 'unit_admin:attribute_value_list' %}">مقادیر ویژگی ها</a>
                             </li>
 
                             <li>
-                                <a href="{% url 'unit_admin:attribute_add' %}">افزودن جدید</a>
+                                <a href="{% url 'unit_admin:attribute_add' %}">افزودن مقادیر ویژگی جدید</a>
                             </li>
                         </ul>
                     </li>
@@ -175,6 +175,21 @@
                             </li>
                             <li>
                                 <a href="order-tracking.html">رهگیری سفارش</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="sidebar-list">
+                        <a class="linear-icon-link sidebar-link sidebar-title" href="javascript:void(0)">
+                            <i class="ri-book-3-line"></i>
+                            <span>پست ها</span>
+                        </a>
+                        <ul class="sidebar-submenu">
+                            <li>
+                                <a href="{% url 'unit_admin:blog_list' %}">لیست پست</a>
+                            </li>
+
+                            <li>
+                                <a href="{% url 'unit_admin:blog_add' %}">افزودن پست جدید</a>
                             </li>
                         </ul>
                     </li>

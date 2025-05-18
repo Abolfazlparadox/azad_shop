@@ -1,22 +1,52 @@
-{# unit_admin/product_attributes/type_list.html #}
-{% extends 'unit_admin/base.html' %}
+{# unit_admin/templates/unit_admin/product_attributes/type_list.html #}
+{% extends "unit_admin/base.html" %}
+{% block title %}پنل مدیریت ادمین – انواع ویژگی‌ها{% endblock %}
+
 {% block body %}
-<h5>لیست انواع ویژگی‌ها</h5>
-<table class="table">
-  <thead><tr><th>نام نوع</th><th>عملیات</th></tr></thead>
-  <tbody>
-    {% for t in types %}
-      <tr>
-        <td>{{ t.name }}</td>
-        <td>
-          <a href="{% url 'unit_admin:attribute_type_edit' t.pk %}">ویرایش</a>
-          <a href="{% url 'unit_admin:attribute_type_delete' t.pk %}">حذف</a>
-        </td>
-      </tr>
-    {% empty %}
-      <tr><td colspan="2">هیچ موردی یافت نشد.</td></tr>
-    {% endfor %}
-  </tbody>
-</table>
-{% include 'partials/pagination.html' with page_obj=page_obj %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="card card-table">
+        <div class="card-body">
+          <div class="title-header option-title d-flex justify-content-between align-items-center">
+            <h5>انواع ویژگی‌ها – {{ request.user.memberships.first.university.name }}</h5>
+            <div class="d-flex align-items-center">
+              <input
+                type="text"
+                id="search-input"
+                class="form-control me-2"
+                style="width: 200px;"
+                placeholder="جستجو..."
+              />
+              <a href="{% url 'unit_admin:attribute_type_add' %}" class="btn btn-theme">
+                <i data-feather="plus"></i> افزودن نوع جدید
+              </a>
+            </div>
+          </div>
+
+          <div class="table-responsive mt-3" id="type-table">
+            {% include "unit_admin/product_attributes/_type_table.html" %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% include "partials/delete_modal.html" %}
+
+<script>
+// AJAX search
+document.getElementById("search-input").addEventListener("input", function(){
+  const q = this.value;
+  fetch(`?q=${encodeURIComponent(q)}`, {
+    headers: { "X-Requested-With": "XMLHttpRequest" }
+  })
+    .then(r => r.text())
+    .then(html => {
+      document.getElementById("type-table").innerHTML = html;
+      feather.replace();
+    });
+});
+</script>
 {% endblock %}

@@ -1,153 +1,86 @@
-{# unit_admin/templates/unit_admin/categories/categories-list.html #}
 {% extends 'unit_admin/base.html' %}
-{% load static thumbnail i18n %}
+{% load static i18n %}
 
 {% block body %}
-  <div class="container-fluid">
-    <div class="card card-table">
-      <div class="card-body">
-        <div class="title-header option-title d-flex justify-content-between">
-          <h5> لیست دسته‌ها</h5>
+<div class="container-fluid">
+  <div class="card card-table">
+    <div class="card-body">
+      <div class="title-header option-title d-flex justify-content-between align-items-center">
+        <h5>لیست دسته‌ها – {{ request.user.memberships.first.university.name }}</h5>
+        <div class="d-flex">
+          <input
+            type="text"
+            id="category-search"
+            class="form-control me-2"
+            style="width:200px;"
+            placeholder="جستجو بر اساس نام..."
+          />
           <a href="{% url 'unit_admin:category_add' %}" class="btn btn-theme">
-            <i data-feather="plus-square"></i> افزودن دسته
+            <i data‑feather="plus-square"></i> افزودن دسته
           </a>
         </div>
+      </div>
 
-        <div class="table-responsive category-table">
-          <table class="table all-package theme-table" id="table_id">
-            <thead>
-              <tr>
-                <th>نام دسته</th>
-                <th>نامک</th>
-                <th>آیکن</th>
-                <th>وضعیت</th>
-                <th>تنظیمات</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for cat, level in rows %}
-              <tr>
-                <td style="padding-left:{{ level|add:"0" }}0px;">
-                  {% if level == 0 %}<strong>{{ cat.title }}</strong>
-                  {% else %}— {{ cat.title }}{% endif %}
-                </td>
-                <td>{{ cat.slug }}</td>
-                <td>
-                  {% if cat.icon %}
-                    {% thumbnail cat.icon "32x32" crop="center" as thumb %}
-                      <img src="{{ thumb.url }}" width="{{ thumb.width }}" height="{{ thumb.height }}" />
-                    {% endthumbnail %}
-                  {% else %}
-                    <i class="ri-folder-line"></i>
-                  {% endif %}
-                </td>
-                <td>
-                  {% if cat.is_active %}
-                    <span class="badge bg-success">فعال</span>
-                  {% else %}
-                    <span class="badge bg-secondary">غیرفعال</span>
-                  {% endif %}
-                </td>
-                <td>
-                  <ul class="list-inline mb-0">
-                    <li class="list-inline-item">
-                      <a href="{% url 'unit_admin:category_edit' cat.pk %}">
-                        <i class="ri-pencil-line"></i>
-                      </a>
-                    </li>
-                    <li class="list-inline-item">
-                      <button class="btn btn-link p-0 text-warning"
-                              data-bs-toggle="modal"
-                              data-bs-target="#deleteCategoryModal"
-                              data-id="{{ cat.pk }}"
-                              data-title="{{ cat.title }}"
-                              data-type="soft">
-                        <i class="ri-delete-bin-line"></i>
-                      </button>
-                    </li>
-                    <li class="list-inline-item">
-                      <button class="btn btn-link p-0 text-danger"
-                              data-bs-toggle="modal"
-                              data-bs-target="#deleteCategoryModal"
-                              data-id="{{ cat.pk }}"
-                              data-title="{{ cat.title }}"
-                              data-type="hard">
-                        <i class="ri-delete-bin-fill"></i>
-                      </button>
-                    </li>
-                  </ul>
-                </td>
-              </tr>
-              {% empty %}
-                <tr><td colspan="5" class="text-center">دسته‌ای یافت نشد.</td></tr>
-              {% endfor %}
-            </tbody>
-          </table>
-            {# Now render pagination #}
-            {% if is_paginated %}
-            <nav aria-label="صفحه‌بندی">
-              <ul class="pagination justify-content-center mt-4">
-                {% if page_obj.has_previous %}
-                  <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo;</a>
-                  </li>
-                {% else %}
-                  <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
-                {% endif %}
-                {% for num in paginator.page_range %}
-                  {% if page_obj.number == num %}
-                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-                  {% elif num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
-                    <li class="page-item">
-                      <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-                    </li>
-                  {% endif %}
-                {% endfor %}
-                {% if page_obj.has_next %}
-                  <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">&raquo;</a>
-                  </li>
-                {% else %}
-                  <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
-                {% endif %}
-              </ul>
-            </nav>
-            {% endif %}
-        </div>
+      <div class="table-responsive mt-3" id="category-table">
+        {% include 'unit_admin/categories/_category_table.html' %}
       </div>
     </div>
   </div>
+</div>
 
-{# Delete Modal (unified) #}
+{# مودال حذف دسته‌ها (مشترک) #}
 <div class="modal fade" id="deleteCategoryModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content text-center p-4">
       <h5 id="modal-category-title">آیا مطمئن هستید؟</h5>
       <div class="mt-3">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">خیر</button>
-        <button id="confirm-delete-btn" class="btn btn-danger ms-2">بله، حذف</button>
+        <button id="confirm-delete-btn" class="btn btn-danger ms-2">بله، حذف شود</button>
       </div>
     </div>
   </div>
 </div>
+{% endblock %}
 
+{% block scripts %}
 <script>
-document.addEventListener('DOMContentLoaded', function(){
-  const modal = new bootstrap.Modal(document.getElementById('deleteCategoryModal'));
-  const confirmBtn = document.getElementById('confirm-delete-btn');
-  let actionUrl = '';
-  document.querySelectorAll('#table_id button[data-bs-target="#deleteCategoryModal"]')
-    .forEach(btn=>{
-      btn.addEventListener('click', ()=>{
-        const id = btn.dataset.id, title=btn.dataset.title, type=btn.dataset.type;
-        document.getElementById('modal-category-title').textContent =
-          `آیا از حذف ${type==='soft'?'نرم':'دائم'} «${title}» مطمئنید؟`;
-        actionUrl = `/unit-admin/categories/${id}/${type==='soft'?'delete':'hard-delete'}/`;
-      });
+document.addEventListener('DOMContentLoaded', () => {
+  // جستجوی AJAX
+  document.getElementById('category-search').addEventListener('input', function(){
+    const q = this.value.trim();
+    fetch(`?q=${encodeURIComponent(q)}`, {
+      headers: {'X-Requested-With':'XMLHttpRequest'}
+    })
+    .then(r=>r.text())
+    .then(html=>{
+      document.getElementById('category-table').innerHTML = html;
+      feather.replace();
     });
-  confirmBtn.addEventListener('click', ()=>{
-    fetch(actionUrl,{method:'POST',headers:{'X-CSRFToken': '{{ csrf_token }}'}})
-      .then(r=>r.ok? location.reload():null);
+  });
+
+  // تنظیم URL حذف در مودال
+  let actionUrl = '';
+  const modalEl = document.getElementById('deleteCategoryModal');
+  const bsModal = new bootstrap.Modal(modalEl);
+  modalEl.addEventListener('show.bs.modal', e => {
+    const btn   = e.relatedTarget;
+    const id    = btn.dataset.id;
+    const title = btn.dataset.title;
+    const type  = btn.dataset.type;
+    document.getElementById('modal-category-title').textContent =
+      `آیا از حذف ${type==='hard'?'دائم':'نرم'} «${title}» مطمئنید؟`;
+    actionUrl = `/unit-admin/categories/${id}/${type==='hard'?'hard-delete':'delete'}/`;
+  });
+
+  // تایید حذف
+  document.getElementById('confirm-delete-btn').addEventListener('click', ()=>{
+    fetch(actionUrl, {
+      method: 'POST',
+      headers: {'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value}
+    })
+    .then(resp => {
+      if (resp.ok) window.location.reload();
+    });
   });
 });
 </script>

@@ -71,9 +71,9 @@
                         <div class="media static-top-widget">
                             <div class="media-body p-0">
                                 <span class="m-0">کاربران شما</span>
-                                <h4 class="mb-0 counter">4.6k
-                                    <span class="badge badge-light-success grow">
-                                        <i data-feather="trending-down"></i>8.5%</span>
+                                <h4 class="mb-0 counter">{{ users_number }}
+                                    <a href="{% url 'unit_admin:add_user' %}" class="badge badge-warning grow">
+                                                                            افزودن کاربر جدید</a>
                                 </h4>
                             </div>
 
@@ -94,159 +94,20 @@
                     </div>
                     <div class="card-body p-0">
                         <div class="category-slider no-arrow">
-                            <div>
+                            {% for cat in category %}
+                            	<div>
                                 <div class="dashboard-category">
                                     <a href="javascript:void(0)" class="category-image">
-                                        <img src="{% static 'admin/svg/vegetable.svg' %}" class="img-fluid" alt="">
+                                        {% if cat.icon %}
+                                        	<img src="{{ cat.icon.url }}" class="img-fluid" alt="">
+                                        {% endif %}
                                     </a>
                                     <a href="javascript:void(0)" class="category-name">
-                                        <h6>سبزیجات و میوه جات</h6>
+                                        <h6>{{ cat.title }}</h6>
                                     </a>
                                 </div>
                             </div>
-
-                            <div>
-                                <div class="dashboard-category">
-                                    <a href="javascript:void(0)" class="category-image">
-                                        <img src="{% static 'admin/svg/cup.svg' %}" class="img-fluid" alt="">
-                                    </a>
-                                    <a href="javascript:void(0)" class="category-name">
-                                        <h6>نوشیدنی ها</h6>
-                                    </a>
-                                </div>
-                            </div>
-
-                            <div>
-                                <div class="dashboard-category">
-                                    <a href="javascript:void(0)" class="category-image">
-                                        <img src="{% static 'admin/svg/meats.svg' %}" class="img-fluid" alt="">
-                                    </a>
-                                    <a href="javascript:void(0)" class="category-name">
-                                        <h6>گوشت و غذاهای دریایی</h6>
-                                    </a>
-                                </div>
-                            </div>
-
-                            <div>
-                                <div class="dashboard-category">
-                                    <a href="javascript:void(0)" class="category-image">
-                                        <img src="{% static 'admin/svg/breakfast.svg' %}" class="img-fluid" alt="">
-                                    </a>
-                                    <a href="javascript:void(0)" class="category-name">
-                                        <h6>صبحانه</h6>
-                                    </a>
-                                </div>
-                            </div>
-
-                            <div>
-                                <div class="dashboard-category">
-                                    <a href="javascript:void(0)" class="category-image">
-                                        <img src="{% static 'admin/svg/frozen.svg' %}" class="img-fluid" alt="">
-                                    </a>
-                                    <a href="javascript:void(0)" class="category-name">
-                                        <h6>غذای یخ زده</h6>
-                                    </a>
-                                </div>
-                            </div>
-
-                            <div>
-                                <div class="dashboard-category">
-                                    <a href="javascript:void(0)" class="category-image">
-                                        <img src="{% static 'admin/svg/milk.svg' %}" class="img-fluid" alt="">
-                                    </a>
-                                    <a href="javascript:void(0)" class="category-name">
-                                        <h6>شیر و لبنیات</h6>
-                                    </a>
-                                </div>
-                            </div>
-
-                            <div>
-                                <div class="dashboard-category">
-                                    <a href="javascript:void(0)" class="category-image">
-                                        <img src="{% static 'admin/svg/pet.svg' %}" class="img-fluid" alt="">
-                                    </a>
-                                    <a href="javascript:void(0)" class="category-name">
-                                        <h6>مواد غذایی حیوان خانگی</h6>
-                                    </a>
-                                </div>
-                            </div>
-
-                            <div>
-                                <div class="dashboard-category">
-                                    <a href="javascript:void(0)" class="category-image">
-                                        <img src="{% static 'admin/svg/vegetable.svg' %}" class="img-fluid" alt="">
-                                    </a>
-                                    <a href="javascript:void(0)" class="category-name">
-                                        <h6>سبزیجات و میوه جات</h6>
-                                    </a>
-                                </div>
-                            </div>
-
-                            <div>
-                                <div class="dashboard-category">
-                                    <a href="javascript:void(0)" class="category-image">
-                                        <img src="{% static 'admin/svg/cup.svg' %}" class="img-fluid" alt="">
-                                    </a>
-                                    <a href="javascript:void(0)" class="category-name">
-                                        <h6>نوشیدنی ها</h6>
-                                    </a>
-                                </div>
-                            </div>
-
-                            <div>
-                                <div class="dashboard-category">
-                                    <a href="javascript:void(0)" class="category-image">
-                                        <img src="{% static 'admin/svg/meats.svg' %}" class="img-fluid" alt="">
-                                    </a>
-                                    <a href="javascript:void(0)" class="category-name">
-                                        <h6>گوشت و غذاهای دریایی</h6>
-                                    </a>
-                                </div>
-                            </div>
-
-                            <div>
-                                <div class="dashboard-category">
-                                    <a href="javascript:void(0)" class="category-image">
-                                        <img src="{% static 'admin/svg/breakfast.svg' %}" class="img-fluid" alt="">
-                                    </a>
-                                    <a href="javascript:void(0)" class="category-name">
-                                        <h6>صبحانه</h6>
-                                    </a>
-                                </div>
-                            </div>
-
-                            <div>
-                                <div class="dashboard-category">
-                                    <a href="javascript:void(0)" class="category-image">
-                                        <img src="{% static 'admin/svg/frozen.svg' %}" class="img-fluid" alt="">
-                                    </a>
-                                    <a href="javascript:void(0)" class="category-name">
-                                        <h6>غذای یخ زده</h6>
-                                    </a>
-                                </div>
-                            </div>
-
-                            <div>
-                                <div class="dashboard-category">
-                                    <a href="javascript:void(0)" class="category-image">
-                                        <img src="{% static 'admin/svg/milk.svg' %}" class="img-fluid" alt="">
-                                    </a>
-                                    <a href="javascript:void(0)" class="category-name">
-                                        <h6>شیر و لبنیات</h6>
-                                    </a>
-                                </div>
-                            </div>
-
-                            <div>
-                                <div class="dashboard-category">
-                                    <a href="javascript:void(0)" class="category-image">
-                                        <img src="{% static 'admin/svg/pet.svg' %}" class="img-fluid" alt="">
-                                    </a>
-                                    <a href="javascript:void(0)" class="category-name">
-                                        <h6>غذای حیوانات</h6>
-                                    </a>
-                                </div>
-                            </div>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>
@@ -753,7 +614,6 @@
                 </div>
             </div>
             <!-- visitors chart end-->
-
 
             <!-- To Do List start-->
             <div class="col-xxl-4 col-md-6">

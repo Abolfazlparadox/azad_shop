@@ -10,7 +10,11 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="title-header option-title">
-                            <h5>افزودن نقش جدید {{ request.user.memberships.first.university.name }}</h5>
+                            {% if membership_obj %}
+                            	<h5>ویرایش نقش </h5>
+                            {% else %}
+                            <h5>افزودن نقش جدید در {{ request.user.memberships.first.university.name }}</h5>
+                            {% endif %}
                             <button type="submit" class="align-items-center btn btn-theme d-flex">
                                 <i data-feather="save"></i>ذخیره نقش
                             </button>
@@ -36,21 +40,21 @@
                                 <div class="row">
                                     <div class="mb-4 row align-items-center">
                                         <div class="col-md-9 col-lg-10">
-                                            <label class="form-label">کاربر</label>
+                                            <label class="form-label">{{  form.user.label }}</label>
                                             {{ form.user }}
                                         </div>
                                     </div>
 
                                     <div class="mb-4 row align-items-center">
                                         <div class="col-md-9 col-lg-10">
-                                            <label class="form-label">نقش</label>
+                                            <label class="form-label">{{  form.role.label }}</label>
                                             {{ form.role }}
                                         </div>
                                     </div>
 
                                     <div class="mb-4 row align-items-center">
                                         <div class="col-md-9 col-lg-10">
-                                            <label class="form-label">کد نقش (اختیاری)</label>
+                                            <label class="form-label">{{  form.code.label }}</label>
                                             {{ form.code }}
                                         </div>
                                     </div>
@@ -63,10 +67,7 @@
                                     <div class="mb-4 row align-items-center">
                                         <div class="col-md-9 col-lg-10">
                                             <div class="form-check form-switch">
-                                                <input class="form-check-input"
-                                                       type="checkbox"
-                                                       checked
-                                                       disabled>
+                                                {{ form.is_confirmed }}
                                                 <label class="form-check-label">
                                                     تایید خودکار توسط دبیر رفاهی
                                                 </label>

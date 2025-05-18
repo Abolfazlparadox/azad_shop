@@ -1,0 +1,54 @@
+{% extends 'unit_admin/base.html' %}
+{% load i18n thumbnail %}
+{% block title %}لیست پست ها{% endblock %}
+{% block body %}
+<div class="container-fluid">
+  <div class="card card-table">
+    <div class="card-body">
+      <div class="title-header option-title d-flex justify-content-between align-items-center">
+        <h5>{% trans "پست‌های وبلاگ" %} – {{ request.user.memberships.first.university.name }}</h5>
+        <div class="d-flex">
+          <input id="post-search" type="text" class="form-control me-2" placeholder="{% trans 'جستجو بر اساس عنوان...' %}">
+          <a href="{% url 'unit_admin:blog_add' %}" class="btn btn-theme">
+            <i class="ri-add-line"></i> {% trans "افزودن پست جدید" %}
+          </a>
+        </div>
+      </div>
+
+      <div class="table-responsive mt-3">
+        <table class="table theme-table">
+          <thead>
+            <tr>
+              <th>{% trans "تصویر" %}</th>
+              <th>{% trans "عنوان" %}</th>
+              <th>{% trans "دسته‌بندی" %}</th>
+              <th>{% trans "وضعیت" %}</th>
+              <th>{% trans "عملیات" %}</th>
+            </tr>
+          </thead>
+          <tbody id="post-tbody">
+            {% include 'unit_admin/blog/_post_rows.html' %}
+          </tbody>
+        </table>
+      </div>
+
+      {% include 'partials/pagination.html' with page_obj=page_obj %}
+    </div>
+  </div>
+</div>
+
+{% include 'partials/delete_modal.html' %}
+
+{% endblock %}
+{% block scripts %}
+<script>
+  document.getElementById('post-search').addEventListener('input', function(){
+    const q = this.value;
+    fetch(`?ajax=1&q=${encodeURIComponent(q)}`, {
+      headers: {'X-Requested-With':'XMLHttpRequest'}
+    })
+      .then(r=>r.text())
+      .then(html=> document.getElementById('post-tbody').innerHTML = html);
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% load i18n thumbnail %}
+{% for p in posts %}
+<tr data-id="{{ p.id }}">
+  <td>
+    {% if p.banner_image %}
+      {% thumbnail p.banner_image "100x60" crop="center" as tn %}
+        <img src="{{ tn.url }}" class="img-fluid rounded" alt="{{ p.title }}">
+      {% endthumbnail %}
+    {% else %}
+      —
+    {% endif %}
+  </td>
+  <td>{{ p.title }}</td>
+   {% if p.category %}
+   	<td>{{ p.category.title }}</td>
+   {% endif %}
+  <td>
+    <span class="badge {{ p.is_published|yesno:'bg-success,bg-secondary' }}">
+      {{ p.is_published|yesno:"منتشر شده,پیش‌نویس" }}
+    </span>
+  </td>
+  <td>
+    <ul class="list-inline mb-0">
+      <li class="list-inline-item">
+        <a href="{% url 'unit_admin:blog_edit' p.pk %}" class="btn btn-sm btn-outline-primary">ویرایش
+          <i data-feather="edit"></i>
+        </a>
+      </li>
+      <li class="list-inline-item">
+        <button class="btn btn-sm btn-outline-secondary-2x"
+                title="این حذف به این گونه است که پست به طور کامل از دیتابیس حذف میشود و دیگر قابل بازیابی نیست"
+                data-bs-toggle="modal"
+                data-bs-target="#deleteConfirmModal"
+                data-delete-url="{% url 'unit_admin:blog_delete' p.pk %}"
+                data-delete-type="hard"
+                data-item-name="{{ p.title }}">
+          <i class="ri-delete-bin-fill">حذف دایُم</i>
+        </button>
+      </li>
+    </ul>
+  </td>
+</tr>
+{% empty %}
+<tr>
+  <td colspan="5" class="text-center text-muted">{% trans "هیچ پستی یافت نشد." %}</td>
+</tr>
+{% endfor %}

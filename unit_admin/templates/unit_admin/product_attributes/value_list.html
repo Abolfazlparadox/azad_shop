@@ -1,23 +1,52 @@
-{# unit_admin/product_attributes/value_list.html #}
-{% extends 'unit_admin/base.html' %}
+{# unit_admin/templates/unit_admin/product_attributes/value_list.html #}
+{% extends "unit_admin/base.html" %}
+{% block title %}پنل مدیریت ادمین – مقادیر ویژگی‌ها{% endblock %}
+
 {% block body %}
-<h5>لیست مقادیر ویژگی‌ها</h5>
-<table class="table">
-  <thead><tr><th>نوع ویژگی</th><th>مقدار</th><th>عملیات</th></tr></thead>
-  <tbody>
-    {% for a in attributes %}
-      <tr>
-        <td>{{ a.type.name }}</td>
-        <td>{{ a.value }}</td>
-        <td>
-          <a href="{% url 'unit_admin:attribute_edit' a.pk %}">ویرایش</a>
-          <a href="{% url 'unit_admin:attribute_delete' a.pk %}">حذف</a>
-        </td>
-      </tr>
-    {% empty %}
-      <tr><td colspan="3">هیچ موردی یافت نشد.</td></tr>
-    {% endfor %}
-  </tbody>
-</table>
-{% include 'partials/pagination.html' with page_obj=page_obj %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="card card-table">
+        <div class="card-body">
+          <div class="title-header option-title d-flex justify-content-between align-items-center">
+            <h5>مقادیر ویژگی‌ها – {{ request.user.memberships.first.university.name }}</h5>
+            <div class="d-flex align-items-center">
+              <input
+                type="text"
+                id="search-input"
+                class="form-control me-2"
+                style="width: 200px;"
+                placeholder="جستجو بر اساس مقدار..."
+              />
+              <a href="{% url 'unit_admin:attribute_add' %}" class="btn btn-theme">
+                <i data-feather="plus"></i> افزودن مقدار جدید
+              </a>
+            </div>
+          </div>
+
+          <div class="table-responsive mt-3" id="value-table">
+            {% include "unit_admin/product_attributes/_value_table.html" %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% include "partials/delete_modal.html" %}
+
+<script>
+// AJAX search
+document.getElementById("search-input").addEventListener("input", function(){
+  const q = this.value;
+  fetch(`?q=${encodeURIComponent(q)}`, {
+    headers: { "X-Requested-With": "XMLHttpRequest" }
+  })
+    .then(r => r.text())
+    .then(html => {
+      document.getElementById("value-table").innerHTML = html;
+      feather.replace();
+    });
+});
+</script>
 {% endblock %}

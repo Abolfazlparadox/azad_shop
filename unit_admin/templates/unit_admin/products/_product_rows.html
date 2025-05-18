@@ -1,0 +1,65 @@
+{% load i18n thumbnail poll_extras %}
+{% for p in products %}
+<tr data-item-id="{{ p.id }}">
+  <td>{{ forloop.counter0|add:page_obj.start_index }}</td>
+  <td>
+    {% if p.main_image %}
+      {% thumbnail p.main_image "80x80" crop="center" as thumb %}
+        <img src="{{ thumb.url }}" class="img-fluid rounded" alt="{{ p.title }}">
+      {% endthumbnail %}
+    {% endif %}
+  </td>
+  <td>{{ p.title }}</td>
+  <td>{{ p.total_stock|default:"—" }}</td>
+  <td>
+    {% if p.min_price == p.max_price %}
+      {{ p.min_price|three_digits_currency }}
+    {% else %}
+      {{ p.min_price|three_digits_currency }} – {{ p.max_price|three_digits_currency }}
+    {% endif %}
+  </td>
+  <td>
+    <span class="badge {{ p.is_active|yesno:'bg-success,bg-secondary' }}">
+      {{ p.is_active|yesno:"فعال,غیرفعال" }}
+    </span>
+  </td>
+  <td>
+    <ul class="list-inline mb-0">
+      <li class="list-inline-item">
+        <a href="{% url 'unit_admin:product_edit' p.pk %}"
+           class="btn btn-sm btn-outline-primary">ویرایش
+          <i data-feather="edit"></i>
+        </a>
+      </li>
+      <li class="list-inline-item">
+        <button class="btn btn-sm btn-outline-warning"
+                title="این حذف به به این گونه است که محصول از دیتابیس حذف نمی شود ولی محصول در سایت قرار نمیگیرد"
+                data-bs-toggle="modal"
+                data-bs-target="#deleteConfirmModal"
+                data-delete-url="{% url 'unit_admin:product_soft_delete' p.pk %}"
+                data-delete-type="soft"
+                data-item-name="{{ p.title }}">
+          <i class="ri-delete-bin-fill">حذف موقت</i>
+        </button>
+      </li>
+      <li class="list-inline-item">
+        <button class="btn btn-sm btn-outline-secondary"
+                title="این حذف به این گونه است که محصول به طور کامل از دیتابیس حذف میشود و دیگر قابل بازیابی نیست"
+                data-bs-toggle="modal"
+                data-bs-target="#deleteConfirmModal"
+                data-delete-url="{% url 'unit_admin:product_hard_delete' p.pk %}"
+                data-delete-type="hard"
+                data-item-name="{{ p.title }}">
+          <i class="ri-delete-bin-fill">حذف دایُم</i>
+        </button>
+      </li>
+    </ul>
+  </td>
+</tr>
+{% empty %}
+<tr>
+  <td colspan="7" class="text-center text-muted py-4">
+    {% trans "محصولی یافت نشد." %}
+  </td>
+</tr>
+{% endfor %}

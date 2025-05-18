@@ -13,7 +13,8 @@ from .views import (
     AdminAddressDeleteView, ContactMessageListView, ContactMessageAnswerView,
     AttributeTypeCreateView, AttributeTypeUpdateView, AttributeTypeDeleteView, AttributeCreateView,
     AttributeUpdateView, AttributeDeleteView, DiscountListView, DiscountCreateView, DiscountUpdateView,
-    DiscountDeleteView, ProductUpdateView, ProductAttributeTypeListView, ProductAttributeListView,
+    DiscountDeleteView, ProductUpdateView, ProductAttributeTypeListView, ProductAttributeListView, BlogPostListView,
+    BlogPostCreateView, BlogPostUpdateView, BlogPostDeleteView,
 )
 
 app_name = 'unit_admin'
@@ -49,7 +50,7 @@ urlpatterns = [
     path('attributes/add/', AttributeCreateView.as_view(), name='attribute_add'),
     path('attributes/<int:pk>/edit/', AttributeUpdateView.as_view(), name='attribute_edit'),
     path('attributes/<int:pk>/delete/', AttributeDeleteView.as_view(), name='attribute_delete'),
-    # Discounts
+
     path('discounts/', DiscountListView.as_view(), name='discount_list'),
     path('discounts/add/', DiscountCreateView.as_view(), name='discount_add'),
     path('discounts/<int:pk>/edit/', DiscountUpdateView.as_view(), name='discount_edit'),
@@ -72,4 +73,9 @@ urlpatterns = [
 
     path("contact/", ContactMessageListView.as_view(), name="contact_list"),
     path("contact/<int:pk>/answer/", ContactMessageAnswerView.as_view(), name="contact_answer"),
+
+    path('blog/', BlogPostListView.as_view(), name='blog_list'),
+    path('blog/add/', BlogPostCreateView.as_view(), name='blog_add'),
+    path('blog/<int:pk>/edit/', BlogPostUpdateView.as_view(), name='blog_edit'),
+    path('blog/<int:pk>/delete/', BlogPostDeleteView.as_view(), name='blog_delete'),
 ]

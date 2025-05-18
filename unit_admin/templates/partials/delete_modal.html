@@ -1,0 +1,78 @@
+{# unit_admin/templates/unit_admin/partials/delete_modal.html #}
+{% load static %}
+<!-- Delete Confirmation Modal -->
+<div class="modal fade theme-modal" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-center p-4">
+      <h5 class="modal-title mb-3" id="deleteModalTitle">آیا اطمینان دارید؟</h5>
+      <p id="deleteModalBody">آیتم <strong id="deleteItemName"></strong> حذف خواهد شد!</p>
+      <div class="mt-auto">
+        <button type="button" class="btn btn-danger ms-2" data-bs-dismiss="modal">خیر</button>
+        <button id="deleteModalConfirmBtn" type="button" class="btn btn-secondary ms-2">بله، حذف شود</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade theme-modal" id="deleteSuccessModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-center p-4">
+      <i class="ri-checkbox-circle-line" style="font-size: 2rem; color: #28a745;"></i>
+      <p class="mt-3 mb-0">حذف با موفقیت انجام شد!</p>
+    </div>
+  </div>
+</div>
+
+<script>
+// Update the existing delete modal script
+confirmBtn.addEventListener('click', () => {
+    const itemId = document.querySelector('#deleteConfirmModal').dataset.itemId;
+
+    fetch(deleteUrl, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => {
+        if (!response.ok) throw new Error(response.statusText);
+        return response.json();
+    })
+    .then(data => {
+        if (data.status === 'success') {
+            // Remove deleted item from DOM
+            document.querySelector(`tr[data-item-id="${data.item_id}"]`).remove();
+
+            // Show Persian success message
+            Toastify({
+                text: data.message,
+                duration: 3000,
+                close: true,
+                gravity: "top",
+                position: "left",
+                backgroundColor: "#28a745",
+                className: "toastify-right",
+                stopOnFocus: true,
+            }).showToast();
+        } else {
+            throw new Error(data.message);
+        }
+    })
+    .catch(error => {
+        // Show Persian error message
+        Toastify({
+            text: 'خطا: ' + error.message,
+            duration: 5000,
+            close: true,
+            gravity: "top",
+            position: "left",
+            backgroundColor: "#dc3545",
+            className: "toastify-right",
+            stopOnFocus: true,
+        }).showToast();
+    })
+    .finally(() => {
+        bsModal.hide();
+    });
+});
+</script>

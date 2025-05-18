@@ -1,29 +1,49 @@
-{# unit_admin/discounts/discount_list.html #}
 {% extends 'unit_admin/base.html' %}
 {% block body %}
-<h5>لیست تخفیف‌ها</h5>
-<table class="table">
-  <thead>
-    <tr>
-      <th>کد</th><th>نوع</th><th>مقدار</th><th>تا تاریخ</th><th>عملیات</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for d in discounts %}
-      <tr>
-        <td>{{ d.code }}</td>
-        <td>{{ d.get_discount_type_display }}</td>
-        <td>{{ d.amount }}</td>
-        <td>{{ d.valid_to|date:"Y/m/d" }}</td>
-        <td>
-          <a href="{% url 'unit_admin:discount_edit' d.pk %}">ویرایش</a>
-          <a href="{% url 'unit_admin:discount_delete' d.pk %}">حذف</a>
-        </td>
-      </tr>
-    {% empty %}
-      <tr><td colspan="5">هیچ موردی یافت نشد.</td></tr>
-    {% endfor %}
-  </tbody>
-</table>
-{% include 'partials/pagination.html' with page_obj=page_obj %}
+<div class="container-fluid">
+  <div class="card card-table">
+    <div class="card-body">
+      <div class="title-header option-title d-flex justify-content-between align-items-center">
+        <h5>لیست تخفیف‌ها – {{ request.user.memberships.first.university.name }}</h5>
+        <div class="d-flex">
+          <input
+            type="text"
+            id="discount-search"
+            class="form-control me-2"
+            style="width:200px;"
+            placeholder="جستجوی کد..."
+          />
+          <a href="{% url 'unit_admin:discount_add' %}" class="btn btn-theme">
+            <i data-feather="plus"></i> ایجاد جدید
+          </a>
+        </div>
+      </div>
+
+      <div class="table-responsive mt-3" id="discount-table">
+        {% include 'unit_admin/discounts/_discount_table.html' %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% include 'partials/delete_modal.html' %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  const input = document.getElementById('discount-search');
+  input.addEventListener('input', function(){
+    const q = this.value.trim();
+    fetch(`?q=${encodeURIComponent(q)}`, {
+      headers: {'X-Requested-With':'XMLHttpRequest'}
+    })
+    .then(r => r.text())
+    .then(html => {
+      document.getElementById('discount-table').innerHTML = html;
+      feather.replace();
+    });
+  });
+});
+</script>
 {% endblock %}

@@ -1,0 +1,71 @@
+{# unit_admin/templates/unit_admin/product_attributes/_value_table.html #}
+<table class="table theme-table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">نوع ویژگی</th>
+      <th scope="col">مقدار</th>
+      <th scope="col">عملیات</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for a in attributes %}
+      <tr>
+        <td>{{ forloop.counter0|add:page_obj.start_index }}</td>
+        <td>{{ a.type.name }}</td>
+        <td>{{ a.value }}</td>
+        <td>
+          <ul class="list-inline mb-0">
+            <li class="list-inline-item">
+              <a href="{% url 'unit_admin:attribute_edit' a.pk %}" class="btn btn-sm btn-outline-primary me-1">
+                <i data-feather="edit"></i>
+              </a>
+            </li>
+            <li class="list-inline-item">
+              <button
+                class="btn btn-sm btn-outline-secondary"
+                data-bs-toggle="modal"
+                data-bs-target="#deleteConfirmModal"
+                data-delete-type="hard"
+                data-delete-url="{% url 'unit_admin:attribute_delete' a.pk %}"
+                data-item-name="{{ a.value }}"
+              >
+                <i data-feather="trash-2"></i>
+              </button>
+            </li>
+          </ul>
+        </td>
+      </tr>
+    {% empty %}
+      <tr>
+        <td colspan="4" class="text-center text-muted py-4">هیچ موردی یافت نشد.</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% if is_paginated %}
+  <nav aria-label="Page navigation" class="mt-3">
+    <ul class="pagination justify-content-center">
+      {% if page_obj.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">«</a>
+        </li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">«</span></li>
+      {% endif %}
+      {% for num in page_obj.paginator.page_range %}
+        <li class="page-item {% if num == page_obj.number %}active{% endif %}">
+          <a class="page-link" href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">{{ num }}</a>
+        </li>
+      {% endfor %}
+      {% if page_obj.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">»</a>
+        </li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">»</span></li>
+      {% endif %}
+    </ul>
+  </nav>
+{% endif %}

@@ -1,0 +1,84 @@
+{% load i18n %}
+<table class="table theme-table">
+  <thead>
+    <tr>
+      <th>{% trans "#" %}</th>
+      <th>{% trans "عنوان" %}</th>
+      <th>{% trans "کاربر" %}</th>
+      <th>{% trans "استان" %}</th>
+      <th>{% trans "شهر" %}</th>
+      <th>{% trans "آدرس" %}</th>
+      <th>{% trans "کد پستی" %}</th>
+      <th>{% trans "تلفن" %}</th>
+      <th>{% trans "پیش‌فرض" %}</th>
+      <th>{% trans "عملیات" %}</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for addr in addresses %}
+      <tr>
+        <td>{{ forloop.counter0|add:page_obj.start_index }}</td>
+        <td>{{ addr.name }}</td>
+        <td>{{ addr.user.get_full_name }}</td>
+        <td>{{ addr.province.name }}</td>
+        <td>{{ addr.city.name }}</td>
+        <td>{{ addr.address|truncatechars:30 }}</td>
+        <td>{{ addr.postal_code }}</td>
+        <td>{{ addr.telephone }}</td>
+        <td>
+          <span class="badge {{ addr.active|yesno:'bg-success,bg-secondary' }}">
+            {{ addr.active|yesno:"بله,خیر" }}
+          </span>
+        </td>
+        <td>
+          <ul class="list-inline mb-0">
+            <li class="list-inline-item">
+              <a href="{% url 'unit_admin:address_edit' addr.pk %}" class="btn btn-sm btn-outline-primary">ویرایش
+                <i data-feather="edit"></i>
+              </a>
+            </li>
+            <li class="list-inline-item">
+              <button class="btn btn-sm btn-outline-secondary"
+                      title="این حذف به این گونه است که آدرس به طور کامل از دیتابیس حذف میشود و دیگر قابل بازیابی نیست"
+                      data-bs-toggle="modal"
+                      data-bs-target="#deleteConfirmModal"
+                      data-delete-type="hard"
+                      data-delete-url="{% url 'unit_admin:delete_address' addr.pk %}"
+                      data-item-name="{{ addr.name }}">
+                <i class="ri-delete-bin-fill">حذف دایُم</i>
+              </button>
+            </li>
+          </ul>
+        </td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="10" class="text-center text-muted">هیچ نشانی‌ای یافت نشد.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% if is_paginated %}
+<nav aria-label="Page navigation" class="mt-3">
+  <ul class="pagination justify-content-center">
+    {% if page_obj.has_previous %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">«</a>
+      </li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link">«</span></li>
+    {% endif %}
+    {% for num in page_obj.paginator.page_range %}
+      <li class="page-item {% if num == page_obj.number %}active{% endif %}">
+        <a class="page-link" href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">{{ num }}</a>
+      </li>
+    {% endfor %}
+    {% if page_obj.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">»</a>
+      </li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link">»</span></li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}

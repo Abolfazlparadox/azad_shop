@@ -12,73 +12,16 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.forms import inlineformset_factory
+
+from blog.models import BlogPost
 from contact.models import ContactMessage
 from django.forms import ModelForm
 from product.models import ProductAttributeType, ProductAttribute, Discount, Product, ProductDescription, \
     ProductVariant, ProductCategory
+from django.forms import BaseInlineFormSet
 
 User = get_user_model()
 
-
-class ProductVariantForm(forms.ModelForm):
-    class Meta:
-        model = ProductVariant
-        fields = ['attributes', 'stock', 'price_override', 'discount']
-        widgets = {
-            'attributes': forms.SelectMultiple(attrs={'class': 'form-select'}),
-            'discount':   forms.Select(attrs={'class': 'form-select'}),
-        }
-        labels = {
-            'attributes':    _('ویژگی‌ها'),
-            'stock':         _('موجودی'),
-            'price_override': _('قیمت ویژه'),
-            'discount':      _('تخفیف'),
-        }
-        error_messages = {
-            'attributes': {
-                'required': _('لطفاً حداقل یک ویژگی انتخاب کنید.'),
-            },
-            'stock': {
-                'required': _('وارد کردن موجودی الزامی است.'),
-                'invalid':  _('موجودی باید عددی صحیح باشد.'),
-            },
-            'price_override': {
-                'invalid': _('قیمت ویژه باید عددی صحیح باشد.'),
-            },
-        }
-class ProductDescriptionForm(forms.ModelForm):
-    class Meta:
-        model = ProductDescription
-        fields = ['Image', 'title_description', 'description']
-        widgets = {
-            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
-        }
-        labels = {
-            'Image':             _('تصویر توضیح'),
-            'title_description': _('تیتر توضیح'),
-            'description':       _('متن توضیح'),
-        }
-        error_messages = {
-            'title_description': {
-                'max_length': _('تیتر توضیح نمی‌تواند بیشتر از ۵۰ کاراکتر باشد.'),
-            },
-            'description': {
-                'required': _('متن توضیح را وارد کنید.'),
-            },
-        }
-ProductVariantFormSet = inlineformset_factory(
-    Product, ProductVariant,
-    form=ProductVariantForm,
-    extra=1,
-    can_delete=True
-)
-
-ProductDescriptionFormSet = inlineformset_factory(
-    Product, ProductDescription,
-    form=ProductDescriptionForm,
-    extra=1,
-    can_delete=True
-)
 class CustomAdminAuthForm(AuthenticationForm):
     def confirm_login_allowed(self, user):
         if not user.is_active:
@@ -103,10 +46,15 @@ class RoleCreationForm(forms.ModelForm):
         widget=forms.TextInput(attrs={'class': 'form-control'}),
         required=False
     )
+    is_confirmed=forms.BooleanField(
+        label="تایید توسط دبیر رفاهی",
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input','role': 'switch'}),
+        required=False
+    )
 
     class Meta:
         model = Membership
-        fields = ['user', 'role', 'code']
+        fields = ['user', 'role', 'code','is_confirmed']
 
     def __init__(self, *args, **kwargs):
         # 1) Pop our custom kwargs
@@ -133,12 +81,14 @@ class RoleCreationForm(forms.ModelForm):
         cleaned = super().clean()
         user = cleaned.get('user')
         role = cleaned.get('role')
+        is_confirmed = cleaned.get('is_confirmed')
         # now self.university is set
         if user and role and self.university:
             exists = Membership.objects.filter(
                 user=user,
                 role=role,
-                university=self.university
+                university=self.university,
+                is_confirmed =is_confirmed
             ).exists()
             if exists:
                 raise forms.ValidationError("این کاربر قبلاً این نقش را در دانشگاه شما دارد")
@@ -148,7 +98,6 @@ class RoleCreationForm(forms.ModelForm):
         with transaction.atomic():
             membership = super().save(commit=commit)
             membership.university = self.university
-            membership.is_confirmed = True
             membership.confirmed_at = timezone.now()
             membership.save()
             AdminActionLog.objects.create(
@@ -196,6 +145,7 @@ class CustomUserCreationForm(UserCreationForm):
             }),
             'password1': forms.PasswordInput(attrs={
                 'class': 'form-control',
+                'name': 'password1',
                 'placeholder': _('رمز عبور را وارد کنید'),
                 'autocomplete': 'new-password'
             }),
@@ -474,43 +424,89 @@ class ProductAttributeForm(ModelForm):
         model = ProductAttribute
         fields = ['type', 'value', 'color', 'image']
 
-class DiscountForm(ModelForm):
+class DiscountForm(forms.ModelForm):
     class Meta:
         model = Discount
-        fields = ['code','description','discount_type','amount','max_discount',
-                  'valid_from','valid_to','max_usage','products','categories']
+        fields = [
+            'code', 'description', 'discount_type', 'amount',
+            'max_discount', 'valid_from', 'valid_to',
+            'max_usage', 'products', 'categories'
+        ]
         widgets = {
-            'products': forms.SelectMultiple(attrs={'class':'form-select'}),
-            'categories': forms.SelectMultiple(attrs={'class':'form-select'}),
+            'code': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': _('مثال: SPRING2025')
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'form-control', 'rows': 2,
+                'placeholder': _('توضیحات اختصاصی برای این کد')
+            }),
+            'discount_type': forms.Select(attrs={'class': 'form-select'}),
+            'amount': forms.NumberInput(attrs={
+                'class': 'form-control', 'min': 0
+            }),
+            'max_discount': forms.NumberInput(attrs={
+                'class': 'form-control', 'min': 0
+            }),
+            'valid_from': forms.DateTimeInput(attrs={
+                'class': 'form-control', 'type': 'datetime-local'
+            }),
+            'valid_to': forms.DateTimeInput(attrs={
+                'class': 'form-control', 'type': 'datetime-local'
+            }),
+            'max_usage': forms.NumberInput(attrs={
+                'class': 'form-control', 'min': 0
+            }),
+            'products': forms.SelectMultiple(attrs={'class': 'form-select'}),
+            'categories': forms.SelectMultiple(attrs={'class': 'form-select'}),
         }
+        labels = {
+            'code': _('کد تخفیف'),
+            'description': _('توضیحات'),
+            'discount_type': _('نوع تخفیف'),
+            'amount': _('مقدار تخفیف'),
+            'max_discount': _('حداکثر مبلغ'),
+            'valid_from': _('تاریخ شروع'),
+            'valid_to': _('تاریخ پایان'),
+            'max_usage': _('حداکثر استفاده'),
+            'products': _('محصولات مرتبط'),
+            'categories': _('دسته‌بندی‌های مرتبط'),
+        }
+        help_texts = {
+            'code': _('کدی کوتاه و منحصر‌به‌فرد'),
+            'amount': _('اگر درصدی است، عدد بین ۰ تا ۱۰۰ و اگر مبلغ ثابت، مبلغ به تومان'),
+            'valid_from': _('زمان آغاز اعتبار'),
+            'valid_to': _('زمان پایان اعتبار (باید بعد از شروع باشد)'),
+        }
+        error_messages = {
+            'code': {
+                'required': _('وارد کردن کد الزامی است.'),
+                'unique': _('این کد قبلاً ثبت شده است.'),
+            },
+            'valid_to': {
+                'invalid': _('فرمت تاریخ/زمان نادرست است.'),
+            },
+        }
+
+    def clean_valid_to(self):
+        start = self.cleaned_data.get('valid_from')
+        end = self.cleaned_data.get('valid_to')
+        if start and end and end <= start:
+            raise forms.ValidationError(_('تاریخ پایان باید بعد از تاریخ شروع باشد.'))
+        return end
 
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
-        exclude = [
-            'slug', 'sku', 'university',
-            'created_at', 'updated_at', 'old_price'
-        ]
+        exclude = ['slug', 'sku', 'university', 'created_at', 'updated_at', 'old_price']
         widgets = {
-            'title': forms.TextInput(attrs={
-                'class':'form-control',
-                'placeholder': _('عنوان محصول را وارد کنید')
-            }),
+            'title': forms.TextInput(attrs={'class':'form-control', 'placeholder':_('عنوان محصول')}),
             'categories': forms.SelectMultiple(attrs={'class':'form-select'}),
-            'main_image': forms.ClearableFileInput(attrs={
-                'class':'form-control','accept':'image/*'
-            }),
+            'main_image': forms.ClearableFileInput(attrs={'class':'form-control','accept':'image/*'}),
             'brand': forms.Select(attrs={'class':'form-select'}),
-            'weight': forms.NumberInput(attrs={
-                'class':'form-control','step':'0.01','min':0
-            }),
-            'dimensions': forms.TextInput(attrs={
-                'class':'form-control',
-                'placeholder': _('طول×عرض×ارتفاع (سانتی‌متر)')
-            }),
-            'short_description':forms.Textarea(attrs={
-                'class':'form-control',
-                'placeholder': _('توضیحات کوتاه')}),
+            'weight': forms.NumberInput(attrs={'class':'form-control','step':'0.01','min':0}),
+            'dimensions': forms.TextInput(attrs={'class':'form-control','placeholder':_('طول×عرض×ارتفاع')}),
+            'short_description': forms.Textarea(attrs={'class':'form-control','rows':3}),
             'tags': forms.SelectMultiple(attrs={'class':'form-select'}),
             'is_active': forms.CheckboxInput(attrs={'class':'form-check-input'}),
             'is_deleted': forms.CheckboxInput(attrs={'class':'form-check-input'}),
@@ -522,65 +518,64 @@ class ProductForm(forms.ModelForm):
             'brand': _('برند'),
             'weight': _('وزن (کیلوگرم)'),
             'dimensions': _('ابعاد'),
-            'short_description':_('توضیحات کوتاه'),
+            'short_description': _('توضیحات کوتاه'),
             'tags': _('تگ‌ها'),
-            'is_active': _('فعال/غیرفعال'),
+            'is_active': _('فعال'),
             'is_deleted': _('حذف نرم'),
         }
-        help_texts = {
-            'is_active': _('با برداشتن تیک، محصول از فروشگاه پنهان می‌شود.'),
-            'is_deleted': _('با تیک‌زدن، محصول به صورت نرم حذف می‌شود.'),
-            'weight': _('وزن را بر حسب کیلوگرم وارد کنید.'),
-            'dimensions': _('ابعاد را به صورت طول×عرض×ارتفاع وارد کنید.'),
+
+class DynamicInlineFormSet(BaseInlineFormSet):
+    """همیشه یک فرم خالی اضافه نگه‌دار"""
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.extra = 1
+
+    def add_fields(self, form, index):
+        super().add_fields(form, index)
+        # فیلد حذف
+        form.fields['DELETE'] = forms.BooleanField(
+            required=False,
+            widget=forms.CheckboxInput(attrs={'class':'form-check-input'}),
+            label=_('حذف')
+        )
+
+class ProductVariantForm(forms.ModelForm):
+    attributes = forms.ModelMultipleChoiceField(
+        queryset=ProductAttribute.objects.all(),
+        widget=forms.SelectMultiple(attrs={'class':'form-select'}),
+        label=_('ویژگی‌ها'),
+        help_text=_('Ctrl+کلیک برای انتخاب چندتایی')
+    )
+    class Meta:
+        model = ProductVariant
+        fields = ['attributes','stock','price_override','discount']
+        widgets = {
+            'stock': forms.NumberInput(attrs={'class':'form-control'}),
+            'price_override': forms.NumberInput(attrs={'class':'form-control'}),
+            'discount': forms.Select(attrs={'class':'form-select'}),
         }
-        error_messages = {
-            'title': {
-                'required': _('وارد کردن عنوان محصول الزامی است.'),
-                'max_length': _('عنوان نباید بیش از ۳۰۰ کاراکتر باشد.'),
-            },
-            'categories': {
-                'required': _('لطفاً حداقل یک دسته‌بندی انتخاب نمایید.'),
-            },
-            'main_image': {
-                'required': _('بارگذاری تصویر اصلی محصول الزامی است.'),
-                'invalid': _('لطفاً یک فایل تصویر معتبر انتخاب کنید.'),
-            },
-            'brand': {
-                'invalid_choice': _('برند انتخاب شده معتبر نیست.'),
-            },
-            'weight': {
-                'invalid': _('وزن باید عددی صحیح یا اعشاری باشد.'),
-            },
-            'dimensions': {
-                'max_length': _('طول توضیحات بیش از حد مجاز است.'),
-            },
-            'short_description':{
-                'required': _('این فیلد نیاز است ')
-            }
+
+class ProductDescriptionForm(forms.ModelForm):
+    class Meta:
+        model = ProductDescription
+        fields = ['Image','title_description','description']
+        widgets = {
+            'description': forms.Textarea(attrs={'class':'form-control','rows':3}),
         }
 
-    def clean_weight(self):
-        weight = self.cleaned_data.get('weight')
-        if weight is None:
-            return weight
-        if weight < 0:
-            raise forms.ValidationError(
-                _('وزن نمی‌تواند منفی باشد.'),
-                code='invalid_weight'
-            )
-        return weight
+ProductVariantFormSet = inlineformset_factory(
+    Product, ProductVariant,
+    form=ProductVariantForm,
+    formset=DynamicInlineFormSet,
+    can_delete=True
+)
 
-    def clean_stock(self):
-        stock = self.cleaned_data.get('stock')
-        if stock is None:
-            return stock
-        if stock < 0:
-            raise forms.ValidationError(
-                _('موجودی نمی‌تواند منفی باشد.'),
-                code='invalid_stock'
-            )
-        return stock
-
+ProductDescriptionFormSet = inlineformset_factory(
+    Product, ProductDescription,
+    form=ProductDescriptionForm,
+    extra=1,
+    can_delete=True
+)
 class CategoryForm(forms.ModelForm):
     class Meta:
         model = ProductCategory
@@ -728,7 +723,6 @@ class AdminSettingsForm(forms.ModelForm):
             user.save()
         return user
 
-
 class ContactAnswerForm(forms.ModelForm):
     class Meta:
         model = ContactMessage
@@ -752,3 +746,40 @@ class ContactAnswerForm(forms.ModelForm):
         if not ans:
             raise forms.ValidationError(_('متن پاسخ نمی‌تواند خالی باشد.'))
         return ans
+
+
+class BlogPostForm(forms.ModelForm):
+    class Meta:
+        model = BlogPost
+        fields = [
+            'title', 'category', 'short_content', 'full_content',
+            'banner_image', 'tags', 'is_published', 'published_at'
+        ]
+        widgets = {
+            'title': forms.TextInput(attrs={'class':'form-control', 'placeholder':_('عنوان را وارد کنید')}),
+            'category': forms.Select(attrs={'class':'form-select'}),
+            'short_content': forms.Textarea(attrs={'class':'form-control', 'rows':3, 'placeholder':_('خلاصه محتوا')}),
+            'full_content': forms.Textarea(attrs={'class':'form-control', 'rows':6}),
+            'banner_image': forms.ClearableFileInput(attrs={'class':'form-control', 'accept':'image/*'}),
+            'tags': forms.SelectMultiple(attrs={'class':'form-select'}),
+            'is_published': forms.CheckboxInput(attrs={'class':'form-check-input'}),
+            'published_at': forms.DateTimeInput(attrs={'class':'form-control','type':'datetime-local'}),
+        }
+        labels = {
+            'title': _('عنوان'),
+            'category': _('دسته‌بندی'),
+            'short_content': _('متن کوتاه'),
+            'full_content': _('متن کامل'),
+            'banner_image': _('عکس بنر'),
+            'tags': _('تگ‌ها'),
+            'is_published': _('منتشر شده'),
+            'published_at': _('تاریخ انتشار'),
+        }
+        help_texts = {
+            'published_at': _('در صورت خالی بودن، پس از زدن دکمه منتشر نخواهد شد'),
+        }
+        error_messages = {
+            'title': {'required': _('وارد کردن عنوان الزامی است.')},
+            'short_content': {'required': _('متن کوتاه را وارد کنید.')},
+            'full_content': {'required': _('متن کامل را وارد کنید.')},
+        }

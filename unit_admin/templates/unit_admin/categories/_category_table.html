@@ -1,0 +1,103 @@
+{# unit_admin/templates/unit_admin/categories/_category_table.html #}
+{% load static thumbnail i18n %}
+<table class="table all-package theme-table">
+  <thead>
+    <tr>
+      <th>نام دسته</th>
+      <th>نامک</th>
+      <th>آیکن</th>
+      <th>وضعیت</th>
+      <th>تنظیمات</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for cat, level in rows %}
+      <tr>
+        <td style="padding-left:{{ level|add:"0" }}0px;">
+          {% if level == 0 %}<strong>{{ cat.title }}</strong>
+          {% else %}— {{ cat.title }}{% endif %}
+        </td>
+        <td>{{ cat.slug }}</td>
+        <td>
+          {% if cat.icon %}
+            {% thumbnail cat.icon "32x32" crop="center" as thumb %}
+              <img src="{{ thumb.url }}" width="{{ thumb.width }}" height="{{ thumb.height }}" />
+            {% endthumbnail %}
+          {% else %}
+            <i class="ri-folder-line"></i>
+          {% endif %}
+        </td>
+        <td>
+          <span class="badge {{ cat.is_active|yesno:'bg-success,bg-secondary' }}">
+            {{ cat.is_active|yesno:"فعال,غیرفعال" }}
+          </span>
+        </td>
+        <td>
+          <ul class="list-inline mb-0">
+            <li class="list-inline-item">
+              <a
+                href="{% url 'unit_admin:category_edit' cat.pk %}"
+                class="btn btn-sm btn-outline-primary"
+                title="ویرایش دسته: {{ cat.title }}"
+              ><i data-feather="edit"></i>ویرایش</a>
+            </li>
+            <li class="list-inline-item">
+              <button
+                class="btn btn-sm btn-outline-warning"
+                data-bs-toggle="modal"
+                data-bs-target="#deleteCategoryModal"
+                data-id="{{ cat.pk }}"
+                data-title="{{ cat.title }}"
+                data-type="soft"
+                title="این حذف نرم باعث غیر فعال شدن دسته می‌شود، داده‌ها باقی می‌ماند."
+              ><i class="ri-delete-bin-line">حذف موقت</i></button>
+            </li>
+            <li class="list-inline-item">
+              <button
+                class="btn btn-sm btn-outline-secondary-2x"
+                data-bs-toggle="modal"
+                data-bs-target="#deleteCategoryModal"
+                data-id="{{ cat.pk }}"
+                data-title="{{ cat.title }}"
+                data-type="hard"
+                title="این حذف دائمی تمام داده‌های مرتبط را پاک می‌کند و قابل بازگشت نیست."
+              ><i class="ri-delete-bin-fill">حذف دایُم</i></button>
+            </li>
+          </ul>
+        </td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="5" class="text-center text-muted">دسته‌ای یافت نشد.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% if is_paginated %}
+<nav aria-label="صفحه‌بندی" class="mt-3">
+  <ul class="pagination justify-content-center">
+    {% if page_obj.has_previous %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">&laquo;</a>
+      </li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+    {% endif %}
+    {% for num in page_obj.paginator.page_range %}
+      {% if num == page_obj.number %}
+        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+      {% elif num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">{{ num }}</a>
+        </li>
+      {% endif %}
+    {% endfor %}
+    {% if page_obj.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">&raquo;</a>
+      </li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}

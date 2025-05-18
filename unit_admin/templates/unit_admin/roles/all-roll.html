@@ -1,127 +1,52 @@
 {% extends 'unit_admin/base.html' %}
 {% load static i18n %}
-{% block title %}پنل مدیریت ادمین - لیست نقش ها {% endblock %}
+{% block title %}لیست نقش‌ها{% endblock %}
+
 {% block body %}
-<!-- Container-fluid starts-->
-
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-sm-12">
-                <div class="card card-table">
-                    <!-- Table Start -->
-                    <div class="card-body">
-                        <div class="title-header option-title">
-                            <h5>لیست نقش‌های تأیید شده {{ request.user.memberships.first.university.name }}</h5>
-                            <div class="d-inline-flex">
-                                <a href="{% url 'unit_admin:add_role' %}" class="align-items-center btn btn-theme d-flex">
-                                    <i data-feather="plus"></i>افزودن نقش جدید
-                                </a>
-                            </div>
-                        </div>
-
-                        <div class="table-responsive">
-                            <table class="table role-table all-package theme-table">
-                            <thead>
-                                    <tr>
-                                        <th>ردیف</th>
-                                        <th>نام کاربر</th>
-                                        <th>نقش</th>
-                                        <th>تاریخ تأیید</th>
-                                        <th>وضعیت</th>
-                                        <th>عملیات</th>
-                                    </tr>
-                            </thead>
-                                <tbody>
-                                    {% for membership in memberships %}
-                                    <tr>
-                                        <td>{{ forloop.counter }}</td>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                {% if membership.user.avatar %}
-                                                <img src="{{ membership.user.avatar.url }}"
-                                                     class="rounded-circle me-2"
-                                                     width="40"
-                                                     height="40"
-                                                     alt="{{ membership.user.get_full_name }}">
-                                                {% endif %}
-                                                {{ membership.user.get_full_name }}
-                                            </div>
-                                        </td>
-                                        <td>{{ membership.get_role_display }}</td>
-                                        <td>{{ membership.confirmed_at|date:"Y/m/d H:i" }}</td>
-                                    {% if membership.is_confirmed %}
-                                    <td class="status-danger">
-                                            <span class="badge bg-success">فعال</span>
-                                    </td>
-                                    {% else %}
-                                        <td class="status-danger">
-                                            <span>غیر فعال</span>
-                                        </td>
-                                    {% endif %}
-                                        <td>
-                                            <ul class="d-flex gap-2">
-                                                <li>
-                                                      {# لینک اول: ویرایش نقش #}
-                                                      <a href="{% url 'unit_admin:role_edit' membership.pk %}">
-                                                        <i class="ri-pencil-line"></i>
-                                                      </a>
-                                                </li>
-                                                <li>
-                                                <!-- مثال: حذف نقش -->
-                                                    <button class="btn btn-link text-danger"
-                                                            data-bs-toggle="modal"
-                                                            data-bs-target="#deleteConfirmModal"
-                                                            data-delete-type="hard"
-                                                            data-delete-url="{% url 'unit_admin:delete_role' membership.pk %}"
-                                                            data-item-name="نقش {{ membership.get_role_display }}">
-                                                      <i class="ri-delete-bin-line"></i>
-                                                    </button>
-                                                </li>
-                                            </ul>
-                                        </td>
-                                    </tr>
-                                    {% empty %}
-                                    <tr>
-                                        <td colspan="6" class="text-center">هیچ نقش فعالی یافت نشد</td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <!-- Pagination -->
-                        {% if is_paginated %}
-                        <nav class="mt-4">
-                            <ul class="pagination justify-content-center">
-                                {% if page_obj.has_previous %}
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">قبلی</a>
-                                </li>
-                                {% endif %}
-
-                                {% for num in page_obj.paginator.page_range %}
-                                {% if page_obj.number == num %}
-                                <li class="page-item active">
-                                    <span class="page-link">{{ num }}</span>
-                                </li>
-                                {% else %}
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-                                </li>
-                                {% endif %}
-                                {% endfor %}
-
-                                {% if page_obj.has_next %}
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">بعدی</a>
-                                </li>
-                                {% endif %}
-                            </ul>
-                        </nav>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
+<div class="container-fluid">
+  <div class="card card-table">
+    <div class="card-body">
+      <div class="title-header option-title d-flex justify-content-between align-items-center">
+        <h5>لیست نقش‌ها – {{ request.user.memberships.first.university.name }}</h5>
+        <div class="d-flex">
+          <input
+            type="text"
+            id="role-search"
+            class="form-control me-2"
+            style="width:300px;"
+            placeholder="جستجو بر اساس نام..."
+          />
+          <a href="{% url 'unit_admin:add_role' %}" class="btn btn-theme">
+            <i data-feather="plus"></i> افزودن
+          </a>
         </div>
+      </div>
+
+      <div class="table-responsive mt-3" id="role-table">
+        {% include "unit_admin/roles/_role_table.html" %}
+      </div>
     </div>
+  </div>
+</div>
+
+{% include 'partials/delete_modal.html' %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  const input = document.getElementById('role-search');
+  input.addEventListener('input', function(){
+    const q = this.value.trim();
+    fetch(`?q=${encodeURIComponent(q)}`, {
+      headers: {'X-Requested-With':'XMLHttpRequest'}
+    })
+    .then(r=>r.text())
+    .then(html=>{
+      document.getElementById('role-table').innerHTML = html;
+      feather.replace();
+    });
+  });
+});
+</script>
 {% endblock %}
