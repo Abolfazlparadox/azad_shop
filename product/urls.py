@@ -6,8 +6,10 @@ from .views import (
     ProductListView,
     ProductDetailView,
     compare_products,
-    toggle_wishlist
+    toggle_wishlist,
+
 )
+
 
 register_converter(UnicodeSlugConverter, 'uslug')
 

@@ -14,6 +14,7 @@ from django.db.models.signals import pre_save
 from home.models import Tag
 from colorfield.fields import ColorField
 from university.models import University
+from decimal import Decimal
 
 
 class BaseModel(models.Model):
@@ -187,14 +188,14 @@ class Discount(models.Model):
 
 class ProductAttributeType(models.Model):
     name = models.CharField(max_length=100, verbose_name='نوع ویژگی')
+    position = models.PositiveIntegerField(default=0, verbose_name='ترتیب نمایش')
 
     class Meta:
         verbose_name = 'نوع ویژگی'
         verbose_name_plural = 'انواع ویژگی‌ها'
-        ordering = ['name']
-
+        ordering = ['position']  # استفاده از فیلد جدید برای ترتیب
     def __str__(self):
-        return self.name
+        return f"{self.name}: {self.position}"
 
 class ProductAttribute(models.Model):
     type = models.ForeignKey(ProductAttributeType, on_delete=models.CASCADE, verbose_name='نوع ویژگی', null=True, blank=True)
@@ -202,142 +203,6 @@ class ProductAttribute(models.Model):
     COLOR_CHOICES = [
         ("#5c5ccd", "جگری"),
         ("#8080f0", "بژ تیره"),
-        ("#7280fa", "حناییِ روشن"),
-        ("#7a96e9", "قهوه‌ایِ حنایی"),
-        ("#7aa0ff", "کرم نارنجی"),
-        ("#0000ff", "قرمز"),
-        ("#3c14dc", "زرشکی"),
-        ("#2222b2", "شرابی"),
-        ("#00008b", "عنابی تند"),
-        ("#cbc0ff", "صورتی"),
-        ("#c1b6ff", "صورتی پررنگ"),
-        ("#9370db", "شرابی روشن"),
-        ("#b469ff", "سرخابی"),
-        ("#9314ff", "شفقی"),
-        ("#8515c7", "ارغوانی"),
-        ("#00a5ff", "نارنجی"),
-        ("#008cff", "نارنجی سیر"),
-        ("#507fff", "نارنجی پررنگ"),
-        ("#4763ff", "قرمز گوجه‌ای"),
-        ("#0045ff", "قرمز-نارنجی"),
-        ("#e0ffff", "شیری"),
-        ("#cdfaff", "شیرشکری"),
-        ("#d2fafa", "لیمویی روشن"),
-        ("#d5efff", "هلویی روشن"),
-        ("#b5e4ff", "هلویی"),
-        ("#b9daff", "هلویی پررنگ"),
-        ("#aae8ee", "نخودی"),
-        ("#83e6f0", "خاکی"),
-        ("#00ffff", "زرد"),
-        ("#00d7ff", "کهربایی باز"),
-        ("#6bb7bd", "ماشی"),
-        ("#2fffad", "مغزپسته‌ای"),
-        ("#00ff7f", "سبز روشن"),
-        ("#00fc7c", "مغزپسته‌ای پررنگ"),
-        ("#00ff00", "مغزپسته‌ای"),
-        ("#98fb98", "سبز کمرنگ"),
-        ("#90ee90", "سبز کدر"),
-        ("#9afa00", "یشمی سیر"),
-        ("#7fff00", "یشمی کمرنگ"),
-        ("#32cd9a", "سبز لجنی"),
-        ("#32cd32", "سبز چمنی"),
-        ("#71b33c", "خزه‌ای"),
-        ("#578b2e", "خزه‌ای پررنگ"),
-        ("#228b22", "شویدی"),
-        ("#008000", "سبز"),
-        ("#238e6b", "سبز ارتشی"),
-        ("#008080", "زیتونی"),
-        ("#2f6b55", "زیتونی سیر"),
-        ("#006400", "سبز آووکادو"),
-        ("#aacd66", "سبز دریایی"),
-        ("#8fbc8f", "سبز دریایی تیره"),
-        ("#aab220", "سبز کبریتی روشن"),
-        ("#8b8b00", "سبز کبریتی تیره"),
-        ("#808000", "سبز دودی"),
-        ("#ffff00", "فیروزه‌ای"),
-        ("#ffffe0", "آبی آسمانی"),
-        ("#eeeeaf", "فیروزه‌ای کدر"),
-        ("#d4ff7f", "یشمی"),
-        ("#d0e040", "سبز دریایی روشن"),
-        ("#ccd148", "فیروزه‌ای تیره"),
-        ("#d1ce00", "فیروزه‌ای سیر"),
-        ("#e6e0b0", "آبی کبریتی روشن"),
-        ("#dec4b0", "بنفش مایل به آبی"),
-        ("#e6d8ad", "آبی کبریتی"),
-        ("#ebce87", "آبی آسمانی سیر"),
-        ("#face87", "آبی روشن"),
-        ("#ffbf00", "آبی کمرنگ"),
-        ("#ed9564", "آبی کدر"),
-        ("#b48246", "نیلی متالیک"),
-        ("#a09e5f", "آبی لجنی"),
-        ("#ee687b", "آبی متالیک روشن"),
-        ("#ff901e", "نیلی"),
-        ("#e16941", "فیروزه‌ای فسفری"),
-        ("#ff0000", "آبی"),
-        ("#cd0000", "آبی سیر"),
-        ("#8b0000", "سرمه‌ای"),
-        ("#800000", "لاجوردی"),
-        ("#701919", "آبی نفتی"),
-        ("#fae6e6", "نیلی کمرنگ"),
-        ("#d8bfd8", "بادمجانی روشن"),
-        ("#dda0dd", "بنفش کدر"),
-        ("#ee82ee", "بنفش روشن"),
-        ("#ff00ff", "سرخابی"),
-        ("#d670da", "ارکیده"),
-        ("#d355ba", "ارکیده سیر"),
-        ("#db7093", "آبی بنفش"),
-        ("#cd5a6a", "آبی فولادی"),
-        ("#e22b8a", "آبی-بنفش سیر"),
-        ("#d30094", "بنفش باز"),
-        ("#cc3299", "ارکیده بنفش"),
-        ("#8b008b", "مخملی"),
-        ("#800080", "بنفش"),
-        ("#8b3d48", "آبی دودی"),
-        ("#82004b", "نیلی سیر"),
-        ("#dcf8ff", "کاهی"),
-        ("#cdebff", "کاهگلی"),
-        ("#c4e4ff", "کرم"),
-        ("#addeff", "کرم سیر"),
-        ("#bcdef5", "گندمی"),
-        ("#87b8de", "خاکی"),
-        ("#8cb4d2", "برنزه کدر"),
-        ("#8f8fbc", "بادمجانی"),
-        ("#60a4f4", "هلویی سیر"),
-        ("#20a5da", "خردلی"),
-        ("#0b86b8", "ماشی سیر"),
-        ("#3f85cd", "بادامی سیر"),
-        ("#1e69d2", "عسلی پررنگ"),
-        ("#13458b", "کاکائویی"),
-        ("#2d52a0", "قهوه‌ای متوسط"),
-        ("#2a2aa5", "قهوه‌ای"),
-        ("#000080", "آلبالویی"),
-        ("#ffffff", "سفید"),
-        ("#fafaff", "صورتی محو"),
-        ("#f0fff0", "یشمی محو"),
-        ("#fafff5", "سفید نعنائی"),
-        ("#fffff0", "آبی محو"),
-        ("#fff8f0", "نیلی محو"),
-        ("#fff8f8", "سفید بنفشه"),
-        ("#f5f5f5", "خاکستری محو"),
-        ("#eef5ff", "بژ باز"),
-        ("#dcf5f5", "هِلی"),
-        ("#e6f5fd", "بژ روشن"),
-        ("#f0faff", "پوست پیازی"),
-        ("#f0ffff", "استخوانی"),
-        ("#d7ebfa", "بژ تیره"),
-        ("#e6f0fa", "کتانی"),
-        ("#f5f0ff", "صورتی مات"),
-        ("#e1e4ff", "بژ"),
-        ("#dcdcdc", "خاکستری مات"),
-        ("#d3d3d3", "نقره‌ای"),
-        ("#c0c0c0", "توسی"),
-        ("#a9a9a9", "خاکستری سیر"),
-        ("#808080", "خاکستری"),
-        ("#696969", "دودی"),
-        ("#998877", "سربی"),
-        ("#908070", "سربی تیره"),
-        ("#4f4f2f", "لجنی تیره"),
-        ("#000000", "سیاه"),
     ]
     image = models.ImageField(upload_to="images",verbose_name='رنگ به صورت عکس',help_text='اگر یه رنگ خاص دارید که داخل رنگ های اشافه شده نبود یه عکس از یه بخش از اون محصول رو آپلود کنید و اسم رنگ رو داخل فیلد مقدار ویژگی وارد کنید سپس گزینه ذخبره رو بزنید دوباره وارد همون رنگی که عکس رو وارد کردید بشید و چک کنید که رنگ مورد نظر شما با رنگ انتخابی شبیه هم هستند', null=True, blank=True)
 
@@ -361,16 +226,30 @@ class ProductVariant(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='variants',null=True, blank=True, verbose_name='محصول')
     attributes = models.ManyToManyField(ProductAttribute, blank=True, verbose_name='ویژگی‌ها')
     stock = models.PositiveIntegerField(verbose_name='تعداد موجودی' ,null=True, blank=True,)
-    price_override = models.IntegerField(null=True, blank=True, verbose_name='قیمت مخصوص این تنوع')
+    price  = models.IntegerField(null=True, blank=True, verbose_name='قیمت مخصوص این تنوع')
     discount = models.ForeignKey('Discount', null=True, blank=True, on_delete=models.SET_NULL, related_name='variants')
 
     class Meta:
         verbose_name = 'تنوع محصول'
         verbose_name_plural = 'تنوع‌های محصول'
 
-    def __str__(self):
-        return f" - {', '.join([str(attr) for attr in self.attributes.all()])} - تخفیف: {self.discount.code if self.discount else 'بدون تخفیف'}"
+    def final_price(self):
+        if self.discount and self.price:
+            if self.discount.discount_type == 'percent':
+                discount_amount = (self.price * self.discount.amount) / 100
+                if self.discount.max_discount:
+                    discount_amount = min(discount_amount, self.discount.max_discount)
+            else:
+                discount_amount = self.discount.amount
 
+            final = self.price - discount_amount
+            # مطمئن می‌شیم عدد منفی نباشه و خروجی عدد صحیح باشه
+            return max(0, int(final))
+
+        return int(self.price) if self.price else 0
+
+    def __str__(self):
+        return f"Variant {self.id}"
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images', verbose_name='محصول')
     image = models.ImageField(upload_to='products/gallery/%Y/%m/%d/', verbose_name='تصویر')

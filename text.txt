@@ -53,3 +53,10 @@ python manage.py migrate product
 i install :
 pip install django-widget-tweaks
 
+
+
+new uptodate
+python manage.py makemigrations cart
+python manage.py migrate cart
+python manage.py makemigrations product
+python manage.py migrate product

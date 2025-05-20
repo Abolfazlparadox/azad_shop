@@ -17,7 +17,7 @@ from .models import ProductAttribute, ProductAttributeType
 class ProductVariantInline(admin.TabularInline):
     model = ProductVariant
     extra = 1
-    fields = ('attributes','price_override','stock' ,'discount',)
+    fields = ('attributes','price','stock' ,'discount',)
 
 @admin.register(ProductAttributeType)
 class ProductAttributeTypeAdmin(admin.ModelAdmin):

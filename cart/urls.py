@@ -11,13 +11,14 @@ from . import views
 from .views import (
     AddProductToCartView,
     CheckoutView,
-    UserCartView
+    UserCartView,
 )
+
 urlpatterns = [
     path('', UserCartView.as_view(), name='user_cart_page'),
     path('add-to-cart/', views.AddProductToCartView.as_view(), name='add_product_to_cart'),
     path('checkout/', views.CheckoutView.as_view(), name='checkout'),
     path('remove/<int:pk>/', views.remove_from_cart, name='remove_from_cart'),
-    path('change-cart-detail/', views.change_cart_detail, name='change_cart_detail')
+    path('change-cart-detail/', views.change_cart_detail, name='change_cart_detail'),
 
 ]

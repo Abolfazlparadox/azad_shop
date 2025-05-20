@@ -96,3 +96,7 @@ function changeCartDetailCount(detailId, state) {
 //             alert('خطا در ارتباط با سرور');
 //         });
 // }
+
+
+
+

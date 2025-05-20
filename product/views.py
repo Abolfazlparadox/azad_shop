@@ -1,21 +1,17 @@
 from django.views.generic import  DetailView,ListView
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
-from .models import Product, ProductCategory, ProductReview, ProductView, ProductImage, ProductVariant,Wishlist ,ProductDescription
+from .models import Product, ProductCategory, ProductReview, ProductView, ProductImage, ProductVariant,Wishlist ,ProductAttributeType,ProductDescription
 from decimal import Decimal, DecimalException
-from django.core.exceptions import ValidationError
 from django.db.models import Q, Max, F, Min, Avg, Prefetch
 from django.core.cache import cache
 from django.http import JsonResponse
-from django.utils import timezone
 from django.shortcuts import get_object_or_404, render
-from django.contrib import messages
-from django.template.loader import render_to_string
+
 from collections import defaultdict
 from django.db.models import Prefetch
-from django.utils import timezone
 from django.views.generic import ListView
-from product.models import University  # if needed
+
 
 class ProductBaseView:
     """Base view with common functionality."""
@@ -46,6 +42,7 @@ class ProductBaseView:
 
 
 
+
 class ProductListView(ListView):
     model = Product
     template_name = 'product/product-list.html'
@@ -54,125 +51,30 @@ class ProductListView(ListView):
     ordering = ['-created_at']
 
     def get_queryset(self):
-        print("شروع دریافت queryset...")  # پرینت برای شروع گرفتن داده‌ها
-        qs = super().get_queryset().filter(is_active=True)
-        qs = qs.select_related('brand', 'university') \
-            .prefetch_related(
-                Prefetch('categories', queryset=ProductCategory.objects.only('title', 'slug')),
-                Prefetch('images', queryset=ProductImage.objects.order_by('order')),
-                Prefetch('variants', queryset=ProductVariant.objects.select_related('discount')
-                         .prefetch_related('attributes'))
-            )
-        print(f"تعداد محصولات یافت‌شده: {qs.count()}")  # پرینت تعداد محصولات یافت‌شده
+        qs = super().get_queryset().filter(is_active=True).select_related(
+            'brand', 'university'
+        ).prefetch_related(
+            Prefetch('categories', queryset=ProductCategory.objects.only('title', 'slug')),
+            Prefetch('images', queryset=ProductImage.objects.order_by('order')),
+            Prefetch('variants', queryset=ProductVariant.objects.select_related('discount').prefetch_related('attributes'))
+        )
         return qs
 
-    def get_context_data(self, **kwargs):
-        print("شروع پردازش context...")  # پرینت برای شروع پردازش context
-        context = super().get_context_data(**kwargs)
-        now = timezone.now()
-        querydict = self.request.GET.copy()
 
-        if 'page' in querydict:
-            querydict.pop('page')
-
-        qs = self.get_queryset()
-
-        sizes = set()
-        colors = set()
-        product_variant_map = {}
-
-        # پرینت برای شروع پردازش محصولات
-        print("شروع پردازش محصولات...")
-
-        for product in qs:
-            print(f"در حال پردازش محصول: {product.title}")  # پرینت نام هر محصول
-            color_to_sizes = defaultdict(set)
-            size_to_colors = defaultdict(set)
-            variants_list = []
-
-            for variant in product.variants.all():
-                print(f"  در حال پردازش واریانت: {variant.pk}")
-                color = None
-                sizes_in_variant = []
-
-                for attr in variant.attributes.all():
-                    if attr.type.name == 'رنگ' and not color:
-                        color = attr.color
-                        colors.add(color)
-                        print(f"    رنگ: {color}")
-                    elif attr.type.name == 'سایز':
-                        size = attr.value
-                        sizes.add(size)
-                        sizes_in_variant.append(size)
-                        print(f"    سایز: {size}")
-
-                # نگاشت‌ها براساس وجود رنگ یا سایز ساخته می‌شن
-                if color:
-                    if sizes_in_variant:
-                        for size in sizes_in_variant:
-                            color_to_sizes[str(color)].add(size)
-                            size_to_colors[size].add(str(color))
-                    else:
-                        # اگر فقط رنگ وجود داشت
-                        color_to_sizes[str(color)].add(None)
-
-                if sizes_in_variant and not color:
-                    for size in sizes_in_variant:
-                        size_to_colors[size].add(None)
-
-                variants_list.append({
-                    'variant_id': variant.pk,
-                    'color': str(color) if color else None,
-                    'sizes': sizes_in_variant,
-                    'price': variant.price_override or variant.product.price,
-                    'stock': variant.stock,
-                    'discount': variant.discount.amount if variant.discount else None,
-                })
-
-            color_to_sizes = {k: list(v) for k, v in color_to_sizes.items()}
-            size_to_colors = {k: list(v) for k, v in size_to_colors.items()}
-
-            # پرینت اطلاعات مربوط به رنگ‌ها و سایزها
-            print(f"    رنگ‌ها به سایزها: {color_to_sizes}")
-            print(f"    سایزها به رنگ‌ها: {size_to_colors}")
-
-            product_variant_map[product.pk] = {
-                'color_to_sizes': color_to_sizes,
-                'size_to_colors': size_to_colors,
-                'variants': variants_list,
-            }
-
-        # پرینت اطلاعات نهایی
-        print(f"رنگ‌ها: {colors}")
-        print(f"سایزها: {sizes}")
-        print(f"مجموعه واریانت‌ها: {product_variant_map}")
-
-        context.update({
-            'now': now,
-            'query_string': querydict.urlencode(),
-            'sizes': sizes,
-            'colors': list(colors),
-            'product_variant_map': product_variant_map,  # ✅ کافی است فقط همین را داشته باشید
-        })
-
-        return context
-
-
-
-
-class ProductDetailView(ProductBaseView, DetailView):
+class ProductDetailView(DetailView):
     model = Product
     template_name = 'product/product-detail.html'
     context_object_name = 'product'
 
     def get_queryset(self):
-        return Product.objects.select_related('brand').prefetch_related(
+        queryset = Product.objects.select_related('brand').prefetch_related(
             'images',
             'categories',
             Prefetch('reviews', queryset=ProductReview.objects.select_related('user')),
-            'tags',  # اگر استفاده شده
-            Prefetch('descriptions', queryset=ProductDescription.objects.all())  # افزودن توضیحات
+            'tags',
+            Prefetch('descriptions', queryset=ProductDescription.objects.all())
         ).filter(is_active=True)
+        return queryset
 
     def get_client_ip(self, request):
         x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
@@ -185,11 +87,11 @@ class ProductDetailView(ProductBaseView, DetailView):
     def get(self, request, *args, **kwargs):
         response = super().get(request, *args, **kwargs)
 
-        # Ensure session exists
+        # اطمینان از وجود session
         if not request.session.session_key:
             request.session.save()
 
-        # Track product view for anonymous users
+        # ذخیره بازدید برای کاربران ناشناس
         if not request.user.is_authenticated:
             ProductView.objects.create(
                 product=self.object,
@@ -203,42 +105,104 @@ class ProductDetailView(ProductBaseView, DetailView):
         context = super().get_context_data(**kwargs)
         product = self.object
 
-        # محاسبه درصد تخفیف
-        discount = 0
-        if product.old_price and product.old_price > product.price:
-            discount = round((product.old_price - product.price) / product.old_price * 100)
 
-        # اطلاعات مربوط به بازخوردها
+        # نظرات و امتیاز
         reviews = product.reviews.all()
         avg_rating = reviews.aggregate(avg=Avg('rating'))['avg'] or 0
 
-        # محصولات مشابه
+        # محصولات مرتبط
         related_products = Product.objects.filter(
             categories__in=product.categories.all()
         ).exclude(pk=product.pk).distinct()[:4]
 
-        # اضافه کردن توضیحات به context
-        descriptions = product.descriptions.all()
+        # ویژگی‌ها و تنوع‌ها
+        variants = list(product.variants.prefetch_related('attributes'))
+        variant_map = {}
+        attribute_map = defaultdict(set)
+
+        # ترتیب ویژگی‌ها از دیتابیس
+        ordered_attribute_types = list(ProductAttributeType.objects.order_by('position').values_list('name', flat=True))
+
+        # جمع‌آوری ویژگی‌ها برای فیلترها
+        for variant in variants:
+            for attr in variant.attributes.all():
+                attribute_map[attr.type.name].add(attr)
+
+        # ساخت map یکتا بر اساس ترتیب درست ویژگی‌ها
+        for variant in variants:
+            attr_dict = {attr.type.name: attr.value for attr in variant.attributes.all()}
+            ordered_parts = [f"{attr_type}:{attr_dict[attr_type]}" for attr_type in ordered_attribute_types if
+                             attr_type in attr_dict]
+            key = ','.join(ordered_parts)
+
+            original_price = variant.price or 0
+            final_price = float(variant.final_price() or 0)
+
+            # محاسبه درصد تخفیف
+            discount_percent = 0
+            if variant.discount and original_price > 0:
+                if variant.discount.discount_type == 'percent':
+                    discount_percent = variant.discount.amount
+                else:
+                    # تخفیف مبلغ ثابت → محاسبه درصد تخفیف تقریبی
+                    discount_amount = original_price - final_price
+                    discount_percent = int((discount_amount * 100) / original_price)
+
+            variant_map[key] = {
+                'price': float(variant.final_price() or 0),  # قیمت نهایی (بعد تخفیف)
+                'original_price': float(variant.price or 0),  # قیمت اولیه (قبل تخفیف)
+                'stock': variant.stock,
+                'variant_id': variant.id,
+                'discount_percent': 0,
+            }
+            # محاسبه درصد تخفیف:
+            if variant.price and variant.final_price() and variant.price > variant.final_price():
+                discount_percent = round(100 * (variant.price - variant.final_price()) / variant.price)
+                variant_map[key]['discount_percent'] = discount_percent
+            # اضافه به context
 
         context.update({
-            'discount_percentage': discount,
             'avg_rating': avg_rating,
             'review_count': reviews.count(),
             'related_products': related_products,
-            'product_info': {
-                'type': getattr(product, 'type', '---'),
-                'sku': product.sku,
-                'created_at': product.created_at,
-                'stock': product.stock,
-                'tags': ', '.join(tag.name for tag in product.tags.all()) if hasattr(product, 'tags') else '',
-                'categories': [c.title for c in product.categories.all()]
-            },
-            'descriptions': descriptions  # توضیحات رو به context اضافه می‌کنیم
+            'product_variant_map': variant_map,
+            'product_attribute_map': {
+                k: list(v) for k, v in attribute_map.items()
+            }
         })
+
+        print("\n✅ Final variant_map:", variant_map)
+        print("\n✅ Final attribute_map:", attribute_map)
+
         return context
 
 
-
+# @method_decorator(csrf_exempt, name='dispatch')
+# class GetVariantInfoView(View):
+#     def post(self, request, *args, **kwargs):
+#         product_id = request.POST.get('product_id')
+#         attributes = request.POST.getlist('attributes[]')  # مثال: ['قرمز', 'XL', 'کتان']
+#
+#         try:
+#             product = Product.objects.get(pk=product_id)
+#         except Product.DoesNotExist:
+#             return JsonResponse({'error': 'محصول یافت نشد'}, status=404)
+#
+#         # پیدا کردن variant دارای همه ویژگی‌ها
+#         variants = product.variants.all()
+#         for attr_value in attributes:
+#             variants = variants.filter(attributes__value=attr_value)
+#
+#         variant = variants.distinct().first()
+#         if variant:
+#             return JsonResponse({
+#                 'variant_id': variant.id,
+#                 'price': variant.final_price(),
+#                 'stock': variant.stock,
+#                 'discount': variant.discount.amount if variant.discount else 0
+#             })
+#         else:
+#             return JsonResponse({'error': 'ترکیب مورد نظر یافت نشد'}, status=404)
 
 
 @require_POST
