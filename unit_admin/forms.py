@@ -546,10 +546,10 @@ class ProductVariantForm(forms.ModelForm):
     )
     class Meta:
         model = ProductVariant
-        fields = ['attributes','stock','price_override','discount']
+        fields = ['attributes','stock','price','discount']
         widgets = {
             'stock': forms.NumberInput(attrs={'class':'form-control'}),
-            'price_override': forms.NumberInput(attrs={'class':'form-control'}),
+            'price': forms.NumberInput(attrs={'class':'form-control'}),
             'discount': forms.Select(attrs={'class':'form-select'}),
         }
 
