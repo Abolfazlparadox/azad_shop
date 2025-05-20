@@ -277,18 +277,6 @@
                                                     </div>
                                                     {% endif %}
                                                 </div>
-                                            <!-- is_staff -->
-                                                <div class="form-check form-switch mb-3">
-                                                    {{ form.is_staff }}
-                                                    <label class="form-check-label">دسترسی کارکنان</label>
-                                                    {% if form.is_staff.errors %}
-                                                    <div class="alert alert-danger mt-2">
-                                                        {% for error in form.is_staff.errors %}
-                                                            {{ error|escape }}
-                                                        {% endfor %}
-                                                    </div>
-                                                    {% endif %}
-                                                </div>
                                             <!-- is_active -->
                                                 <div class="form-check form-switch mb-3">
                                                     {{ form.is_active }}

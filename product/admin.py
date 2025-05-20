@@ -182,17 +182,13 @@ class ProductAdmin(UniversityAccessAdmin):
     actions = ['restock_products', 'toggle_active']
 
     fieldsets = (
-        (None, {'fields': ('title', 'slug', 'brand', 'categories', 'tags')}),
+        (None, {'fields': ('title', 'slug', 'brand', 'categories', 'tags' ,'university')}),
         (_('موجودی'), {'fields': ('weight', 'dimensions')}),
         (_('توضیحات'), {'fields': ('main_image', 'short_description',)}),
         (_('وضعیت'), {'fields': ('is_active', 'is_deleted')}),
     )
 
-    def get_readonly_fields(self, request, obj=None):
-        ro_fields = list(super().get_readonly_fields(request, obj))
-        if obj:
-            ro_fields.append('university')
-        return ro_fields
+
 
     def save_model(self, request, obj, form, change):
         if not change:

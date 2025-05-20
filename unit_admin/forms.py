@@ -133,8 +133,7 @@ class CustomUserCreationForm(UserCreationForm):
             'username',   'password1',      'email',     'password2',
             'first_name', 'last_name',      'mobile',    'national_code',
             'birthday',   'avatar',         'province',  'city',
-            'address',    'postal_code',    'is_verified',
-            'is_staff',   'is_active',      'marketing_consent',
+            'address',    'postal_code',    'is_verified',   'is_active',      'marketing_consent',
             'is_deleted',
             'terms_accepted','email_verified'
         )
@@ -196,7 +195,6 @@ class CustomUserCreationForm(UserCreationForm):
             }),
             # switches
             'is_verified':    forms.CheckboxInput(attrs={'class': 'form-check-input','role': 'switch'}),
-            'is_staff':       forms.CheckboxInput(attrs={'class': 'form-check-input','role': 'switch'}),
             'is_active':      forms.CheckboxInput(attrs={'class': 'form-check-input','role': 'switch'}),
             'marketing_consent': forms.CheckboxInput(attrs={'class': 'form-check-input','role': 'switch'}),
             'terms_accepted': forms.CheckboxInput(attrs={'class': 'form-check-input','role': 'switch'}),

@@ -5,8 +5,8 @@ python.exe -m pip install --upgrade pip
 pip install django
 django-admin startproject main
 pip install mysqlclient
-python manage.py makemigrations contact
-python manage.py migrate contact
+python manage.py makemigrations notification
+python manage.py migrate notification
 python manage.py migrate account
 python manage.py makemigrations
 pip install django-iranian-cities
@@ -16,7 +16,7 @@ pip install sorl-thumbnail
 pip install django_render_partial
 python -m pip install Pillow   
 python manage.py generate_city
-python manage.py startapp home
+python manage.py startapp notification
 python manage.py createsuperuser
 python manage.py runserver
 pip install django-ckeditor

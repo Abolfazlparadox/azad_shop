@@ -29,10 +29,11 @@ urlpatterns = [
     path('blog/', include('blog.urls')),
     path('products/', include('product.urls')),
     path('accounts/', include('account.urls')),
+    path('university/', include('university.urls')),
+    path('comments/', include(('comment.urls', 'comment'), namespace='comment')),
     path('about/', include('about.urls', namespace='about')),
     path('contact/', include('contact.urls', namespace='contact')),
     path('cart/', include('cart.urls')),
-    path('', include('comment.urls')),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

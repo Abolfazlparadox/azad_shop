@@ -16,7 +16,7 @@
                     <div class="home-detail p-center-left w-75">
                         <div>
                             <h6>پیشنهاد ویژه <span>30% تخفیف</span></h6>
-                            <h1 class="text-uppercase">با خیال راحت خرید کنید <span class="daily">نیازهای روزانه</span></h1>
+                            <h1 class="theme-color">با خیال راحت خرید کنید <span class="daily">نیازهای روزانه</span></h1>
                             <p class="w-75 d-none d-sm-block">سبزیجات حاوی بسیاری از ویتامین ها و مواد معدنی هستند که برای سلامتی مفیدند.</p>
                             <button onclick="location.href = 'shop-left-sidebar.html';"
                                 class="btn btn-animation mt-xxl-4 mt-2 home-button mend-auto">خرید آنلاین <i
@@ -144,86 +144,36 @@
                     <div class="category-menu">
                         <h3>دسته بندی ما</h3>
                         <ul>
-                            <li>
-                                <div class="category-list">
-                                    <img src="{% static 'svg/1/vegetable.svg' %}" class="blur-up lazyload" alt="">
-                                    <h5>
-                                        <a href="shop-left-sidebar.html">میوه و سبزیجات</a>
-                                    </h5>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="category-list">
-                                    <img src="{% static 'svg/1/cup.svg' %}" class="blur-up lazyload" alt="">
-                                    <h5>
-                                        <a href="shop-left-sidebar.html">نوشیدنی ها</a>
-                                    </h5>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="category-list">
-                                    <img src="{% static 'svg/1/meats.svg' %}" class="blur-up lazyload" alt="">
-                                    <h5>
-                                        <a href="shop-left-sidebar.html">گوشت و غذای دریایی</a>
-                                    </h5>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="category-list">
-                                    <img src="{% static 'svg/1/breakfast.svg' %}" class="blur-up lazyload" alt="">
-                                    <h5>
-                                        <a href="shop-left-sidebar.html">صبحانه و لبنیات</a>
-                                    </h5>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="category-list">
-                                    <img src="{% static 'svg/1/frozen.svg' %}" class="blur-up lazyload" alt="">
-                                    <h5>
-                                        <a href="shop-left-sidebar.html">غذای یخ زده</a>
-                                    </h5>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="category-list">
-                                    <img src="{% static 'svg/1/biscuit.svg' %}" class="blur-up lazyload" alt="">
-                                    <h5>
-                                        <a href="shop-left-sidebar.html">بیسکویت و تنقلات</a>
-                                    </h5>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="category-list">
-                                    <img src="{% static 'svg/1/grocery.svg' %}" class="blur-up lazyload" alt="">
-                                    <h5>
-                                        <a href="shop-left-sidebar.html">مواد غذایی آماده</a>
-                                    </h5>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="category-list">
-                                    <img src="{% static 'svg/1/drink.svg' %}" class="blur-up lazyload" alt="">
-                                    <h5>
-                                        <a href="shop-left-sidebar.html">نوشیدنی های بدون الکل</a>
-                                    </h5>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="category-list">
-                                    <img src="{% static 'svg/1/milk.svg' %}" class="blur-up lazyload" alt="">
-                                    <h5>
-                                        <a href="shop-left-sidebar.html">شیر و لبنیات</a>
-                                    </h5>
-                                </div>
-                            </li>
-                            <li class="pb-30">
-                                <div class="category-list">
-                                    <img src="{% static 'svg/1/pet.svg' %}" class="blur-up lazyload" alt="">
-                                    <h5>
-                                        <a href="shop-left-sidebar.html">غذای حیوانات</a>
-                                    </h5>
-                                </div>
-                            </li>
+                            {% for category in list_category %}
+                                {% if category.parent == None %}
+                                    <li>
+                                        <div class="category-list">
+                                            {% if category.icon %}
+                                                <img src="{{ category.icon.url }}" class="blur-up lazyload" alt="">
+                                            {% else %}
+                                                <img src="#" class="blur-up lazyload" alt="">
+                                            {% endif %}
+                                            <h5>
+                                                <a href="#">{{ category.title }}</a>
+                                            </h5>
+                                        </div>
+                                    </li>
+                                {% endif %}
+                                {% if forloop.last %}
+                                    <li class="pb-30">
+                                        <div class="category-list">
+                                            {% if category.icon %}
+                                                <img src="{{ category.icon.url }}" class="blur-up lazyload" alt="">
+                                            {% else %}
+                                                <img src="#" class="blur-up lazyload" alt="">
+                                            {% endif %}
+                                            <h5>
+                                                <a href="#">{{ category.title }}</a>
+                                            </h5>
+                                        </div>
+                                    </li>
+                                {% endif %} 
+                            {% endfor %}
                         </ul>
 
                         <ul class="value-list">
@@ -1518,68 +1468,23 @@
                     <p>برترین دسته ها در این هفته</p>
                 </div>
                 <div class="category-slider-2 product-wrapper no-arrow">
-                    <div>
-                        <a href="shop-left-sidebar.html" class="category-box category-dark">
-                            <div>
-                                <img src="{% static 'svg/1/vegetable.svg' %}" class="blur-up lazyload" alt="">
-                                <h5>میوه و سبزیجات</h5>
+                    {% for category in list_category %}
+                    	{% if category.parent == None %}
+                    		<div>
+                                <a href="#" class="category-box category-dark">
+                                    <div>
+                                        {% if category.icon %}
+                                            <img src="{{ category.icon.url }}" class="blur-up lazyload" alt="">
+                                        {% else %}
+                                            <img src="#" class="blur-up lazyload" alt="">
+                                        {% endif %}
+                                        <h5>{{ category.title }}</h5>
+                                    </div>
+                                </a>
                             </div>
-                        </a>
-                    </div>
+                    	{% endif %} 
+                    {% endfor %}
 
-                    <div>
-                        <a href="shop-left-sidebar.html" class="category-box category-dark">
-                            <div>
-                                <img src="{% static 'svg/1/cup.svg' %}" class="blur-up lazyload" alt="">
-                                <h5>نوشیدنی ها</h5>
-                            </div>
-                        </a>
-                    </div>
-
-                    <div>
-                        <a href="shop-left-sidebar.html" class="category-box category-dark">
-                            <div>
-                                <img src="{% static 'svg/1/meats.svg' %}" class="blur-up lazyload" alt="">
-                                <h5>گوشت و غذای دریایی</h5>
-                            </div>
-                        </a>
-                    </div>
-
-                    <div>
-                        <a href="shop-left-sidebar.html" class="category-box category-dark">
-                            <div>
-                                <img src="{% static 'svg/1/breakfast.svg' %}" class="blur-up lazyload" alt="">
-                                <h5>گوشت تازه</h5>
-                            </div>
-                        </a>
-                    </div>
-
-                    <div>
-                        <a href="shop-left-sidebar.html" class="category-box category-dark">
-                            <div>
-                                <img src="{% static 'svg/1/frozen.svg' %}" class="blur-up lazyload" alt="">
-                                <h5>غذای منجمد</h5>
-                            </div>
-                        </a>
-                    </div>
-
-                    <div>
-                        <a href="shop-left-sidebar.html" class="category-box category-dark">
-                            <div>
-                                <img src="{% static 'svg/1/milk.svg' %}" class="blur-up lazyload" alt="">
-                                <h5>شیر و لبنیات</h5>
-                            </div>
-                        </a>
-                    </div>
-
-                    <div>
-                        <a href="shop-left-sidebar.html" class="category-box category-dark">
-                            <div>
-                                <img src="{% static 'svg/1/pet.svg' %}" class="blur-up lazyload" alt="">
-                                <h5>غذای حیوانات</h5>
-                            </div>
-                        </a>
-                    </div>
                 </div>
                 <!-- Category Section End -->
                 <!-- BlogPost Section Start -->

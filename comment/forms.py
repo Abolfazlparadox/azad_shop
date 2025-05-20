@@ -1,21 +1,13 @@
-# comment/forms.py
-
 from django import forms
-from comment.models import Comment
+from .models import Comment
 
 class CommentForm(forms.ModelForm):
+    parent = forms.IntegerField(widget=forms.HiddenInput, required=False)
+
     class Meta:
         model = Comment
-        fields = ['content', 'rating']
+        fields = ['content', 'rating', 'parent']
         widgets = {
-            'content': forms.Textarea(attrs={
-                'class': 'form-control',
-                'rows': 4,
-                'placeholder': 'دیدگاه شما'
-            }),
-            'rating': forms.Select(attrs={'class': 'form-select'}),
-        }
-        labels = {
-            'content': 'دیدگاه شما',
-            'rating': 'امتیاز',
+            'content': forms.Textarea(attrs={'rows':4, 'class':'form-control'}),
+            'rating': forms.Select(attrs={'class':'form-select'}),
         }

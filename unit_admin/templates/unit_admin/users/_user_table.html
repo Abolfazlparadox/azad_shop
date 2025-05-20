@@ -1,3 +1,4 @@
+{% load static %}
 {% load thumbnail i18n %}
 <table class="table theme-table">
   <thead>
@@ -18,7 +19,7 @@
           {% if user.avatar %}
             <img src="{{ user.avatar.url }}" class="img-fluid rounded-circle" width="40" />
           {% else %}
-            <div class="avatar-placeholder">{{ user.first_name|first }}{{ user.last_name|first }}</div>
+            <img src="{% static 'admin/images/users/defulte.svg' %}" class="rounded-circle me-2" width="40" height="40"/>
           {% endif %}
         </td>
         <td>

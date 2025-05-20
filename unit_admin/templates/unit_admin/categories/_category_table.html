@@ -20,9 +20,7 @@
         <td>{{ cat.slug }}</td>
         <td>
           {% if cat.icon %}
-            {% thumbnail cat.icon "32x32" crop="center" as thumb %}
-              <img src="{{ thumb.url }}" width="{{ thumb.width }}" height="{{ thumb.height }}" />
-            {% endthumbnail %}
+              <img src="{{ cat.icon.url }}" width="32" height="32}" />
           {% else %}
             <i class="ri-folder-line"></i>
           {% endif %}

@@ -33,6 +33,8 @@
         <option value="$MODULE_DIR$/cart/templates" />
         <option value="$MODULE_DIR$/contact/templates" />
         <option value="$MODULE_DIR$/about/templates" />
+        <option value="$MODULE_DIR$/university/templates" />
+        <option value="$MODULE_DIR$/comment/templates" />
       </list>
     </option>
   </component>

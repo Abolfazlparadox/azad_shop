@@ -3,6 +3,8 @@ import secrets
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.http import JsonResponse, HttpResponseBadRequest
+
+from contact.models import ContactMessage
 from .decorators import email_verified_required
 from datetime import date
 from django.contrib.auth import login
@@ -395,11 +397,12 @@ class UserDashboardView(LoginRequiredMixin, UpdateView):
         context = super().get_context_data(**kwargs)
         user = self.object  # Use the view's object instead of request.user
         list_address = Address.objects.filter(user=user)
-
+        list_contact = ContactMessage.objects.filter(first_name=user.first_name, last_name=user.last_name,email=user.email)
         # Basic user information
         context.update({
             "full_name": user.get_full_name() or user.username,
             "email": user.email,
+            "list_contact" :list_contact,
             "location": self._get_user_location(user),
             "activity_years": self._calculate_activity_years(user),
             "national_code": user.national_code,

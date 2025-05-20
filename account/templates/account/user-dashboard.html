@@ -78,6 +78,11 @@
                       سفارشات</button>
                   </li>
                   <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="pills-ticket-tab" data-bs-toggle="pill"
+                            data-bs-target="#pills-ticket" type="button"><i data-feather="file-text"></i>
+                      تیکت ها</button>
+                  </li>
+                  <li class="nav-item" role="presentation">
                     <button class="nav-link" id="pills-wishlist-tab" data-bs-toggle="pill"
                             data-bs-target="#pills-wishlist" type="button"><i data-feather="heart"></i>
                       علاقه‌مندی</button>
@@ -852,6 +857,115 @@
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="pills-ticket" role="tabpanel">
+                            <div class="dashboard-order">
+                                <div class="title">
+                                    <h2>تاریخچه تیکت های من</h2>
+                                    <span class="title-leaf title-leaf-gray">
+                                        <svg class="icon-width bg-gray">
+                                            <use xlink:href="svg/leaf.svg#leaf"></use>
+                                        </svg>
+                                    </span>
+                                </div>
+
+                                <div class="order-contain">
+                                    {% if list_contact %}
+                                    	{% for ticket in list_contact %}
+                                        <div class="order-box dashboard-bg-box">
+                                        <div class="order-container">
+                                            <div class="order-icon">
+                                                <i data-feather="box"></i>
+                                            </div>
+
+                                            <div class="order-detail">
+                                                <h2>وضعیت {% if ticket.answer %}
+                                                	<span class="success-bg">{{ ticket.status }}</span>
+                                                {% else %}
+                                                    <span>{{ ticket.status }}</span>
+                                                {% endif %} </h2>
+                                                <h3 class="text-content">
+                                                {% if ticket.subject %}
+                                                    {{ ticket.subject }}
+                                                 {% else %}
+                                                    {{ ticket.other_subject }}
+                                                {% endif %}
+                                                </h3>
+                                                <h4>{{ ticket.message }}</h4>
+                                            </div>
+                                        </div>
+                                        {% if ticket.answer %}
+                                        	<div class="product-order-detail">
+                                            <a href="product-left.html" class="order-image">
+                                                <img src="{% static 'images/vegetable/product/4.png' %}"
+                                                    class="blur-up lazyload" alt="">
+                                            </a>
+
+                                            <div class="order-wrap">
+                                                <a href="product-left.html">
+                                                    <h3>بسته ترکیبی اسنک آرمور از جوار استیک و چیپس جوار</h3>
+                                                </a>
+                                                <p class="text-content">پسرک کفشا رو پوشید و خوشحال رو به پیر مرد کرد و گفت: شما خدایید؟! پیر مرد لبش را گزید و گفت نه! پسرک گفت پس دوست خدایی، چون من دیشب فقط به خدا گفتم كه کفش ندارم…</p>
+                                                <ul class="product-size">
+                                                    <li>
+                                                        <div class="size-box">
+                                                            <h6 class="text-content">قیمت: </h6>
+                                                            <h5>2.680 تومان</h5>
+                                                        </div>
+                                                    </li>
+
+                                                    <li>
+                                                        <div class="size-box">
+                                                            <h6 class="text-content">امتیاز : </h6>
+                                                            <div class="product-rating ms-2">
+                                                                <ul class="rating">
+                                                                    <li>
+                                                                        <i data-feather="star" class="fill"></i>
+                                                                    </li>
+                                                                    <li>
+                                                                        <i data-feather="star" class="fill"></i>
+                                                                    </li>
+                                                                    <li>
+                                                                        <i data-feather="star" class="fill"></i>
+                                                                    </li>
+                                                                    <li>
+                                                                        <i data-feather="star" class="fill"></i>
+                                                                    </li>
+                                                                    <li>
+                                                                        <i data-feather="star"></i>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+
+                                                    <li>
+                                                        <div class="size-box">
+                                                            <h6 class="text-content">سازنده : </h6>
+                                                            <h5>اپل</h5>
+                                                        </div>
+                                                    </li>
+
+                                                    <li>
+                                                        <div class="size-box">
+                                                            <h6 class="text-content">مقدار : </h6>
+                                                            <h5>250 گرم</h5>
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                         {% else %}
+                                            <h3>بدون پاسخ</h3>
+                                        {% endif %}
+                                    </div>
+                                    {% endfor %}
+                                    {% else %}
+                                        تیکت ندارید
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>

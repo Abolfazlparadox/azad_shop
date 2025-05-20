@@ -1,0 +1,57 @@
+{% load static %}
+{% load thumbnail %}
+<div class="col-12">
+  <div class="blog-box blog-list wow fadeInUp">
+    <div class="blog-image">
+      {% if university.logo %}
+        {% thumbnail university.logo "500x300" crop="center" as thumb %}
+          <a href="{% url 'university:detail' university.slug %}">
+            <img src="{{ thumb.url }}"
+                 width="{{ thumb.width }}"
+                 height="{{ thumb.height }}"
+                 class="blur-up lazyload rounded"
+                 alt="{{ university.name }}" />
+          </a>
+        {% endthumbnail %}
+      {% else %}
+        <a href="{% url 'university:detail' university.slug %}">
+          <img src="{% static 'images/azad1.png' %}"
+               width="800" height="400"
+               class="blur-up lazyload rounded"
+               alt="{{ university.name }}" />
+        </a>
+      {% endif %}
+    </div>
+
+    <div class="blog-contain blog-contain-2">
+      <div class="blog-label">
+        <span class="super">
+          <i data-feather="map-pin"></i>
+          <span>{{ university.city.name }}, {{ university.province.name }}</span>
+        </span>
+      </div>
+
+      <a href="{% url 'university:detail' university.slug %}">
+        <h3>{{ university.name }}</h3>
+      </a>
+
+      <p>
+        <strong>تأسیس:</strong>
+        {{ university.established_date|date:"j F Y" }}
+      </p>
+
+      {% if manager_name %}
+        <p>
+          <strong>مدیر واحد:</strong>
+          <a href="{% url 'account:profile' manager_user_id %}">
+            {{ manager_name }}
+          </a>
+        </p>
+      {% endif %}
+
+      <button onclick="location.href='{% url 'university:detail' university.slug %}'" class="blog-button">
+        مشاهده جزئیات <i class="fa-solid fa-right-long"></i>
+      </button>
+    </div>
+  </div>
+</div>

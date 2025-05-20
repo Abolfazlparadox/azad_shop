@@ -15,20 +15,21 @@
         <td >
           <ul class="list-inline mb-0">
             <li class="list-inline-item">
-                  <a href="{% url 'unit_admin:attribute_type_edit' t.pk %}" class="btn btn-sm btn-outline-primary me-1">
+                  <a href="{% url 'unit_admin:attribute_type_edit' t.pk %}" class="btn btn-sm btn-outline-primary">ویرایش
                     <i data-feather="edit"></i>
                   </a>
             </li>
             <li class="list-inline-item">
                   <button
                     class="btn btn-sm btn-outline-secondary"
+                    title="این حذف به این گونه است که ویژگی به طور کامل از دیتابیس حذف میشود و دیگر قابل بازیابی نیست"
                     data-bs-toggle="modal"
                     data-bs-target="#deleteConfirmModal"
                     data-delete-type="hard"
                     data-delete-url="{% url 'unit_admin:attribute_type_delete' t.pk %}"
                     data-item-name="{{ t.name }}"
                   >
-                    <i data-feather="trash-2"></i>
+                    <i class="ri-delete-bin-fill">حذف دایُم</i>
                   </button>
             </li>
         </td>

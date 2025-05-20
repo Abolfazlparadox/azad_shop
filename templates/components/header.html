@@ -194,6 +194,41 @@
                                         </div>
                                     </div>
                                 </li>
+                                {#alarm#}
+                                <li class="right-side">
+                                    <div class="onhover-dropdown header-badge">
+                                        <button type="button" class="btn p-0 position-relative header-wishlist">
+                                            <a href="" class="btn btn-sm cart-button"><i data-feather="bell"></i></a>
+
+                                            <span class="position-absolute top-0 start-100 translate-middle badge">2
+                                                <span class="visually-hidden">پیام جدید</span>
+                                            </span>
+                                        </button>
+
+                                        <div class="onhover-div">
+                                            <ul class="cart-list">
+                                                <li class="product-box-contain">
+                                                    <div class="drop-cart">
+                                                        <a href="product-left-thumbnail.html" class="drop-image">
+                                                            <img src="{% static 'images/vegetable/product/1.png' %}"
+                                                                class="blur-up lazyload" alt="">
+                                                        </a>
+
+                                                        <div class="drop-contain">
+                                                            <a href="product-left-thumbnail.html">
+                                                                <h5>شکلات قهوه ای فرانسوی با ظرف شیشه ای</h5>
+                                                            </a>
+                                                            <h6><span>1 x</span> 80.000 تومان</h6>
+                                                            <button class="close-button close_button">
+                                                                <i class="fa-solid fa-xmark"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </li>
                                 <li class="right-side onhover-dropdown">
                                     <div class="delivery-login-box">
                                         <div class="delivery-icon">
@@ -954,22 +989,7 @@
                                                 data-bs-toggle="dropdown">دانشگاه</a>
                                             <ul class="dropdown-menu">
                                                 <li>
-                                                    <a class="dropdown-item" href="seller-become.html">فروشنده شوید</a>
-                                                </li>
-                                                <li>
-                                                    <a class="dropdown-item" href="seller-dashboard.html">داشبورد فروشندگان</a>
-                                                </li>
-                                                <li>
-                                                    <a class="dropdown-item" href="seller-detail.html">اطلاعات فروشندگان 1</a>
-                                                </li>
-                                                <li>
-                                                    <a class="dropdown-item" href="seller-detail-2.html">اطلاعات فروشندگان 2</a>
-                                                </li>
-                                                <li>
-                                                    <a class="dropdown-item" href="seller-grid.html">فروشنده (شبکه ای 1)</a>
-                                                </li>
-                                                <li>
-                                                    <a class="dropdown-item" href="seller-grid-2.html">فروشنده (شبکه ای 2)</a>
+                                                    <a class="dropdown-item" href="{% url 'university:list' %}">لیست دانشگاه ها</a>
                                                 </li>
                                             </ul>
                                         </li>

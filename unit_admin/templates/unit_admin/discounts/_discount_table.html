@@ -26,18 +26,19 @@
       <td>
         <ul class="list-inline mb-0">
           <li class="list-inline-item">
-            <a href="{% url 'unit_admin:discount_edit' d.pk %}" class="btn btn-sm btn-outline-primary">
+            <a href="{% url 'unit_admin:discount_edit' d.pk %}" class="btn btn-sm btn-outline-primary">ویرایش
               <i data-feather="edit"></i>
             </a>
           </li>
           <li class="list-inline-item">
             <button
-              class="btn btn-sm btn-outline-secondary"
+              class="btn btn-sm btn-outline-secondary-2x"
+               title="این حذف به این گونه است که تخفیف به طور کامل از دیتابیس حذف میشود و دیگر قابل بازیابی نیست"
               data-bs-toggle="modal" data-bs-target="#deleteConfirmModal"
               data-delete-type="hard"
               data-delete-url="{% url 'unit_admin:discount_delete' d.pk %}"
               data-item-name="{{ d.code }}"
-            ><i data-feather="trash-2"></i></button>
+            ><i class="ri-delete-bin-fill">حذف دایُم</i></button>
           </li>
         </ul>
       </td>

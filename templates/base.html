@@ -38,6 +38,7 @@
     {% include 'components/tap_to_top_and_theme_setting_button.html' %}
     {% include 'components/bg_overlay.html' %}
     {% include 'components/foot.html' %}
+    {% block script %}{% endblock %}
     <script>
       document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.reply-button').forEach(btn => {
