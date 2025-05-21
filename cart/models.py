@@ -94,15 +94,34 @@ class CartDetail(models.Model):
 # models.py
 
 class Order(models.Model):
+    STATUS_PENDING = 'pending'          # در حال انتظار تایید
+    STATUS_CONFIRMED = 'confirmed'      # تایید شده
+    STATUS_SHIPPING = 'shipping'        # در حال ارسال به پست
+    STATUS_DELIVERING = 'delivering'    # در حال ارسال پست به مقصد
+
+    STATUS_CHOICES = [
+        (STATUS_PENDING, 'در حال انتظار تایید'),
+        (STATUS_CONFIRMED, 'تایید شده'),
+        (STATUS_SHIPPING, 'در حال ارسال به پست'),
+        (STATUS_DELIVERING, 'در حال ارسال پست به مقصد'),
+    ]
+
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="کاربر")
     created_at = models.DateTimeField(auto_now_add=True , null=True, blank=True, verbose_name='تاریخ ثبت سفارش ')
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default=STATUS_PENDING,
+        verbose_name='وضعیت سفارش'
+    )
     total_price = models.PositiveIntegerField(verbose_name="مبلغ کل")
     shipping_cost = models.PositiveIntegerField(default=70000)
     final_price = models.PositiveIntegerField(verbose_name="مبلغ نهایی پرداختی")
     address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
-        return f"سفارش {self.id} - {self.user}"
+        return f"سفارش #{self.id} - کاربر: {self.user.username} - وضعیت: {self.get_status_display()}"
+
 
     class Meta:
         verbose_name = ' سفارش '

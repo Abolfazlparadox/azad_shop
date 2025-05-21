@@ -381,3 +381,24 @@ def export_pdf(request, order_id):
     HTML(string=html_string, base_url=request.build_absolute_uri('/')).write_pdf(response, stylesheets=stylesheets)
 
     return response
+
+
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from weasyprint import HTML
+import tempfile
+from .models import Order
+from io import BytesIO
+
+def order_invoice_pdf(request, order_id):
+    order = Order.objects.get(pk=order_id)
+    html_string = render_to_string('order_invoice.html', {'order': order})
+
+    # استفاده از BytesIO برای تولید PDF در حافظه
+    pdf_file = BytesIO()
+    HTML(string=html_string).write_pdf(pdf_file)
+    pdf_file.seek(0)
+
+    response = HttpResponse(pdf_file.read(), content_type='application/pdf')
+    response['Content-Disposition'] = f'filename=invoice_order_{order_id}.pdf'
+    return response

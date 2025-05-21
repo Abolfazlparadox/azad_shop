@@ -13,6 +13,8 @@ from .views import (
     CheckoutView,
     UserCartView,
 )
+from .views import order_invoice_pdf
+
 
 urlpatterns = [
     path('', UserCartView.as_view(), name='user_cart_page'),
@@ -23,5 +25,6 @@ urlpatterns = [
     path('payment-result/', views.PaymentResultView.as_view(), name='payment_result_page'),
 
     path('export_pdf/<int:order_id>/', views.export_pdf, name='export_pdf'),
+    path('orders/<int:order_id>/invoice/', order_invoice_pdf, name='order_invoice_pdf'),
 
 ]
