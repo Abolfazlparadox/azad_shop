@@ -60,3 +60,6 @@ python manage.py makemigrations cart
 python manage.py migrate cart
 python manage.py makemigrations product
 python manage.py migrate product
+
+ pip install weasyprint
+ pip install xhtml2pdf

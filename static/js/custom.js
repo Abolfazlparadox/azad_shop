@@ -408,51 +408,51 @@ $(document).ready(function () {
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.querySelector('#checkout-form');
     if (!form) {
-        console.log('فرم با id "checkout-form" پیدا نشد.');
         return;
     }
-
-    console.log('فرم پیدا شد، آماده ارسال AJAX.');
-
     form.addEventListener('submit', function(e) {
         e.preventDefault();
-        console.log('ارسال فرم متوقف شد، شروع ارسال AJAX');
-
         const formData = new FormData(form);
 
         fetch(form.action, {
             method: 'POST',
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': getCookie('csrftoken'), // حتما ارسال CSRF
             },
             body: formData
         })
-        .then(response => {
-            console.log('پاسخ سرور دریافت شد:', response);
-            return response.json();
-        })
+        .then(response => response.json())
         .then(data => {
-            console.log('دیتای JSON دریافت شده:', data);
-            if (data.success) {
-                console.log('پرداخت موفق:', data.message);
-                alert(data.message || 'سفارش با موفقیت ثبت شد.');
-                if (data.redirect_url) {
-                    console.log('هدایت به:', data.redirect_url);
-                    window.location.href = data.redirect_url;
+            Swal.fire({
+                title: data.success ? 'موفقیت' : 'خطا',
+                text: data.message || (data.success ? 'سفارش با موفقیت ثبت شد.' : 'خطایی رخ داده است.'),
+                icon: data.success ? 'success' : 'error',
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'باشه'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    if (data.status === 'not_auth') {
+                        window.location.href = '/login';
+                    } else if (data.redirect_url) {
+                        window.location.href = data.redirect_url;
+                    }
                 }
-            } else {
-                console.warn('خطا در پردازش:', data.error);
-                alert(data.error || 'خطایی رخ داده است.');
-            }
+            });
         })
         .catch(error => {
             console.error('خطای ارسال درخواست:', error);
-            alert('خطایی در ارسال درخواست رخ داده است.');
+            Swal.fire({
+                title: 'خطا',
+                text: 'خطایی در ارسال درخواست رخ داده است.',
+                icon: 'error',
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'باشه'
+            });
         });
     });
 });
 
-// تابع برای گرفتن CSRF از کوکی (می‌تونی از داکیومنت Django هم استفاده کنی)
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {

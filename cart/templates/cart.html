@@ -40,7 +40,7 @@
             <div class="row g-sm-5 g-3">
                 <div class="col-xxl-9">
                     <div class="cart-table">
-                        <div class="table-responsive-xl">
+                        <div class="table-responsive">
                         <table class="table table-bordered text-center align-middle">
                             <thead>
                                 <tr>
@@ -58,9 +58,11 @@
                                 <tr>
                                     <!-- تصویر -->
                                     <td>
-                                        {% thumbnail item.product.main_image "150x150" quality=90 as thumb %}
-                                            <img src="{{ thumb.url }}" alt="{{ item.product.title }}" width="80" height="80" class="img-thumbnail">
-                                        {% endthumbnail %}
+                                                <a href="{{ item.product.get_absolute_url }}" class="product-image">
+                                                        {% thumbnail item.product.main_image "150x150" quality=90 as thumb %}
+                                                            <img src="{{ thumb.url }}" alt="{{ item.product.title }}" width="80" height="80" class="img-thumbnail">
+                                                        {% endthumbnail %}
+                                                </a>
                                     </td>
 
                                     <!-- عنوان و ویژگی‌ها -->
@@ -124,7 +126,6 @@
                             {% endfor %}
                             </tbody>
                         </table>
-
                         </div>
                     </div>
                 </div>

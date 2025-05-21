@@ -232,7 +232,7 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
 SECURE_BROWSER_XSS_FILTER = True
-SESSION_COOKIE_AGE = 1800 + 1800  # 30 minutes
+SESSION_COOKIE_AGE = 1800 + 1800 + 1800  # 30 minutes
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_USE_TLS = True

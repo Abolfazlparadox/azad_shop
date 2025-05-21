@@ -1,0 +1,58 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <title>فاکتور سفارش</title>
+    <link rel="stylesheet" href="{% static 'css/rtl.css' %}">
+</head>
+
+<body>
+    <h3>فاکتور سفارش شما</h3>
+
+    <div>
+        <p><strong>شماره فاکتور:</strong> {{ order.id }}</p>
+        <p><strong>تاریخ:</strong> {{ order.created_at|date:"Y/m/d" }}</p>
+        <p><strong>نام مشتری:</strong> {{ order.user.get_full_name }}</p>
+        <p><strong>ایمیل:</strong> {{ order.user.email }}</p>
+    </div>
+
+    <hr>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ردیف</th>
+                <th>محصول</th>
+                <th>تعداد</th>
+                <th>قیمت واحد</th>
+                <th>جمع</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in order.orderdetail_set.all %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ item.product_variant.product.title }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.final_price|floatformat:0 }} تومان</td>
+                <td>{{ item.get_total_price|floatformat:0 }} تومان</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <hr>
+
+    <p><strong>مبلغ کل:</strong> {{ order.total_price|floatformat:0 }} تومان</p>
+    {% if order.discount %}
+        <p><strong>تخفیف:</strong> {{ order.discount.amount }}%</p>
+        <p><strong>مبلغ نهایی با تخفیف:</strong> {{ order.final_price|floatformat:0 }} تومان</p>
+    {% endif %}
+
+    <br><br>
+    <p style="text-align:center;">با تشکر از خرید شما 🌸</p>
+</body>
+
+</html>

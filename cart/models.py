@@ -76,6 +76,7 @@ class CartDetail(models.Model):
     @property
     def total_discount(self):
         return self.discount_amount * self.count
+
     def save(self, *args, **kwargs):
         # قبل از ذخیره حتما اعتبارسنجی انجام شود
         self.full_clean()

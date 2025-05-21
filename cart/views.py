@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.views import View
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -16,9 +16,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 
-
-
-
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+import datetime
 
 # ----------------------------- Add Product to Cart View -----------------------------
 class AddProductToCartView(View):
@@ -110,7 +110,7 @@ class CheckoutView(LoginRequiredMixin, View):
         total_price = sum(item.get_total_price() for item in cart_details)
         total_discount = sum(item.total_discount for item in cart_details)
         shipping_cost = 70000
-        final_price = total_price + shipping_cost - total_discount
+        final_price = total_price + shipping_cost
 
         addresses = Address.objects.filter(user=request.user)
 
@@ -152,7 +152,7 @@ class CheckoutView(LoginRequiredMixin, View):
         shipping_cost = 70000
         total_price = sum(item.get_total_price() for item in cart_details)
         total_discount = sum(item.total_discount for item in cart_details)
-        final_price = total_price + shipping_cost - total_discount
+        final_price = total_price + shipping_cost
 
         with transaction.atomic():
             for item in cart_details:
@@ -187,24 +187,57 @@ class CheckoutView(LoginRequiredMixin, View):
             cart.payment_date = timezone.now()
             cart.save()
             cart_details.delete()
-
         if is_ajax:
             return JsonResponse({
-                "success": True,
-                "message": "پرداخت شما با موفقیت ثبت شد، سفارش شما در حال پردازش است.",
-                "redirect_url": "/orders/"  # آدرس صفحه سفارش‌ها یا صفحه موفقیت
+                'success': True,
+                'redirect_url': '/cart/payment-result/'  # یا هر آدرس دلخواه
             })
-
-        return render(request, 'cart_module/payment_result.html', {
-            'success': 'پرداخت شما با موفقیت ثبت شد، سفارش شما در حال پردازش است.'
-        })
+        else:
+            return redirect('payment_result_page')  # اگر فرم معمولی بود
 
 
 
 
-        #----------- User Cart Page View -----------------------------
 
 
+
+class PaymentResultView(LoginRequiredMixin, TemplateView):
+    template_name = 'cart_module/payment_result.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        order_id = self.request.GET.get('order_id')
+        if not order_id:
+            order = self.request.user.order_set.order_by('-created_at').first()
+        else:
+            order = get_object_or_404(Order, id=order_id, user=self.request.user)
+
+        order_items = order.items.select_related('variant').all()
+
+        # محاسبه مجموع تخفیف
+        total_discount = 0
+        for item in order_items:
+            original_price = item.variant.price if item.variant and item.variant.price else 0
+            discount_per_unit = max(0, original_price - item.unit_price)
+            total_discount += discount_per_unit * item.count
+
+        context['order'] = order
+        context['order_items'] = order_items
+        context['total_discount'] = total_discount
+        return context
+
+
+
+
+
+
+
+
+
+
+
+#----------- User Cart Page View -----------------------------
 
 
 class UserCartView(LoginRequiredMixin, TemplateView):
@@ -280,3 +313,71 @@ def change_cart_detail(request):
                 'status': 'error',
                 'message': 'موردی یافت نشد'
             })
+
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from weasyprint import HTML, CSS
+import os
+from django.conf import settings
+from .models import Order
+import datetime
+
+import os
+import datetime
+from django.conf import settings
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from weasyprint import HTML, CSS
+from .models import Order  # اگر مدل سفارش در app فعلی باشه
+
+def export_pdf(request, order_id):
+    order = Order.objects.get(id=order_id)
+
+    # HTML template rendering
+    html_string = render_to_string('order_pdf_user.html', {
+        'order': order
+    })
+
+    # مسیر فایل‌های فونت و CSS
+    font_path = os.path.join(settings.BASE_DIR, 'static', 'fonts', 'Vazir.ttf')
+    style_path = os.path.join(settings.BASE_DIR, 'static', 'css', 'rtl.css')
+
+    # ایجاد پاسخ PDF
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename=order_{datetime.datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf'
+
+    # استایل‌ها برای weasyprint
+    stylesheets = [
+        CSS(filename=style_path),
+        CSS(string=f"""
+            @font-face {{
+                font-family: 'Vazir';
+                src: url('file:///{font_path.replace(os.sep, "/")}');
+            }}
+            body {{
+                font-family: 'Vazir', sans-serif;
+                direction: rtl;
+                text-align: right;
+                padding: 30px;
+            }}
+            table {{
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 14px;
+            }}
+            th, td {{
+                border: 1px solid #ccc;
+                padding: 8px;
+                text-align: center;
+            }}
+            h3 {{
+                text-align: center;
+                margin-bottom: 20px;
+            }}
+        """)
+    ]
+
+    # تولید PDF
+    HTML(string=html_string, base_url=request.build_absolute_uri('/')).write_pdf(response, stylesheets=stylesheets)
+
+    return response

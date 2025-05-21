@@ -20,5 +20,8 @@ urlpatterns = [
     path('checkout/', views.CheckoutView.as_view(), name='checkout'),
     path('remove/<int:pk>/', views.remove_from_cart, name='remove_from_cart'),
     path('change-cart-detail/', views.change_cart_detail, name='change_cart_detail'),
+    path('payment-result/', views.PaymentResultView.as_view(), name='payment_result_page'),
+
+    path('export_pdf/<int:order_id>/', views.export_pdf, name='export_pdf'),
 
 ]
