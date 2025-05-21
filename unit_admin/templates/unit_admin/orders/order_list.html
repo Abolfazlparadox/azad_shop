@@ -1,0 +1,104 @@
+{% extends 'unit_admin/base.html' %}
+{% load i18n thumbnail poll_extras %}
+{% block title %}{% trans "لیست سفارش‌ها" %}{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+  <div class="row mb-3 align-items-center">
+    <div class="col-md-8">
+      <h5>{% trans "سفارش‌های دانشگاه" %} {{ offi_university.name }}</h5>
+    </div>
+    <div class="col-md-4 text-end">
+      <input id="order-search" type="text" class="form-control d-inline-block w-auto" placeholder="{% trans 'جستجو...' %}" />
+      <input id="date-from" type="date" class="form-control d-inline-block w-auto" />
+      <input id="date-to"   type="date" class="form-control d-inline-block w-auto" />
+        <a id="report-pdf" href="#"
+           onclick="event.preventDefault(); openReportPdf();">
+          <i data-feather="file-text"></i> گزارش PDF
+        </a>
+    </div>
+  </div>
+
+  <div class="card card-table">
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table theme-table">
+          <thead>
+            <tr>
+            <th>#</th>
+            <th>{% trans "تاریخ" %}</th>
+            <th>{% trans "کاربر" %}</th>
+            <th>{% trans "تعداد آیتم‌های من" %}</th>
+            <th>{% trans "جمع مبلغ من" %}</th>
+            <th>{% trans "جمع کل سفارش" %}</th>
+            <th>{% trans "وضعیت" %}</th>
+            <th>{% trans "عملیات" %}</th>
+            </tr>
+          </thead>
+          <tbody id="order-rows">
+            {% include 'unit_admin/orders/_order_rows.html' %}
+          </tbody>
+        </table>
+      </div>
+      {% include 'partials/pagination.html' with page_obj=page_obj %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // مسیر ثابت لیست سفارش‌ها
+  const listUrl = "{% url 'unit_admin:order_list' %}";
+
+  function fetchOrders() {
+    const q = document.getElementById('order-search').value.trim();
+    const f = document.getElementById('date-from').value;
+    const t = document.getElementById('date-to').value;
+
+    // همیشه ajax=1 رو اضافه می‌کنیم
+    const params = new URLSearchParams({ ajax: '1' });
+    if (q) params.set('q', q);
+    if (f) params.set('from', f);
+    if (t) params.set('to', t);
+
+    fetch(`${listUrl}?${params.toString()}`, {
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+      .then(r => r.text())
+      .then(html => {
+        document.getElementById('order-rows').innerHTML = html;
+        feather.replace();
+      });
+  }
+
+  document.getElementById('order-search').addEventListener('input', fetchOrders);
+  document.getElementById('date-from').addEventListener('change', fetchOrders);
+  document.getElementById('date-to').addEventListener('change', fetchOrders);
+
+  // لینک گزارش PDF
+  document.getElementById('report-pdf').addEventListener('click', e => {
+    e.preventDefault();
+
+    const q = document.getElementById('order-search').value.trim();
+    const f = document.getElementById('date-from').value;
+    const t = document.getElementById('date-to').value;
+
+    const params = new URLSearchParams();
+    if (q) params.set('q', q);
+    if (f) params.set('from', f);
+    if (t) params.set('to', t);
+
+    // مسیر ثابت گزارش PDF
+    const pdfUrl = "{% url 'unit_admin:order_report_pdf' %}";
+    const fullUrl = params.toString() ? `${pdfUrl}?${params}` : pdfUrl;
+    window.open(fullUrl, '_blank');
+  });
+
+  // initialize feather icons
+  document.addEventListener('DOMContentLoaded', () => {
+    feather.replace();
+  });
+</script>
+{% endblock %}
+

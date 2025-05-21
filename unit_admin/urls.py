@@ -15,6 +15,7 @@ from .views import (
     AttributeUpdateView, AttributeDeleteView, DiscountListView, DiscountCreateView, DiscountUpdateView,
     DiscountDeleteView, ProductUpdateView, ProductAttributeTypeListView, ProductAttributeListView, BlogPostListView,
     BlogPostCreateView, BlogPostUpdateView, BlogPostDeleteView, CommentListView, CommentUpdateView, CommentDeleteView,
+    OrderListView, OrderDetailView, OrderListReportPDFView, OrderDetailReportPDFView,
 )
 
 app_name = 'unit_admin'
@@ -82,4 +83,9 @@ urlpatterns = [
     path('comment', CommentListView.as_view(), name='comment_list'),
     path('comment/<int:pk>/edit/', CommentUpdateView.as_view(), name='comment_edit'),
     path('comment/<int:pk>/delete/', CommentDeleteView.as_view(), name='comment_delete'),
+
+    path('order', OrderListView.as_view(), name='order_list'),
+    path('order/report/pdf/', OrderListReportPDFView.as_view(), name='order_report_pdf'),
+    path('order/<int:pk>/', OrderDetailView.as_view(), name='order_detail'),
+    path('order/<int:pk>/report/pdf/', OrderDetailReportPDFView.as_view(), name='order_detail_report_pdf'),
 ]

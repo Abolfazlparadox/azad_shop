@@ -1,5 +1,5 @@
 {% extends 'unit_admin/base.html' %}
-{% load static%}
+{% load static poll_extras%}
 {% block title %}پنل مدیریت ادمین {{ site_settings.site_name }}{% endblock %}
 {% load thumbnail %}
 {% block body %}
@@ -129,172 +129,68 @@
             </div>
             <!-- Earning chart  end-->
 
-            <!-- Best Selling Product Start -->
             <div class="col-xl-6 col-md-12">
-                <div class="card o-hidden card-hover">
-                    <div class="card-header card-header-top card-header--2 px-0 pt-0">
-                        <div class="card-header-title">
-                            <h4>پرفروش ترین محصول</h4>
-                        </div>
-
-                        <div class="best-selling-box d-sm-flex d-none">
-                            <span>براساس :</span>
-                            <div class="dropdown">
-                                <button class="btn p-0 dropdown-toggle" type="button"
-                                    id="dropdownMenuButton1" data-bs-toggle="dropdown"
-                                    data-bs-auto-close="true">تاریخ</button>
-                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                    <li><a class="dropdown-item" href="#">قیمت</a></li>
-                                    <li><a class="dropdown-item" href="#">تعداد</a></li>
-                                    <li><a class="dropdown-item" href="#">بروزرسانی</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card-body p-0">
-                        <div>
-                            <div class="table-responsive">
-                                <table class="best-selling-table w-image
-                                w-image
-                                w-image table border-0">
-                                    <tbody>
-                                        <tr>
-                                            <td>
-                                                <div class="best-product-box">
-                                                    <div class="product-image">
-                                                        <img src="{% static 'admin/images/product/1.png' %}"
-                                                            class="img-fluid" alt="Product">
-                                                    </div>
-                                                    <div class="product-name">
-                                                        <h5>بیسکویت عطا</h5>
-                                                        <h6>26 اردیبهشت 1402</h6>
-                                                    </div>
-                                                </div>
-                                            </td>
-
-                                            <td>
-                                                <div class="product-detail-box">
-                                                    <h6>قیمت</h6>
-                                                    <h5>29.000 تومان</h5>
-                                                </div>
-                                            </td>
-
-                                            <td>
-                                                <div class="product-detail-box">
-                                                    <h6>سفارشات</h6>
-                                                    <h5>62</h5>
-                                                </div>
-                                            </td>
-
-                                            <td>
-                                                <div class="product-detail-box">
-                                                    <h6>موجودی</h6>
-                                                    <h5>510</h5>
-                                                </div>
-                                            </td>
-
-                                            <td>
-                                                <div class="product-detail-box">
-                                                    <h6>جمع کل</h6>
-                                                    <h5>17.850 تومان</h5>
-                                                </div>
-                                            </td>
-                                        </tr>
-
-                                        <tr>
-                                            <td>
-                                                <div class="best-product-box">
-                                                    <div class="product-image">
-                                                        <img src="{% static 'admin/images/product/2.png' %}"
-                                                            class="img-fluid" alt="Product">
-                                                    </div>
-                                                    <div class="product-name">
-                                                        <h5>دلستر</h5>
-                                                        <h6>26 اردیبهشت 1402</h6>
-                                                    </div>
-                                                </div>
-                                            </td>
-
-                                            <td>
-                                                <div class="product-detail-box">
-                                                    <h6>قیمت</h6>
-                                                    <h5>29.000 تومان</h5>
-                                                </div>
-                                            </td>
-
-                                            <td>
-                                                <div class="product-detail-box">
-                                                    <h6>سفارشات</h6>
-                                                    <h5>62</h5>
-                                                </div>
-                                            </td>
-
-                                            <td>
-                                                <div class="product-detail-box">
-                                                    <h6>موجودی</h6>
-                                                    <h5>510</h5>
-                                                </div>
-                                            </td>
-
-                                            <td>
-                                                <div class="product-detail-box">
-                                                    <h6>جمع کل</h6>
-                                                    <h5>17.850 تومان</h5>
-                                                </div>
-                                            </td>
-                                        </tr>
-
-                                        <tr>
-                                            <td>
-                                                <div class="best-product-box">
-                                                    <div class="product-image">
-                                                        <img src="{% static 'admin/images/product/3.png' %}"
-                                                            class="img-fluid" alt="Product">
-                                                    </div>
-                                                    <div class="product-name">
-                                                        <h5>کیک</h5>
-                                                        <h6>26 اردیبهشت 1402</h6>
-                                                    </div>
-                                                </div>
-                                            </td>
-
-                                            <td>
-                                                <div class="product-detail-box">
-                                                    <h6>قیمت</h6>
-                                                    <h5>29.000 تومان</h5>
-                                                </div>
-                                            </td>
-
-                                            <td>
-                                                <div class="product-detail-box">
-                                                    <h6>سفارشات</h6>
-                                                    <h5>62</h5>
-                                                </div>
-                                            </td>
-
-                                            <td>
-                                                <div class="product-detail-box">
-                                                    <h6>موجودی</h6>
-                                                    <h5>510</h5>
-                                                </div>
-                                            </td>
-
-                                            <td>
-                                                <div class="product-detail-box">
-                                                    <h6>جمع کل</h6>
-                                                    <h5>17.850 تومان</h5>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
+              <div class="card o-hidden card-hover">
+                <div class="card-header card-header-top card-header--2 px-0 pt-0 d-flex justify-content-between align-items-center">
+                  <h4 class="ms-3">پرفروش‌ترین محصولات</h4>
                 </div>
+                <div class="card-body p-0">
+                  <div class="table-responsive">
+                    <table class="table best-selling-table border-0">
+                      <tbody>
+                        {% for p in best_selling %}
+                          <tr>
+                            <td>
+                              <div class="d-flex align-items-center">
+                                <div class="me-3" style="width:60px;">
+                                  {% if p.main_image %}
+                                    {% thumbnail p.main_image "60x60" crop="center" as thumb %}
+                                      <img src="{{ thumb.url }}" class="img-fluid rounded" alt="{{ p.title }}">
+                                    {% endthumbnail %}
+                                  {% else %}
+                                    <div class="bg-secondary rounded" style="width:60px;height:60px;"></div>
+                                  {% endif %}
+                                </div>
+                                <div>
+                                  <h5 class="mb-1">{{ p.title }}</h5>
+                                  <small class="text-muted">
+                                    آخرین فروش: {{ p.last_sold|date:"Y/m/d" }}
+                                  </small>
+                                </div>
+                              </div>
+                            </td>
+                            <td>
+                              <div>
+                                <h6 class="mb-1">مبلغ کل فروش</h6>
+                                <span class="fw-bold">{{ p.total_sold|default:0|three_digits_currency }} تومان</span>
+                              </div>
+                            </td>
+                            <td>
+                              <div>
+                                <h6 class="mb-1">تعداد کل</h6>
+                                <span class="fw-bold">{{ p.total_qty|default:0 }}</span>
+                              </div>
+                            </td>
+                            <td>
+                              <div>
+                                <h6 class="mb-1">موجودی</h6>
+                                <span class="fw-bold">{{ p.available_stock|default:0 }}</span>
+                              </div>
+                            </td>
+                          </tr>
+                        {% empty %}
+                          <tr>
+                            <td colspan="4" class="text-center text-muted py-3">
+                              هنوز فروشی برای محصولات شما ثبت نشده.
+                            </td>
+                          </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
             </div>
-            <!-- Best Selling Product End -->
 
             <!-- Recent orders start-->
             <div class="col-xl-6">

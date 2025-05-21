@@ -1,0 +1,47 @@
+{% load static poll_extras %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>فاکتور سفارش {{ order.pk }}</title>
+  <link rel="stylesheet" href="{% static 'css/vendors/bootstrap.css' %}">
+  <style>
+    body { font-family: "Nunito Sans", sans-serif; direction: rtl; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #ccc; padding: 8px; }
+    th { background: #f0f0f0; }
+    .header, .footer { text-align: center; margin: 10px 0; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h2>فاکتور سفارش شماره {{ order.pk }}</h2>
+    <p>دانشگاه: {{ offi_university.name }}</p>
+    <p>تاریخ: {{ order.created_at|date:"Y/m/d H:i" }}</p>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>ردیف</th><th>محصول</th><th>تعداد</th><th>قیمت واحد</th><th>جمع</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in items %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ item.product.title }}</td>
+        <td>{{ item.count }}</td>
+        <td>{{ item.unit_price|three_digits_currency }} تومان</td>
+        <td>{{ item.total_price|three_digits_currency }} تومان</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="footer mt-3">
+    <p>جمع کل آیتم‌های دانشگاه: {{ total|three_digits_currency }} تومان</p>
+    <p>جمع کل سفارش: {{ order.total_price|three_digits_currency }} تومان</p>
+  </div>
+</body>
+</html>

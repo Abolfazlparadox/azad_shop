@@ -1,0 +1,43 @@
+{# unit_admin/orders/_order_rows.html #}
+{% load poll_extras i18n %}
+{% for order in orders %}
+<tr>
+  <td>{{ order.id }}</td>
+  <td>{{ order.created_at|date:"Y/m/d H:i" }}</td>
+  <td>{{ order.user.get_full_name }}</td>
+  <td>{{ order.university_items_count|default:0 }}</td>
+  <td>
+    {% if order.university_total_price %}
+      {{ order.university_total_price|three_digits_currency }}
+    {% else %}
+      —
+    {% endif %}
+  </td>
+  <td>{{ order.total_price|three_digits_currency }} </td>
+
+  {# ستون وضعیت #}
+  <td>
+    <span class="badge {% if order.status == 'pending' %}bg-secondary
+                        {% elif order.status == 'confirmed' %}bg-success
+                        {% elif order.status == 'shipping' %}bg-info
+                        {% elif order.status == 'delivering' %}bg-primary{% endif %}">
+      {{ order.get_status_display }}
+    </span>
+  </td>
+
+  {# ستون عملیات: دکمه‌ی جزئیات #}
+  <td>
+    <a href="{% url 'unit_admin:order_detail' order.pk %}"
+       class="btn btn-sm btn-outline-primary"
+       title="{% trans 'مشاهده جزئیات سفارش' %}">
+      <i data-feather="eye"></i>
+    </a>
+  </td>
+</tr>
+{% empty %}
+<tr>
+  <td colspan="8" class="text-center text-muted">
+    {% trans "هیچ سفارش مرتبطی یافت نشد." %}
+  </td>
+</tr>
+{% endfor %}

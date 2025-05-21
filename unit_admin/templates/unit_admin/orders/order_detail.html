@@ -1,0 +1,84 @@
+{% extends 'unit_admin/base.html' %}
+{% load i18n thumbnail poll_extras %}
+
+{% block body %}
+<div class="container-fluid">
+  <div class="row mb-3 align-items-center">
+    <div class="col-md-8">
+      <h5>جزئیات سفارش #{{ order.id }} – {{ order.user.get_full_name }}</h5>
+    </div>
+    <div class="col-md-4 text-end">
+      <a href="{% url 'unit_admin:order_detail_report_pdf' order.pk %}"
+         class="btn btn-outline-primary me-2">
+        <i data-feather="file-text"></i> دانلود PDF
+      </a>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-body row gy-2">
+      <div class="col-md-6">
+        <p><strong>تاریخ ثبت:</strong> {{ order.created_at|date:"Y/m/d H:i" }}</p>
+        <p><strong>مخاطب:</strong> {{ order.user.get_full_name }} ({{ order.user.email }})</p>
+      </div>
+      <div class="col-md-6">
+        <p><strong>آدرس ارسال:</strong> {{ full_address }}</p>
+        <form method="post" class="d-inline-block">
+          {% csrf_token %}
+          <label class="form-label me-2"><strong>وضعیت:</strong></label>
+          <select name="status" class="form-select d-inline-block w-auto me-2">
+            {% for val,label in status_choices %}
+              <option value="{{ val }}" {% if order.status == val %}selected{% endif %}>
+                {{ label }}
+              </option>
+            {% endfor %}
+          </select>
+          <button type="submit" class="btn btn-sm btn-theme">{{ _('بروزرسانی') }}</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body table-responsive">
+      <table class="table theme-table">
+        <thead>
+          <tr>
+            <th>#</th><th>محصول</th><th>ویژگی‌ها</th><th>تعداد</th><th>قیمت واحد</th><th>جمع</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in items %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td>{{ item.product.title }}</td>
+              <td>
+                {% for attr in item.variant.attributes.all %}
+                  {{ attr.value }}{% if not forloop.last %}, {% endif %}
+                {% empty %}
+                  —
+                {% endfor %}
+              </td>
+              <td>{{ item.count }}</td>
+              <td>{{ item.unit_price|three_digits_currency }}</td>
+              <td>{{ item.total_price|three_digits_currency }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <div class="mt-3 text-end">
+        <h5>جمع کل سفارش (دانشگاه شما): {{ uni_total|three_digits_currency }} </h5>
+        <p>هزینه ارسال: {{ order.shipping_cost|three_digits_currency }} </p>
+        <h4>مبلغ نهایی: {{ order.final_price|three_digits_currency }} </h4>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    feather.replace();
+  });
+</script>
+{% endblock %}

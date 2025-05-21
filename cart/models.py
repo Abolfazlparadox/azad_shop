@@ -25,9 +25,6 @@ class Cart(models.Model):
         verbose_name = 'سبد خرید'
         verbose_name_plural = 'سبدهای خرید کاربران'
 
-
-
-
 class CartDetail(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, verbose_name='سبد خرید')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='محصول')
@@ -88,10 +85,6 @@ class CartDetail(models.Model):
     class Meta:
         verbose_name = 'جزئیات سبد خرید'
         verbose_name_plural = 'لیست جزئیات سبدهای خرید'
-
-
-
-# models.py
 
 class Order(models.Model):
     STATUS_PENDING = 'pending'          # در حال انتظار تایید

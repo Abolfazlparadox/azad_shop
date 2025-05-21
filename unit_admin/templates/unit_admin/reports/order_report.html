@@ -1,0 +1,47 @@
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>گزارش سفارش‌ها</title>
+  <style>
+    body { font-family: DejaVu Sans, sans-serif; direction: rtl; }
+    table { width:100%; border-collapse: collapse; margin-bottom: 1em; }
+    th, td { border: 1px solid #666; padding: 6px; text-align: center; }
+    h1 { text-align: center; margin-bottom: .5em; }
+    .meta { margin-bottom: 1em; }
+    .meta span { display: inline-block; margin-left: 1em; }
+  </style>
+</head>
+<body>
+  <h1>گزارش سفارش‌ها برای {{ offi_university.name }}</h1>
+  <div class="meta">
+    <span>تاریخ تولید گزارش: {{ generated_at|date:"Y/m/d H:i" }}</span>
+    <span>تعداد سفارش‌ها: {{ orders|length }}</span>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>شناسه</th>
+        <th>کاربر</th>
+        <th>تاریخ</th>
+        <th>قیمت کل</th>
+        <th>هزینه ارسال</th>
+        <th>قیمت نهایی</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for o in orders %}
+      <tr>
+        <td>{{ o.id }}</td>
+        <td>{{ o.user.get_full_name }}</td>
+        <td>{{ o.created_at|date:"Y/m/d" }}</td>
+        <td>{{ o.total_price|default:"—" }}</td>
+        <td>{{ o.shipping_cost }}</td>
+        <td>{{ o.final_price }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</body>
+</html>

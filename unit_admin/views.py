@@ -1,5 +1,6 @@
 from django.db import IntegrityError
-from django.views.generic import ListView, TemplateView, UpdateView
+from django.template.loader import render_to_string
+from django.views.generic import ListView, TemplateView, UpdateView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth import get_user_model
@@ -9,8 +10,9 @@ from account.models import Membership, Address
 from django.views.generic.edit import CreateView,DeleteView
 from django.urls import reverse_lazy
 from django.views import View
-
+from weasyprint import HTML, CSS
 from blog.models import BlogPost
+from cart.models import Order
 from comment.models import Comment
 from utility.category_tree import build_category_tree
 from django.core.paginator import Paginator
@@ -23,7 +25,7 @@ from unit_admin.forms import CustomUserCreationForm, RoleCreationForm, AddressFo
 from django.contrib import messages
 from django.utils import timezone
 from django.shortcuts import redirect, get_object_or_404, render
-from django.http import JsonResponse, HttpResponseBadRequest, Http404
+from django.http import JsonResponse, HttpResponseBadRequest, Http404, HttpResponse
 import logging
 
 logger = logging.getLogger(__name__)
@@ -48,26 +50,27 @@ class OffiMixin(LoginRequiredMixin):
         return super().dispatch(request, *args, **kwargs)
 class UnitAdminIndexView(OffiMixin, TemplateView):
     template_name = 'unit_admin/index.html'
-    login_url = 'login'       # adjust if your login URL name differs
-    redirect_field_name = 'next'
-    def get_form_kwargs(self):
-        kws = super().get_form_kwargs()
-        kws['university'] = self.university
-        return kws
+    login_url = 'login'
+
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        # نمونه: اضافه کردن داده‌های داشبورد
-        admin_membership = self.request.user.memberships.get(role='OFFI')
-        admin_product =  Product.objects.filter(
-            university=admin_membership.university,
-        )
-        users_number=User.objects.filter(memberships__university=admin_membership.university).count()-1
-        ctx['users_number'] = users_number
-        category = ProductCategory.objects.filter(parent=None)
-        ctx['category'] = category
-        ctx['university'] = admin_membership.university
-        ctx['admin_product'] = admin_product
-        # ctx['stats'] = ... هر داده‌ی دیگری که می‌خواهید به تمپلیت بدهید
+        uni = self.university
+
+        # آمار کلی
+        ctx['users_number'] = User.objects.filter(
+            memberships__university=uni
+        ).count() - 1
+        ctx['category'] = ProductCategory.objects.filter(parent=None)
+
+        # پرفروش‌ترین ۳ محصول (براساس مبلغ کل فروش، همه زمان‌ها)
+        best = Product.objects.filter(university=uni).annotate(
+            total_sold=Sum('orderitem__total_price'),
+            total_qty=Sum('orderitem__count'),
+            last_sold=Max('orderitem__order__created_at'),
+            available_stock=Sum('variants__stock')
+        ).order_by('-total_sold')[:3]
+        ctx['best_selling'] = best
+
         return ctx
 
 #User
@@ -548,8 +551,8 @@ class ProductListView(OffiMixin, ListView):
     def get_queryset(self):
         qs = Product.objects.filter(university=self.university).annotate(
             total_stock=Sum('variants__stock'),
-            min_price=Min('variants__price_override', filter=Q(variants__price_override__isnull=False)),
-            max_price=Max('variants__price_override', filter=Q(variants__price_override__isnull=False))
+            min_price=Min('variants__price', filter=Q(variants__price__isnull=False)),
+            max_price=Max('variants__price', filter=Q(variants__price__isnull=False))
         ).distinct().order_by('-created_at')
 
         q = self.request.GET.get('q', '').strip()
@@ -909,18 +912,141 @@ class CommentDeleteView(OffiMixin, DeleteView):
 
 
 
-
-
-
-
-
-
-class OrdersListView( OffiMixin, ListView):
-    model = ProductCategory  # Replace with your actual model
-    template_name = "unit_admin/orders/list.html"
+class OrderListView(OffiMixin, ListView):
+    model = Order
+    template_name = 'unit_admin/orders/order_list.html'
     context_object_name = 'orders'
-    ordering = ['-created_at']
-    paginate_by = 15
+    paginate_by = 10
+
+    def get_queryset(self):
+        qs = Order.objects.filter(
+            items__product__university=self.university
+        ).distinct().annotate(
+            university_items_count=Sum('items__count', filter=Q(items__product__university=self.university)),
+            university_total_price=Sum('items__total_price', filter=Q(items__product__university=self.university)),
+        ).order_by('-created_at')
+
+        q  = self.request.GET.get('q','').strip()
+        f  = self.request.GET.get('from','').strip()
+        t  = self.request.GET.get('to','').strip()
+        if q:
+            qs = qs.filter(
+                Q(user__first_name__icontains=q) |
+                Q(user__last_name__icontains=q)
+            )
+        if f:
+            qs = qs.filter(created_at__date__gte=f)
+        if t:
+            qs = qs.filter(created_at__date__lte=t)
+        return qs
+
+    def render_to_response(self, context, **response_kwargs):
+        if self.request.GET.get('ajax') == '1':
+            return render(self.request, 'unit_admin/orders/_order_rows.html', context, **response_kwargs)
+        return super().render_to_response(context, **response_kwargs)
+
+
+class OrderDetailView(OffiMixin, DetailView):
+    model = Order
+    template_name = 'unit_admin/orders/order_detail.html'
+    context_object_name = 'order'
+
+    def get_object(self):
+        return get_object_or_404(
+            Order,
+            pk=self.kwargs['pk'],
+            items__product__university=self.university
+        )
+
+    def post(self, request, *args, **kwargs):
+        order = self.get_object()
+        new_status = request.POST.get('status')
+        if new_status in dict(Order.STATUS_CHOICES):
+            order.status = new_status
+            order.save(update_fields=['status'])
+            messages.success(request, _('وضعیت سفارش با موفقیت به‌روزرسانی شد.'))
+        else:
+            messages.error(request, _('وضعیت نامعتبر است.'))
+        return redirect('unit_admin:order_detail', pk=order.pk)
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        order = ctx['order']
+        items = order.items.filter(product__university=self.university)
+        ctx['items'] = items
+        # جمع مبلغ آیتم‌های دانشگاه جاری
+        ctx['uni_total'] = items.aggregate(total=Sum('total_price'))['total'] or 0
+        # وضعیت‌های قابل انتخاب
+        ctx['status_choices'] = Order.STATUS_CHOICES
+        # آدرس کامل
+        if order.address:
+            addr = order.address
+            ctx['full_address'] = f"{addr.address}, {addr.city.name}، {addr.province.name} - کدپستی: {addr.postal_code}"
+        else:
+            ctx['full_address'] = _('بدون آدرس')
+        return ctx
+
+
+class OrderListReportPDFView(OffiMixin, View):
+    def get(self, request, *args, **kwargs):
+        # 1) یک نمونه از OrderListView می‌سازیم
+        view = OrderListView()
+        # 2) متد setup را صدا بزن تا request, args, kwargs تنظیم شوند
+        view.setup(request, *args, **kwargs)
+        # 3) دانشگاه را هم ست می‌کنیم
+        view.university = self.university
+        # 4) حالا queryset با تمام فیلترها بدست می‌آید
+        orders = view.get_queryset()
+
+        # 5) رندر قالب HTML گزارش
+        html_string = render_to_string(
+            'unit_admin/orders/report_list.html',
+            {'orders': orders, 'offi_university': self.university}
+        )
+        # 6) ساخت PDF با WeasyPrint
+        html = HTML(string=html_string, base_url=request.build_absolute_uri())
+        css  = CSS(string='@page { size: A4; margin: 1cm }')
+        pdf  = html.write_pdf(stylesheets=[css])
+
+        # 7) ارسال پاسخ PDF
+        filename = timezone.now().strftime("orders_report_%Y%m%d_%H%M.pdf")
+        response = HttpResponse(pdf, content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response
+
+
+class OrderDetailReportPDFView(OffiMixin, View):
+    def get(self, request, pk, *args, **kwargs):
+        order = get_object_or_404(
+            Order,
+            pk=pk,
+            items__product__university=self.university
+        )
+        items = order.items.filter(product__university=self.university)
+        total = items.aggregate(sum=Sum('total_price'))['sum'] or 0
+
+        html_string = render_to_string(
+            'unit_admin/orders/report_detail.html',
+            {
+                'order': order,
+                'items': items,
+                'total': total,
+                'offi_university': self.university
+            }
+        )
+        html = HTML(string=html_string, base_url=request.build_absolute_uri())
+        css = CSS(string='@page { size: A4; margin: 1cm }')
+        pdf = html.write_pdf(stylesheets=[css])
+
+        filename = timezone.now().strftime(f"order_{order.pk}_%Y%m%d_%H%M.pdf")
+        response = HttpResponse(pdf, content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response
+
+
+
+
+
 class TaxListView( OffiMixin, ListView):
     model = ProductCategory  # Replace with your actual model
     template_name = "unit_admin/tax/list.html"
