@@ -5,12 +5,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.utils.translation import gettext_lazy as _
 
-
 class Comment(models.Model):
-    """
-    A generic comment model that can be attached to any object (e.g., blog posts, products, or site-wide).
-    Supports threaded replies via a self-referential parent field, star ratings, and like counts.
-    """
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -24,7 +19,7 @@ class Comment(models.Model):
         verbose_name=_('نوع محتوا'),
         help_text=_('نوع مدلی که این دیدگاه به آن متصل است')
     )
-    object_id = models.PositiveIntegerField(verbose_name=_('شناسه شی'))
+    object_id = models.PositiveIntegerField(verbose_name=_('شناسه شی'),blank=True, null=True)
     content_object = GenericForeignKey('content_type', 'object_id')
 
     # Threaded replies
@@ -67,7 +62,4 @@ class Comment(models.Model):
         return f"Comment by {self.user} on {self.content_type} (ID {self.object_id})"
 
     def approved_replies(self):
-        """
-        Return only replies that have been approved.
-        """
         return self.replies.filter(is_approved=True)

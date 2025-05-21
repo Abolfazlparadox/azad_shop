@@ -191,10 +191,83 @@
         </div>
       {% endif %}
     </div>
+        <div class="comment-box overflow-hidden">
+          <div class="leave-title">
+            <h3>{% trans "دیدگاه‌ها" %} ({{ comments.count }})</h3>
+          </div>
+          <div class="user-comment-box">
+            <ul>
+              {% for comment in comments %}
+                {% include 'comment/includes/comment.html' with comment=comment %}
+                {% for reply in comment.approved_replies %}
+                  {% include 'comment/includes/comment.html' with comment=reply %}
+                {% endfor %}
+              {% empty %}
+                <li>
+                  <div class="user-box border-color">
+                    <p>{% trans "هنوز دیدگاهی ثبت نشده است." %}</p>
+                  </div>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
 
+        {% if user.is_authenticated %}
+          <div class="leave-box">
+            <div class="leave-title mt-0">
+              <h3>{% trans "ارسال دیدگاه" %}</h3>
+            </div>
+            <div class="leave-comment">
+              <div class="comment-notes">
+                <p class="text-content mb-4">{% trans "آدرس ایمیل شما منتشر نخواهد شد!" %}</p>
+              </div>
+              <form method="post"
+                    action="{% url 'comment:add_generic' app_label=comment_app_label model_name=comment_model_name object_id=post.pk %}">
+                {% csrf_token %}
+                {{ comment_form.non_field_errors }}
+                <div class="mb-3">
+                  {{ comment_form.content.errors }}
+                  {{ comment_form.content }}
+                </div>
+                <div class="mb-3">
+                  {{ comment_form.rating.errors }}
+                  {{ comment_form.rating }}
+                </div>
+                <button type="submit"
+                        class="btn btn-animation ms-xxl-auto mt-3 btn-md fw-bold">
+                  {% trans "ارسال دیدگاه" %}
+                </button>
+              </form>
+            </div>
+          </div>
+        {% else %}
+          <div class="leave-box">
+            <p>
+              {% trans "برای ارسال دیدگاه لطفاً" %}
+              <a href="{% url 'login' %}?next={{ request.path }}">{{ _("وارد شوید") }}</a>
+              {% trans "یا" %}
+              <a href="{% url 'signup' %}">{{ _("ثبت‌نام کنید") }}</a>.
+            </p>
+          </div>
+        {% endif %}
   </div>
 </div>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelector('.user-comment-box')
+    .addEventListener('click', e => {
+      const btn = e.target.closest('.reply-button');
+      if (!btn) return;
+      const cid = btn.dataset.commentId;
+      const form = document.getElementById(`reply-form-${cid}`);
+      if (!form) return;
+      form.style.display = form.style.display === 'none' ? 'block' : 'none';
+      if (form.style.display === 'block') form.querySelector('textarea').focus();
+    });
+});
+</script>
 </section>
 <!-- Blog Details Section End -->
 {% endblock %}

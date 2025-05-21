@@ -1,0 +1,16 @@
+{% extends 'unit_admin/base.html' %}
+{% load i18n %}
+{% block body %}
+<div class="container-fluid">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-center p-4">
+      <h5 class="modal-title mb-3">{% trans "آیا مطمئن هستید حذف شود؟" %}</h5>
+      <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger ms-2">{% trans "بله، حذف" %}</button>
+        <a href="{% url 'unit_admin:comment_list' %}" class="btn btn-secondary">{% trans "خیر" %}</a>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

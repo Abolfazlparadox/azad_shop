@@ -1,0 +1,33 @@
+<table class="table theme-table">
+  <thead>
+    <tr>
+      <th>#</th><th>کاربر</th><th>محتوا</th><th>تاریخ</th><th>تأیید</th><th>عملیات</th>
+    </tr>
+  </thead>
+  <tbody id="comment-rows">
+    {% for c in comments %}
+      <tr>
+        <td>{{ forloop.counter0|add:page_obj.start_index }}</td>
+        <td>{{ c.user.get_full_name }}</td>
+        <td>{{ c.content|truncatechars:50 }}</td>
+        <td>{{ c.created_at|date:"Y/m/d H:i" }}</td>
+        <td>
+          <span class="badge {% if c.is_approved %}bg-success{% else %}bg-secondary{% endif %}">
+            {% if c.is_approved %}تأیید{% else %}منتظر{% endif %}
+          </span>
+        </td>
+        <td>
+          <a href="{% url 'unit_admin:comment_edit' c.pk %}" class="btn btn-sm btn-outline-primary">
+            <i data-feather="edit"></i>
+          </a>
+          <a href="{% url 'unit_admin:comment_delete' c.pk %}" class="btn btn-sm btn-outline-danger">
+            <i data-feather="trash-2"></i>
+          </a>
+        </td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="6" class="text-center text-muted">دیدگاهی یافت نشد.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% include 'partials/pagination.html' with page_obj=page_obj %}

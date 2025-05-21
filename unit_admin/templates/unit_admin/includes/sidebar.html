@@ -188,6 +188,23 @@
                         </ul>
                     </li>
                     <li class="sidebar-list">
+                        <a class="sidebar-link sidebar-title" href="javascript:void(0)">
+                            <i class="ri-message-3-line"></i>
+                            <span>دیدگاه‌ها</span>
+                        </a>
+                        <ul class="sidebar-submenu">
+                            <li>
+                                <a href="{% url 'unit_admin:comment_list' %}">نمایش همه دیدگاه‌ها</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'unit_admin:comment_list' %}?q=pending">دیدگاه‌های در انتظار</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'unit_admin:comment_list' %}?q=approved">دیدگاه‌های تأییدشده</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="sidebar-list">
                         <a class="sidebar-link sidebar-title link-nav" href="{% url 'unit_admin:contact_list' %}">
                             <i class="ri-phone-line"></i>
                             <span>تیکت ها</span>

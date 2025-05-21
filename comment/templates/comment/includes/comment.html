@@ -3,42 +3,6 @@
 <li class="{% if comment.parent %}li-padding{% endif %}">
   <div class="user-box {% if not comment.parent %}border-color{% endif %}">
 
-    {# Reply button: only for top‑level comments and authorized users #}
-    {% if not comment.parent and comment.can_reply %}
-      <button type="button"
-              class="reply-button btn btn-link p-0 mb-2"
-              data-comment-id="{{ comment.id }}">
-        <i class="fa-solid fa-reply"></i>
-        <span class="theme-color">{% trans "پاسخ" %}</span>
-      </button>
-
-      <div id="reply-form-{{ comment.id }}" class="reply-form" style="display:none; margin-top:1rem;">
-        <form method="post"
-              action="{% url 'comment:add_generic' app_label=comment.content_type.app_label model_name=comment.content_type.model object_id=comment.object_id %}">
-          {% csrf_token %}
-          <input type="hidden" name="parent" value="{{ comment.id }}">
-          <div class="mb-2">
-            <textarea name="content"
-                      class="form-control"
-                      rows="3"
-                      placeholder="{% trans 'پاسخ شما' %}"
-                      required></textarea>
-          </div>
-          <div class="mb-2">
-            <select name="rating" class="form-select" required>
-              <option value="">{% trans "امتیاز" %}</option>
-              {% for i in "12345"|make_list %}
-                <option value="{{ i }}">{{ i }} ⭐</option>
-              {% endfor %}
-            </select>
-          </div>
-          <button type="submit" class="btn btn-sm theme-bg-color text-white">
-            {% trans "ارسال پاسخ" %}
-          </button>
-        </form>
-      </div>
-    {% endif %}
-
     {# Avatar + Name + Date #}
     <div class="user-image">
       <img src="{% if comment.user.avatar %}{{ comment.user.avatar.url }}{% else %}{% static 'images/inner-page/user/1.jpg' %}{% endif %}"
@@ -50,13 +14,12 @@
       </div>
     </div>
 
-    {# Content and Rating #}
+    {# Content + Rating #}
     <div class="user-contain">
       <p>{{ comment.content }}</p>
-
       {% if comment.rating %}
         <div class="comment-rating mb-2">
-          {% for i in "12345"|make_list %}
+          {% for _ in "12345"|make_list %}
             {% if forloop.counter <= comment.rating %}
               <i class="fa-solid fa-star text-warning"></i>
             {% else %}
@@ -67,20 +30,50 @@
       {% endif %}
     </div>
 
+    {# Reply button (only if allowed) #}
+    {% if not comment.parent and comment.can_reply %}
+      <button type="button"
+              class="reply-button btn btn-sm btn-link p-0 mt-2"
+              data-comment-id="{{ comment.id }}">
+        <i class="fa-solid fa-reply"></i>
+        <span class="theme-color">{% trans "پاسخ" %}</span>
+      </button>
+    {% endif %}
   </div>
+    {# Hidden reply form, moved under the comment content #}
+    {% if not comment.parent and comment.can_reply %}
+      <div id="reply-form-{{ comment.id }}"
+           class="reply-form mt-3 p-3 border rounded"
+           style="display:none;">
+        <form method="post" action="{% url 'comment:add_generic' app_label=comment.content_type.app_label model_name=comment.content_type.model object_id=comment.object_id %}">
+          {% csrf_token %}
+          <input type="hidden" name="parent" value="{{ comment.id }}">
+
+          <div class="mb-2">
+            <textarea
+              name="content"
+                  class="form-control"
+              rows="3"
+              placeholder="{% trans 'پاسخ شما' %}"
+              required
+            ></textarea>
+          </div>
+          <div class="mb-2">
+            <select name="rating"
+                    class="form-select form-select-sm"
+                    required>
+              <option value="">{% trans "امتیاز" %}</option>
+              {% for _ in "12345"|make_list %}
+                <option value="{{ forloop.counter }}">{{ forloop.counter }} ⭐</option>
+              {% endfor %}
+            </select>
+          </div>
+          <button type="submit"
+                  class="btn btn-sm btn-primary">
+            {% trans "ارسال پاسخ" %}
+          </button>
+        </form>
+      </div>
+    {% endif %}
 </li>
 
-<script>
-  document.querySelectorAll('.reply-button').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const cid = btn.dataset.commentId;
-      const form = document.getElementById(`reply-form-${cid}`);
-      if (form.style.display === 'none') {
-        form.style.display = 'block';
-        form.querySelector('textarea').focus();
-      } else {
-        form.style.display = 'none';
-      }
-    });
-  });
-</script>

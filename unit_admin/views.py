@@ -11,6 +11,7 @@ from django.urls import reverse_lazy
 from django.views import View
 
 from blog.models import BlogPost
+from comment.models import Comment
 from utility.category_tree import build_category_tree
 from django.core.paginator import Paginator
 from django.db.models import Q, F,Sum, Min, Max
@@ -847,6 +848,71 @@ class BlogPostDeleteView(OffiMixin, View):
         post = get_object_or_404(BlogPost, pk=pk, university=self.university)
         post.delete()
         return JsonResponse({'status':'success','message':_('پست حذف شد')})
+
+
+class CommentListView(OffiMixin, ListView):
+    model = Comment
+    template_name = 'unit_admin/comments/comment_list.html'
+    context_object_name = 'comments'
+    paginate_by = 10
+
+    def get_queryset(self):
+        # فقط دیدگاه‌هایی که متعلق به دانشگاه همین دبیر واحد هستند
+        qs = Comment.objects.select_related('user', 'content_type').order_by('-created_at')
+        # فیلتر بر اساس دانشگاه
+        qs = qs.filter(
+            Q(content_type__model='blogpost', object_id__in=
+                BlogPost.objects.filter(university=self.university).values_list('pk', flat=True)
+            ) |
+            Q(content_type__model='product', object_id__in=
+                Product.objects.filter(university=self.university).values_list('pk', flat=True)
+            )
+        )
+        # جستجو
+        q = self.request.GET.get('q', '').strip()
+        if q:
+            qs = qs.filter(
+                Q(user__first_name__icontains=q) |
+                Q(user__last_name__icontains=q) |
+                Q(content__icontains=q)
+            )
+        return qs
+
+    def render_to_response(self, context, **response_kwargs):
+        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            # فقط ردیف‌های جدول
+            return render(self.request, 'unit_admin/comments/_comment_rows.html', context)
+        return super().render_to_response(context, **response_kwargs)
+
+
+class CommentUpdateView(OffiMixin, UpdateView):
+    model = Comment
+    fields = ['content', 'is_approved']
+    template_name = 'unit_admin/comments/comment_form.html'
+    success_url = reverse_lazy('unit_admin:comment_list')
+
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        # اطمینان از این‌که تعلق به دانشگاه خودش باشد
+        ct = obj.content_type.model
+        if ct == 'blogpost':
+            if obj.content_object.university != self.university:
+                raise Http404
+        # برای محصولات هم مشابه
+        return obj
+
+
+class CommentDeleteView(OffiMixin, DeleteView):
+    model = Comment
+    success_url = reverse_lazy('unit_admin:comment_list')
+    template_name = 'unit_admin/comments/comment_confirm_delete.html'
+
+
+
+
+
+
+
 
 
 class OrdersListView( OffiMixin, ListView):

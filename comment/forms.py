@@ -6,7 +6,7 @@ class CommentForm(forms.ModelForm):
 
     class Meta:
         model = Comment
-        fields = ['content', 'rating', 'parent']
+        fields = ['content', 'rating']  # ← remove 'parent' from here
         widgets = {
             'content': forms.Textarea(attrs={'rows':4, 'class':'form-control'}),
             'rating': forms.Select(attrs={'class':'form-select'}),

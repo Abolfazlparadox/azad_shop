@@ -1,3 +1,4 @@
+{% load poll_extras %}
 {% load i18n thumbnail %}
 {% for p in posts %}
 <tr data-id="{{ p.id }}">
@@ -18,6 +19,9 @@
     <span class="badge {{ p.is_published|yesno:'bg-success,bg-secondary' }}">
       {{ p.is_published|yesno:"منتشر شده,پیش‌نویس" }}
     </span>
+  </td>
+  <td>
+      {{ p.created_at | show_jalali_date }}
   </td>
   <td>
     <ul class="list-inline mb-0">

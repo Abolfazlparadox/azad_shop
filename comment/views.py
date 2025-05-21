@@ -31,20 +31,19 @@ class CommentCreateGenericView(LoginRequiredMixin, FormView):
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
-        parent_id = self.request.POST.get('parent')
+        parent_id = form.cleaned_data.get('parent')  # now controlled by the form
 
-        # If this is a reply...
         if parent_id:
-            # 1) ensure parent exists & is top‑level
             parent = get_object_or_404(
                 Comment,
                 pk=parent_id,
                 content_type=self.content_type,
                 object_id=self.object_id
             )
+            form.instance.is_approved = True
             if parent.parent is not None:
-                # cannot reply to a reply
                 raise Http404("امکان پاسخ‌گویی به پاسخ وجود ندارد.")
+
 
             user = self.request.user
 
@@ -74,7 +73,7 @@ class CommentCreateGenericView(LoginRequiredMixin, FormView):
             form.instance.parent = parent
 
         # save the comment
-        form.instance.user = self.request.user
+        form.instance.user         = self.request.user
         form.instance.content_type = self.content_type
         form.instance.object_id    = self.object_id
         form.save()

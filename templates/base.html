@@ -40,18 +40,6 @@
     {% include 'components/foot.html' %}
     {% block script %}{% endblock %}
     <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('.reply-button').forEach(btn => {
-          btn.addEventListener('click', () => {
-            const cid = btn.getAttribute('data-comment-id');
-            const formDiv = document.getElementById('reply-form-' + cid);
-            // toggle between hidden and block
-            formDiv.style.display = formDiv.style.display === 'none' ? 'block' : 'none';
-          });
-        });
-      });
-    </script>
-    <script>
         document.addEventListener('DOMContentLoaded', function() {
           // Wait 2 seconds, then remove all alerts
           setTimeout(function() {

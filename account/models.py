@@ -5,6 +5,7 @@ from django.contrib.auth.models import AbstractUser, PermissionsMixin
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
+from jalali_date import date2jalali
 from phonenumber_field.modelfields import PhoneNumberField
 import uuid
 from django.core.exceptions import ValidationError
@@ -172,6 +173,7 @@ class User(AbstractUser):
         self.is_deleted = True
         self.deleted_at = timezone.now()
         self.save()
+
 
     @property
     def active_role_display(self):

@@ -14,7 +14,7 @@ from .views import (
     AttributeTypeCreateView, AttributeTypeUpdateView, AttributeTypeDeleteView, AttributeCreateView,
     AttributeUpdateView, AttributeDeleteView, DiscountListView, DiscountCreateView, DiscountUpdateView,
     DiscountDeleteView, ProductUpdateView, ProductAttributeTypeListView, ProductAttributeListView, BlogPostListView,
-    BlogPostCreateView, BlogPostUpdateView, BlogPostDeleteView,
+    BlogPostCreateView, BlogPostUpdateView, BlogPostDeleteView, CommentListView, CommentUpdateView, CommentDeleteView,
 )
 
 app_name = 'unit_admin'
@@ -78,4 +78,8 @@ urlpatterns = [
     path('blog/add/', BlogPostCreateView.as_view(), name='blog_add'),
     path('blog/<int:pk>/edit/', BlogPostUpdateView.as_view(), name='blog_edit'),
     path('blog/<int:pk>/delete/', BlogPostDeleteView.as_view(), name='blog_delete'),
+
+    path('comment', CommentListView.as_view(), name='comment_list'),
+    path('comment/<int:pk>/edit/', CommentUpdateView.as_view(), name='comment_edit'),
+    path('comment/<int:pk>/delete/', CommentDeleteView.as_view(), name='comment_delete'),
 ]

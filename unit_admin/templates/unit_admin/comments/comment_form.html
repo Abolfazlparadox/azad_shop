@@ -1,0 +1,26 @@
+{% extends 'unit_admin/base.html' %}
+{% load widget_tweaks %}
+{% load i18n %}
+{% block body %}
+<div class="container-fluid">
+  <div class="card">
+    <div class="card-header">{% if form.instance.pk %}ویرایش دیدگاه{% else %}دیدگاه جدید{% endif %}</div>
+    <div class="card-body">
+      <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label class="form-label">{% trans "محتوا" %}</label>
+          {{ form.content|add_class:"form-control" }}
+        </div>
+        <div class="form-check form-switch mb-3">
+          {{ form.is_approved|add_class:"form-check-input" }}
+          <label class="form-check-label">{% trans "تأیید شده" %}</label>
+        </div>
+        <button type="submit" class="btn btn-theme">
+          <i data-feather="save"></i> {% trans "ذخیره" %}
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

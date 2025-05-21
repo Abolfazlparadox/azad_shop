@@ -9,6 +9,7 @@ from django.contrib.contenttypes.models import ContentType
 from account.models import Membership
 from comment.forms import CommentForm
 from comment.models import Comment
+from university.models import University
 from .models import BlogPost
 
 
@@ -44,61 +45,53 @@ class BlogDetailView(DetailView):
     def get_object(self, queryset=None):
         obj = get_object_or_404(
             BlogPost,
-            slug=self.kwargs.get('slug'),
+            slug=self.kwargs['slug'],
             is_published=True,
             published_at__lte=timezone.now()
         )
-        # Increment view count atomically
         BlogPost.objects.filter(pk=obj.pk).update(views=obj.views + 1)
         return obj
 
     def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
+        ctx  = super().get_context_data(**kwargs)
         post = self.object
         user = self.request.user
 
-        # Breadcrumbs
-        ctx['breadcrumb'] = [
-            {'name': _('بلاگ'), 'url': reverse_lazy('posts')},
-            {'name': post.title,  'url': ''},
-        ]
-        ctx['breadcrumb_title'] = post.title
-
-        # Fetch top‑level approved comments
         # fetch top‑level approved comments
         ct = ContentType.objects.get_for_model(post)
         comments = list(Comment.objects.filter(
-            content_type=ct, object_id=post.pk,
-            parent__isnull=True, is_approved=True
+            content_type=ct,
+            object_id=post.pk,
+            parent__isnull=True,
+            is_approved=True
         ).select_related('user'))
 
-        # determine which comments the current user may reply to
+        # determine can_reply per comment
         for comment in comments:
-            # only top‑level (they all are) and user logged in
-            can_reply = False
+            # default: no reply
+            comment.can_reply = False
+
+            # only top‑level comments considered
             if user.is_authenticated:
                 if user.is_superuser:
-                    can_reply = True
+                    comment.can_reply = True
                 else:
-                    # check OFFI membership against this post’s university
-                    # assuming BlogPost has a .university FK
+                    # find university of this blog post
                     uni = getattr(post, 'university', None)
-                    if uni:
+                    if isinstance(uni, University):
                         is_offi = Membership.objects.filter(
                             user=user,
                             university=uni,
                             role=Membership.Role.UNIT_OFFICER,
                             is_confirmed=True
                         ).exists()
-                        if is_offi:
-                            can_reply = True
-            comment.can_reply = can_reply
+                        comment.can_reply = is_offi
 
-        ctx['comments'] = comments
-
-        # === Add these two lines ===
-        ctx['comment_app_label']  = post._meta.app_label   # e.g. 'blog'
-        ctx['comment_model_name'] = post._meta.model_name  # e.g. 'blogpost'
+        ctx['comments']     = comments
+        if user.is_authenticated:
+            ctx['comment_form'] = CommentForm()
+        ctx['comment_app_label']  = post._meta.app_label
+        ctx['comment_model_name'] = post._meta.model_name
 
         return ctx
 

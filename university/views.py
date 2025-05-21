@@ -5,8 +5,10 @@ from django.views.generic import ListView, DetailView
 from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-
+from django.contrib.contenttypes.models import ContentType
 from account.models import Membership
+from comment.forms import CommentForm
+from comment.models import Comment
 from .models import University
 
 
@@ -49,27 +51,57 @@ class UniversityDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        uni = self.object
+        uni  = self.object
+        user = self.request.user
 
-        # واکشی مدیر (نقش OFFI) تأییدشده برای این دانشگاه
-        manager_membership = (
-            Membership.objects
-            .filter(university=uni, role=Membership.Role.UNIT_OFFICER, is_confirmed=True)
-            .select_related('user')
-            .first()
-        )
-
-        if manager_membership:
-            ctx['manager_name'] = manager_membership.user.get_full_name() or manager_membership.user.username
-            ctx['manager_user_id'] = manager_membership.user.id
+        # OFFI‑admin lookup
+        manager = (Membership.objects
+                   .filter(university=uni,
+                           role=Membership.Role.UNIT_OFFICER,
+                           is_confirmed=True)
+                   .select_related('user')
+                   .first())
+        if manager:
+            ctx['manager_name']    = manager.user.get_full_name() or manager.user.username
+            ctx['manager_user_id'] = manager.user.id
         else:
-            ctx['manager_name'] = _('هنوز تعیین نشده')
+            ctx['manager_name']    = _('هنوز تعیین نشده')
             ctx['manager_user_id'] = None
 
-        # Breadcrumb
-        ctx['breadcrumb'] = [
+        # Breadcrumbs
+        ctx['breadcrumb']       = [
             {'name': _('دانشگاه‌ها'), 'url': reverse_lazy('university:list')},
-            {'name': uni.name, 'url': ''},
+            {'name': uni.name,          'url': ''},
         ]
         ctx['breadcrumb_title'] = uni.name
+
+        # Comments: top‑level, approved
+        ct = ContentType.objects.get_for_model(uni)
+        comments = list(Comment.objects.filter(
+            content_type=ct,
+            object_id=uni.pk,
+            parent__isnull=True,
+            is_approved=True
+        ).select_related('user'))
+
+        # Annotate can_reply
+        for comment in comments:
+            comment.can_reply = False
+            if user.is_authenticated:
+                if user.is_superuser:
+                    comment.can_reply = True
+                else:
+                    # only OFFI‑admins of *this* university
+                    comment.can_reply = Membership.objects.filter(
+                        user=user,
+                        university=uni,
+                        role=Membership.Role.UNIT_OFFICER,
+                        is_confirmed=True
+                    ).exists()
+
+        ctx['comments']             = comments
+        if user.is_authenticated:
+            ctx['comment_form']      = CommentForm()
+        ctx['comment_app_label']     = 'university'
+        ctx['comment_model_name']    = 'university'
         return ctx

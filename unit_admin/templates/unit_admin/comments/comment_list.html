@@ -1,0 +1,27 @@
+{% extends 'unit_admin/base.html' %}
+{% load i18n %}
+{% block body %}
+<div class="container-fluid">
+  <div class="card card-table">
+      <div class="card-body">
+          <div class="title-header option-title d-flex justify-content-between align-items-center mb-3">
+            <h5>مدیریت دیدگاه‌ها – {{ request.user.memberships.first.university.name }}</h5>
+            <input id="search-input" type="text" class="form-control w-25" placeholder="جستجو..." />
+          </div>
+          <div class="table-responsive mt-3" id="comment-table">
+            {% include 'unit_admin/comments/_comment_table.html' %}
+          </div>
+      </div>
+  </div>
+</div>
+
+<script>
+document.getElementById('search-input').addEventListener('input', function(){
+  fetch(`?q=${encodeURIComponent(this.value)}`, {
+    headers: {'X-Requested-With':'XMLHttpRequest'}
+  })
+  .then(r=>r.text())
+  .then(html=>{ document.getElementById('comment-table').innerHTML = html });
+});
+</script>
+{% endblock %}
