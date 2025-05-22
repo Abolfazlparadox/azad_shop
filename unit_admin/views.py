@@ -989,26 +989,32 @@ class OrderDetailView(OffiMixin, DetailView):
 
 class OrderListReportPDFView(OffiMixin, View):
     def get(self, request, *args, **kwargs):
-        # 1) یک نمونه از OrderListView می‌سازیم
+        # … your existing steps 1–4 …
         view = OrderListView()
-        # 2) متد setup را صدا بزن تا request, args, kwargs تنظیم شوند
         view.setup(request, *args, **kwargs)
-        # 3) دانشگاه را هم ست می‌کنیم
         view.university = self.university
-        # 4) حالا queryset با تمام فیلترها بدست می‌آید
         orders = view.get_queryset()
 
-        # 5) رندر قالب HTML گزارش
+        # → Compute totals
+        total_items = sum(getattr(o, 'university_items_count', 0) for o in orders)
+        total_price = sum(getattr(o, 'university_total_price', 0) for o in orders)
+
+        # 5) render HTML
         html_string = render_to_string(
             'unit_admin/orders/report_list.html',
-            {'orders': orders, 'offi_university': self.university}
+            {
+              'orders': orders,
+              'offi_university': self.university,
+              'total_items': total_items,
+              'total_price': total_price,
+            }
         )
-        # 6) ساخت PDF با WeasyPrint
+
+        # → rest of PDF generation unchanged …
         html = HTML(string=html_string, base_url=request.build_absolute_uri())
         css  = CSS(string='@page { size: A4; margin: 1cm }')
         pdf  = html.write_pdf(stylesheets=[css])
 
-        # 7) ارسال پاسخ PDF
         filename = timezone.now().strftime("orders_report_%Y%m%d_%H%M.pdf")
         response = HttpResponse(pdf, content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="{filename}"'

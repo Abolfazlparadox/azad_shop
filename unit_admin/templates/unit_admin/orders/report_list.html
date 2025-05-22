@@ -10,6 +10,7 @@
     table { width: 100%; border-collapse: collapse; }
     th, td { border: 1px solid #ccc; padding: 8px; }
     th { background: #f0f0f0; }
+    tfoot th, tfoot td { font-weight: bold; background: #e9ecef; }
   </style>
 </head>
 <body>
@@ -17,7 +18,11 @@
   <table>
     <thead>
       <tr>
-        <th>#</th><th>تاریخ</th><th>کاربر</th><th>تعداد آیتم‌ها</th><th>جمع مبلغ</th>
+        <th>#</th>
+        <th>تاریخ</th>
+        <th>کاربر</th>
+        <th>تعداد آیتم‌ها</th>
+        <th>جمع مبلغ</th>
       </tr>
     </thead>
     <tbody>
@@ -27,12 +32,23 @@
         <td>{{ o.created_at|date:"Y/m/d H:i" }}</td>
         <td>{{ o.user.get_full_name }}</td>
         <td>{{ o.university_items_count|default:0 }}</td>
-        <td>{{ o.university_total_price|default:0|three_digits_currency }} تومان</td>
+        <td>{{ o.university_total_price|default:0|three_digits_currency }} </td>
       </tr>
       {% empty %}
-      <tr><td colspan="5" class="text-center">هیچ سفارشی یافت نشد.</td></tr>
+      <tr>
+        <td colspan="5" class="text-center">هیچ سفارشی یافت نشد.</td>
+      </tr>
       {% endfor %}
     </tbody>
+    {% if orders %}
+    <tfoot>
+      <tr>
+        <th colspan="3">جمع کل</th>
+        <th>{{ total_items }}</th>
+        <th>{{ total_price|three_digits_currency }} </th>
+      </tr>
+    </tfoot>
+    {% endif %}
   </table>
 </body>
 </html>
