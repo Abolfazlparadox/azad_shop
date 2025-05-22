@@ -10,7 +10,9 @@
                             {% for option in site_settings.options.all %}
                                 <div class="service-box">
                                     <div class="service-image">
-                                        <img src="{{ option.logo.url }}" class="blur-up lazyload" alt="">
+                                        {% if option.logo %}
+                                        	<img src="{{ option.logo.url }}" class="blur-up lazyload" alt="">
+                                        {% endif %}
                                     </div>
 
                                     <div class="service-detail">
@@ -28,10 +30,10 @@
                 <div class="row g-md-4 g-3">
                     <div class="col-xl-3 col-lg-4 col-sm-6">
                         <div class="footer-logo">
-                            <div class="theme-logo">
+                            <div class="">
                                 <a href="{% url 'home' %}" class="web-logo nav-logo">
                                     {% if site_settings.site_logo %}
-                                      {% thumbnail site_settings.site_logo "840x150" crop="center" as thumb %}
+                                      {% thumbnail site_settings.site_logo "840x150"  as thumb %}
                                         <img src="{{ thumb.url }}"
                                              width="{{ thumb.width }}"
                                              height="{{ thumb.height }}"
@@ -70,24 +72,11 @@
 
                         <div class="footer-contain">
                             <ul>
+                                {% for main_category in main_categories %}
                                 <li>
-                                    <a href="shop-left-sidebar.html" class="text-content">میوه وسبزیجات</a>
+                                    <a href="{% url 'product:category-list' category_slug=main_category.slug %}" class="text-content">{{ main_category.title }}</a>
                                 </li>
-                                <li>
-                                    <a href="shop-left-sidebar.html" class="text-content">گوشت</a>
-                                </li>
-                                <li>
-                                    <a href="shop-left-sidebar.html" class="text-content">غذای دریایی</a>
-                                </li>
-                                <li>
-                                    <a href="shop-left-sidebar.html" class="text-content">غذای منجمد شده</a>
-                                </li>
-                                <li>
-                                    <a href="shop-left-sidebar.html" class="text-content">بیسکویت</a>
-                                </li>
-                                <li>
-                                    <a href="shop-left-sidebar.html" class="text-content">انرژی زا</a>
-                                </li>
+                                {% endfor %}
                             </ul>
                         </div>
                     </div>
@@ -102,17 +91,20 @@
                                 <li>
                                     <a href="{% url 'home' %}" class="text-content">خانه</a>
                                 </li>
-{#                                <li>#}
-{#                                    <a href="{% url 'product-list' %}" class="text-content">فروشگاه</a>#}
-{#                                </li>#}
                                 <li>
-                                    <a href="about-us.html" class="text-content">درباره ما</a>
+                                    <a href="{% url 'product:list' %}" class="text-content">فروشگاه</a>
                                 </li>
                                 <li>
-                                    <a href="{% url 'posts' %}" class="text-content">وبلاگ</a>
+                                    <a href="{% url 'posts' %}" class="text-content">وبلاگ ها</a>
                                 </li>
                                 <li>
-                                    <a href="contact-us.html" class="text-content">تماس با ما</a>
+                                    <a href="{% url 'university:list' %}" class="text-content">دانشگاه ها</a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'contact:contact' %}" class="text-content">تماس با ما</a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'about:about_us' %}" class="text-content">درباره ما</a>
                                 </li>
                             </ul>
                         </div>
