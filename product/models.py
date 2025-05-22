@@ -250,6 +250,9 @@ class ProductVariant(models.Model):
 
     def __str__(self):
         return f"Variant {self.id}"
+
+
+
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images', verbose_name='محصول')
     image = models.ImageField(upload_to='products/gallery/%Y/%m/%d/', verbose_name='تصویر')

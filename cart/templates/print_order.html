@@ -1,0 +1,144 @@
+
+{% load static %}
+{% load thumbnail %}
+{% load poll_extras %}
+
+{% block title %}
+	پرینت لیست سفارشات
+{% endblock %}
+{% block body %}
+    <body class="bg-light">
+    <section class="theme-invoice-1">
+        <div class="container">
+            <div class="row">
+                <div class="col-xxl-6 col-xl-8 mx-auto my-3">
+                    <div class="invoice-wrapper">
+                        <div class="invoice-header">
+                            <div class="header-content">
+                                <h3>فاکتور سفارش شما</h3>
+                            </div>
+                            <div class="header-image">
+                                <img src="{% static 'assets/images/1.png' %}" class="img-fluid" alt="logo">
+                            </div>
+                        </div>
+                        <div class="invoice-body">
+                            <div class="top-sec">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="details-box">
+                                            <div class="address-box">
+                                                <ul>
+                                                    <li>شیراز - بلوار چمران</li>
+                                                    <li>کوچه 12 فرعی 12.2</li>
+                                                    <li>کد پستی : 123456789</li>
+                                                </ul>
+                                            </div>
+
+                                            <div class="address-box">
+                                                <ul>
+                                                    <li class="theme-color">تاریخ صدور : <span class="text-content">{{ order.created_at|date:"j F Y" }}</span></li>
+                                                    <li class="theme-color">شماره فاکتور : <span class="text-content">{{ order.id }}</span></li>
+                                                    <li class="theme-color">ایمیل : <span class="text-content">{{ order.user.email }}</span></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="invoice-table">
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>تاریخ فاکتور:</th>
+                                                <th>شماره فاکتور:</th>
+                                                <th>شماره حساب:</th>
+                                                <th>مبلغ سررسید:</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>{{ order.created_at|date:"j F Y" }}</td>
+                                                <td>{{ order.id }}</td>
+                                                <td>3898409291</td> <!-- اگر شماره حساب متغیر است، تغییرش بده -->
+                                                <td>{{ order.final_price|three_digits_currency }} تومان</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="invoice-table-2">
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>ردیف.</th>
+                                                <th class="text-start">آیتم خریداری</th>
+                                                <th>تعداد</th>
+                                                <th>قیمت</th>
+                                                <th>جمع</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for item in order.items.all %}
+                                            <tr>
+                                                <td class="text-content">{{ forloop.counter }}</td>
+                                                <td>
+                                                    <ul class="text-start item-detail">
+                                                        <li>{{ item.product.title }}</li>
+                                                        <li class="text-content">
+                                                            {% if item.variant %}
+                                                                {% for attr in item.variant.attributes.all %}
+                                                                    {{ attr.type.name }}: {{ attr.value }}{% if not forloop.last %}, {% endif %}
+                                                                {% endfor %}
+                                                            {% else %}
+                                                                -
+                                                            {% endif %}
+                                                        </li>
+                                                    </ul>
+                                                </td>
+                                                <td>{{ item.count }}</td>
+                                                <td>{{ item.unit_price|three_digits_currency }}</td>
+                                                <td>{{ item.total_price|three_digits_currency }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="price-box">
+                                <ul>
+                                    <li>جمع کل : </li>
+                                    <li class="theme-color">{{ order.total_price|three_digits_currency }} تومان</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="invoice-footer">
+                            <div class="signature-box">
+                                <img src="{% static 'assets/images/sign.png' %}" class="img-fluid" alt="">
+                                <h5>فارس کد</h5>
+                            </div>
+
+                            <div class="button-group">
+                                <ul>
+                                    <li>
+                                        <button class="btn theme-bg-color text-white rounded"
+                                            onclick="window.print();">دانلود pdf</button>
+                                    </li>
+                                    <li>
+                                        <button class="btn text-white print-button rounded ms-2"
+                                            onclick="window.print();">پرینت</button>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+
+{% endblock %}
+
+

@@ -22,3 +22,24 @@ select:not(:-internal-list-box):not([multiple]) option {
     background-color: #1d1d22 !important;  /* اضافه کردن رنگ پس‌زمینه با اولویت */
     color: white !important; /* تغییر رنگ متن با اولویت */
 }
+
+
+.low-stock {
+        color: red;
+        animation: blink 1s infinite;
+        font-weight: bold;
+}
+
+@keyframes blink {
+        0%   { opacity: 1; }
+        50%  { opacity: 0; }
+        100% { opacity: 1; }
+}
+
+
+
+.custom-img-box {
+    background-color: #fff;
+    max-width: 800px;
+    margin: 0 auto; /* برای وسط‌چین افقی */
+}

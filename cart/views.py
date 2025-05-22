@@ -402,3 +402,24 @@ def order_invoice_pdf(request, order_id):
     response = HttpResponse(pdf_file.read(), content_type='application/pdf')
     response['Content-Disposition'] = f'filename=invoice_order_{order_id}.pdf'
     return response
+
+
+
+
+
+
+
+from django.views.generic import DetailView
+
+class OrderPrintView(DetailView):
+    model = Order
+    template_name = 'print_order.html'
+    context_object_name = 'order'
+    pk_url_kwarg = 'order_id'
+
+    def get_queryset(self):
+        # برای بهینه‌سازی، آیتم‌ها و محصولات رو به صورت select_related و prefetch_related بگیریم
+        return super().get_queryset().prefetch_related(
+            'items__product',
+            'items__variant'
+        ).select_related('user', 'address')

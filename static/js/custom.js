@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const variantEl = document.getElementById('variant-data');
     if (!variantEl) return; // فقط در صفحه محصول اجرا شود
 
+
     const variantMap = JSON.parse(variantEl.textContent);
     let selectedAttributes = {};
 
@@ -211,6 +212,8 @@ function loadSelectedAttributes() {
 
 // به‌روزرسانی اطلاعات variant بر اساس انتخاب‌های فعلی و تعداد
 function updateVariantInfo(quantity = 1) {
+        console.log('updateVariantInfo called with quantity:', quantity, 'and selectedAttributes:', selectedAttributes);
+
     if (!variantData) {
         // اگر داده variantData نیست، اطلاعات رو خالی کن و از تابع خارج شو
         $('#selected-price').text('—');
@@ -224,10 +227,11 @@ function updateVariantInfo(quantity = 1) {
 
     const keys = Object.keys(selectedAttributes).sort();
     const variantKey = keys.map(key => `${key}:${selectedAttributes[key]}`).join(',');
-
+    console.log('Looking for variantKey:', variantKey);
     const variant = variantData[variantKey];
 
     if (variant) {
+        console.log('Variant found:', variant);
         const totalPrice = variant.price * quantity;
         $('#selected-price').text(formatPriceWithCommas(totalPrice));
         $('#selected-stock').text(variant.stock);
@@ -251,6 +255,7 @@ function updateVariantInfo(quantity = 1) {
             $('#discount-percent').parent().hide();
         }
     } else {
+        console.warn('Variant not found for key:', variantKey);
         $('#selected-price').text('—');
         $('#selected-stock').text('—');
         $('#original-price').hide();
@@ -269,6 +274,8 @@ $(document).on('click', '.select-package [data-type]', function () {
 
     // به‌روزرسانی ویژگی انتخاب‌شده
     selectedAttributes[type] = value;
+        console.log('selectedAttributes updated:', selectedAttributes);
+
 
     // مشخص کردن وضعیت انتخاب‌شده در رابط کاربری
     const $parent = $(this).closest('.select-package');
@@ -279,6 +286,13 @@ $(document).on('click', '.select-package [data-type]', function () {
     const quantity = parseInt($('#product-count').val()) || 1;
     updateVariantInfo(quantity);
 });
+
+
+
+
+
+
+
 
 // تابع افزودن محصول به سبد خرید
 function addProductToCart(productId) {
@@ -362,6 +376,7 @@ $(document).ready(function () {
     // مقداردهی variantData پس از بارگذاری DOM
     const variantEl = document.getElementById('variant-data');
     variantData = variantEl ? JSON.parse(variantEl.textContent) : null;
+    console.log('variantData loaded:', variantData);
 
     // بارگذاری انتخاب‌های پیش‌فرض از UI
     loadSelectedAttributes();
@@ -389,6 +404,7 @@ $(document).ready(function () {
         let quantity = parseInt($('#product-count').val()) || 1;
         quantity += 1;
         $('#product-count').val(quantity);
+        console.log('quantity increased:', quantity);
         updateVariantInfo(quantity);
     });
 
@@ -398,6 +414,7 @@ $(document).ready(function () {
         if (quantity > 1) {
             quantity -= 1;
             $('#product-count').val(quantity);
+             console.log('quantity decreased:', quantity);
             updateVariantInfo(quantity);
         }
     });

@@ -14,6 +14,7 @@ from .views import (
     UserCartView,
 )
 from .views import order_invoice_pdf
+from .views import OrderPrintView
 
 
 urlpatterns = [
@@ -26,5 +27,6 @@ urlpatterns = [
 
     path('export_pdf/<int:order_id>/', views.export_pdf, name='export_pdf'),
     path('orders/<int:order_id>/invoice/', order_invoice_pdf, name='order_invoice_pdf'),
+    path('order/print/<int:order_id>/', OrderPrintView.as_view(), name='print_order'),
 
 ]

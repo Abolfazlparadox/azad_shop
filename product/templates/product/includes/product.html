@@ -1,50 +1,43 @@
 {% load static %}
 {% load thumbnail %}
 {% load poll_extras %}
-
-                        <div>
-                            <div class="product-box-3 h-100 wow fadeInUp " data-wow-delay="0.05s">
-                                <div class="product-header">
-                                    <div class="product-image">
-                                        <a href="{{ product.get_absolute_url }}">
-                                            {% if product.main_image %}
-                                                {% thumbnail product.main_image "600x600" quality=99 crop="center" as im %}
-                                                    <img src="{{ im.url }}" class="img-fluid blur-up lazyload" alt="{{ product.title }}">
-                                                {% endthumbnail %}
-                                            {% else %}
-                                                <img src="{% static 'images/appstore.svg' %}" class="img-fluid blur-up lazyload" alt="Default image">
-                                            {% endif %}
-                                        </a>
-                                    </div>
-                                </div>
-                                <div class="product-footer">
-                                    <div class="product-detail">
-                                        <span class="span-name">سبزیجات</span>
-                                        <a href="product-left.html">
-                                            <h5 class="name">آرد نان و شیرینی تازه 200 گرم</h5>
-                                        </a>
-                                        <p class="text-content mt-1 mb-2 product-content">لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است و برای شرایط فعلی تکنولوژی مورد نیاز و کاربردهای متنوع با هدف بهبود</p>
-                                        <div class="product-rating mt-2">
-                                            <ul class="rating">
-                                                <li>
-                                                    <i data-feather="star" class="fill"></i>
-                                                </li>
-                                                <li>
-                                                    <i data-feather="star" class="fill"></i>
-                                                </li>
-                                                <li>
-                                                    <i data-feather="star" class="fill"></i>
-                                                </li>
-                                                <li>
-                                                    <i data-feather="star" class="fill"></i>
-                                                </li>
-                                                <li>
-                                                    <i data-feather="star"></i>
-                                                </li>
-                                            </ul>
-                                            <span>(4.0)</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+<div>
+    <div class="product-box-3 h-100 wow fadeInUp" data-wow-delay="0.05s">
+        <div class="product-header">
+            <div class="product-image">
+                <a href="{{ product.get_absolute_url }}">
+                    {% if product.main_image %}
+                        {% thumbnail product.main_image "600x600" quality=99 crop="center" as im %}
+                            <img src="{{ im.url }}" class="img-fluid blur-up lazyload" alt="{{ product.title }}">
+                        {% endthumbnail %}
+                    {% else %}
+                        <img src="{% static 'images/appstore.svg' %}" class="img-fluid blur-up lazyload" alt="Default image">
+                    {% endif %}
+                </a>
+            </div>
+        </div>
+        <div class="product-footer">
+            <div class="product-detail">
+                {% if product.brand %}
+                    <span class="span-name  d-block text-center">{{ product.brand.title }}</span>
+                {% endif %}
+                <a href="{{ product.get_absolute_url }}">
+                    <h5 class="name">{{ product.title }}</h5>
+                </a>
+                <p class="text-content mt-1 mb-2 product-content">
+                    {{ product.short_description|truncatechars:150 }}
+                </p>
+                <div class="product-rating mt-2">
+                    <ul class="rating">
+                        <li><i data-feather="star" class="fill"></i></li>
+                        <li><i data-feather="star" class="fill"></i></li>
+                        <li><i data-feather="star" class="fill"></i></li>
+                        <li><i data-feather="star" class="fill"></i></li>
+                        <li><i data-feather="star"></i></li>
+                    </ul>
+                    <span>(4.0)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

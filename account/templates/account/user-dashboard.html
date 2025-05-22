@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 {% load static%}
+{% load poll_extras %}
+{% load thumbnail %}
 {% load i18n %}
 {% block title %}داشبورد{% endblock %}
 {% block body %}
@@ -631,86 +633,104 @@
                                     </span>
                                 </div>
 
-                                <div class="order-contain">
-                                    <div class="order-box dashboard-bg-box">
-                                        <div class="order-container">
-                                            <div class="order-icon">
-                                                <i data-feather="box"></i>
-                                            </div>
+<div class="order-contain">
+{% for order in user_orders %}
+    <div class="order-box dashboard-bg-box">
+        <div class="order-container">
+            <div class="order-icon">
+                <i data-feather="box"></i>
+            </div>
 
-                                            <div class="order-detail">
-                                                <h4>وضعیت <span>در انتظار</span></h4>
-                                                <h6 class="text-content">این یک نوشته آزمایشی است که به طراحان و برنامه نویسان کمک میکند تا این عزیزان با بهره گیری از این نوشته تستی و آزمایشی بتوانند. چدار دولسلات گودا. پنیر ماکارونی
-                                                    رشته های پنیر پنیر کوتج فتا هالومی پنیر جارلسبرگ
-                                                    مثلث ها می گویند پنیر.</h6>
-                                            </div>
-                                        </div>
+            <div class="order-detail">
+                <h4>وضعیت:
+                    <span class="{% if order.status == 'pending' %}status-pending
+                                 {% elif order.status == 'confirmed' %}status-confirmed
+                                 {% elif order.status == 'shipping' %}status-shipping
+                                 {% elif order.status == 'delivering' %}status-delivering
+                                 {% endif %}">
+                        {{ order.get_status_display }}
+                    </span>
+                </h4>
+                <h6 class="text-content">{{ order.status_description|default:"توضیحی موجود نیست" }}</h6>
+            </div>
+        </div>
 
-                                        <div class="product-order-detail">
-                                            <a href="product-left-thumbnail.html" class="order-image">
-                                                <img src="{% static 'images/vegetable/product/1.png' %}"
-                                                    class="blur-up lazyload" alt="">
-                                            </a>
+<div class="product-order-detail">
+    <table class="table table-bordered product-order-table">
+        <thead>
+            <tr>
+                <th>تصویر</th>
+                <th>عنوان و توضیحات</th>
+                <th>ویژگی‌ها</th>
+                <th>قیمت واحد</th>
+                <th>تعداد</th>
+                <th>قیمت کل</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in order.items.all %}
+                {% if item.product %}
+                    <tr>
+                        <td class="product-image-cell">
+                            {% if item.product.main_image %}
+                                {% thumbnail item.product.main_image "150x150" quality=90 as thumb %}
+                                    <img src="{{ thumb.url }}" alt="{{ item.product.title }}" class="img-thumbnail">
+                                {% endthumbnail %}
+                            {% else %}
+                                <p>تصویر اصلی ندارد</p>
+                            {% endif %}
+                        </td>
 
-                                            <div class="order-wrap">
-                                                <a href="product-left-thumbnail.html">
-                                                    <h3>کوکی های ترد فانتزی شکلات چیپ</h3>
-                                                </a>
-                                                <p class="text-content">چدار دولسلات گودا. پنیر ماکارونی
-                                                    رشته های پنیر پنیر کوتج فتا هالومی پنیر جارلسبرگ
-                                                    مثلث ها می گویند پنیر. </p>
-                                                <ul class="product-size">
-                                                    <li>
-                                                        <div class="size-box">
-                                                            <h6 class="text-content">قیمت : </h6>
-                                                            <h5>20.680 تومان</h5>
-                                                        </div>
-                                                    </li>
+                        <td class="product-info-cell">
+                            <a href="{{ item.product.get_absolute_url }}">
+                                <h5>{{ item.product.title }}</h5>
+                            </a>
+                            <p class="text-content">{{ item.product.description|truncatewords:20 }}</p>
+                        </td>
 
-                                                    <li>
-                                                        <div class="size-box">
-                                                            <h6 class="text-content">امتیاز : </h6>
-                                                            <div class="product-rating ms-2">
-                                                                <ul class="rating">
-                                                                    <li>
-                                                                        <i data-feather="star" class="fill"></i>
-                                                                    </li>
-                                                                    <li>
-                                                                        <i data-feather="star" class="fill"></i>
-                                                                    </li>
-                                                                    <li>
-                                                                        <i data-feather="star" class="fill"></i>
-                                                                    </li>
-                                                                    <li>
-                                                                        <i data-feather="star" class="fill"></i>
-                                                                    </li>
-                                                                    <li>
-                                                                        <i data-feather="star"></i>
-                                                                    </li>
-                                                                </ul>
-                                                            </div>
-                                                        </div>
-                                                    </li>
+                        <td class="product-attributes-cell">
+                            {% if item.variant %}
+                                <ul class="list-unstyled mb-0">
+                                    {% for attr in item.variant.attributes.all %}
+                                        <li><strong>{{ attr.type.name }}:</strong> {{ attr.value }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p>ویژگی ندارد</p>
+                            {% endif %}
+                        </td>
 
-                                                    <li>
-                                                        <div class="size-box">
-                                                            <h6 class="text-content">سازنده : </h6>
-                                                            <h5>اپل</h5>
-                                                        </div>
-                                                    </li>
+                        <td class="product-price-cell">
+                            {% if item.variant and item.variant.final_price %}
+                                <del class="red-text">{{ item.variant.price|three_digits_currency }}</del><br>
+                                <span>{{ item.variant.final_price|three_digits_currency }}</span>
+                            {% else %}
+                                <span>{{ item.variant.price|three_digits_currency }}</span>
+                            {% endif %}
+                        </td>
 
-                                                    <li>
-                                                        <div class="size-box">
-                                                            <h6 class="text-content">مقدار : </h6>
-                                                            <h5>250 گرم</h5>
-                                                        </div>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
+                        <td class="product-quantity-cell">
+                            {{ item.count }}
+                        </td>
 
-                                </div>
+                        <td class="product-total-price-cell">
+                            {{ item.total_price|three_digits_currency }}
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="text-danger">محصول حذف شده است.</td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+    </div>
+{% empty %}
+    <p>شما هنوز سفارشی ثبت نکرده‌اید.</p>
+{% endfor %}
+</div>
                             </div>
                         </div>
 

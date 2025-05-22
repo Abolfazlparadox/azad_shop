@@ -35,7 +35,9 @@ from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from  utility.email_service import send_email
+from cart.models import Order
 logger = logging.getLogger(__name__)
+
 
 class SignupView(CreateView):
     model = User  # Add this line
@@ -395,20 +397,23 @@ class UserDashboardView(LoginRequiredMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        user = self.object  # Use the view's object instead of request.user
+        user = self.object
+
+        # آوردن همه سفارش‌های کاربر
+        user_orders = Order.objects.filter(user=user).order_by('-created_at').prefetch_related('items__product','items__variant')
         list_address = Address.objects.filter(user=user)
         list_contact = ContactMessage.objects.filter(first_name=user.first_name, last_name=user.last_name,email=user.email)
-        # Basic user information
+
         context.update({
             "full_name": user.get_full_name() or user.username,
             "email": user.email,
-            "list_contact" :list_contact,
+            "list_contact": list_contact,
             "location": self._get_user_location(user),
             "activity_years": self._calculate_activity_years(user),
             "national_code": user.national_code,
             "birthday": user.birthday,
             "phone": user.mobile,
-            "confirmed_memberships":user.memberships.filter(is_confirmed=True),
+            "confirmed_memberships": user.memberships.filter(is_confirmed=True),
             "address": user.address,
             "list_addresses": list_address,
             "postal_code": user.postal_code,
@@ -418,6 +423,7 @@ class UserDashboardView(LoginRequiredMixin, UpdateView):
             "universities": University.objects.only("id", "name"),
             "provinces": Province.objects.only("id", "name"),
             "cities": City.objects.only("id", "name"),
+            "user_orders": user_orders,  # اضافه کردن سفارش‌ها به کانتکست
             "breadcrumb": [
                 {"name": _("حساب کاربری"), "url": reverse_lazy("user_dashboard")},
                 {"name": _("داشبورد"), "url": ""},
