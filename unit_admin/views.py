@@ -12,11 +12,11 @@ from django.urls import reverse_lazy
 from django.views import View
 from weasyprint import HTML, CSS
 from blog.models import BlogPost
-from cart.models import Order
+from cart.models import Order, OrderItem
 from comment.models import Comment
 from utility.category_tree import build_category_tree
 from django.core.paginator import Paginator
-from django.db.models import Q, F,Sum, Min, Max
+from django.db.models import Q, F, Sum, Min, Max, Count, DecimalField, IntegerField
 from contact.models import ContactMessage
 from product.models import Product, ProductCategory, ProductAttribute, ProductAttributeType, Discount
 from unit_admin.forms import CustomUserCreationForm, RoleCreationForm, AddressForm, ProductForm, CategoryForm, \
@@ -53,25 +53,93 @@ class UnitAdminIndexView(OffiMixin, TemplateView):
     login_url = 'login'
 
     def get_context_data(self, **kwargs):
+        from django.db.models import Sum, Count, F, DecimalField, IntegerField, Max
+        from django.db.models.functions import TruncMonth
+        import datetime
+        import jdatetime  # برای تبدیل به سال خورشیدی
+
         ctx = super().get_context_data(**kwargs)
         uni = self.university
 
         # آمار کلی
-        ctx['users_number'] = User.objects.filter(
-            memberships__university=uni
-        ).count() - 1
-        ctx['category'] = ProductCategory.objects.filter(parent=None)
+        ctx['users_number'] = User.objects.filter(memberships__university=uni).count() - 1
+        ctx['category']     = ProductCategory.objects.filter(parent=None)
 
-        # پرفروش‌ترین ۳ محصول (براساس مبلغ کل فروش، همه زمان‌ها)
-        best = Product.objects.filter(university=uni).annotate(
-            total_sold=Sum('orderitem__total_price'),
-            total_qty=Sum('orderitem__count'),
-            last_sold=Max('orderitem__order__created_at'),
-            available_stock=Sum('variants__stock')
-        ).order_by('-total_sold')[:3]
+        # پرفروش‌ترین ۳ محصول
+        best = (
+            Product.objects
+                   .filter(university=uni)
+                   .annotate(
+                       total_sold=Sum('orderitem__total_price', output_field=DecimalField()),
+                       total_qty =Sum('orderitem__count',       output_field=IntegerField()),
+                       last_sold =Max('orderitem__order__created_at'),
+                       available_stock=Sum('variants__stock',    output_field=IntegerField()),
+                   )
+                   .order_by('-total_sold')[:3]
+        )
         ctx['best_selling'] = best
 
+        # سفارشات اخیر
+        recent = (
+            Order.objects
+                 .filter(items__product__university=uni)
+                 .annotate(
+                     university_items_count = Count('items', distinct=True),
+                     university_total_price = Sum('items__total_price', output_field=DecimalField()),
+                 )
+                 .distinct()
+                 .order_by('-created_at')[:4]
+        )
+        ctx['recent_orders'] = recent
+        # گزارش کل درآمد از ابتدا تا امروز
+        total_earnings = (
+                OrderItem.objects
+                .filter(product__university=uni, order__status=Order.STATUS_CONFIRMED)
+                .aggregate(sum=Sum('total_price'))['sum'] or 0
+        )
+
+        # تعداد کل سفارشات از ابتدا تا امروز
+        total_orders = (
+            Order.objects
+            .filter(items__product__university=uni)
+            .distinct()
+            .count()
+        )
+
+        ctx['total_earnings'] = total_earnings
+        ctx['total_orders'] = total_orders
+        ctx['admin_product_count'] = Product.objects.filter(university=uni).count()
+        # گزارش درآمد ماهانه (12 ماه گذشته)
+        qs = (
+            OrderItem.objects
+                     .filter(
+                         product__university=uni,
+                         order__status=Order.STATUS_CONFIRMED
+                     )
+                     .annotate(month=TruncMonth('order__created_at'))
+                     .values('month')
+                     .annotate(data=Sum('total_price'))
+                     .order_by('month')
+        )
+        # Prepare last 12 months labels and values, in Jalali calendar
+        today = datetime.date.today().replace(day=1)
+        labels = []
+        data = []
+        for i in range(11, -1, -1):
+            # calculate Gregorian month
+            month_offset = (today.month - i - 1) % 12 + 1
+            year_offset = today.year - ((today.month - i - 1) // 12 + 1) if today.month - i <= 0 else today.year
+            g_date = datetime.date(year_offset, month_offset, 1)
+            # convert to Jalali
+            j_date = jdatetime.date.fromgregorian(date=g_date)
+            # format as 'YYYY-MM'
+            labels.append(f"{j_date.year}-{j_date.month:02d}")
+            # find sum in qs
+            total = next((item['data'] for item in qs if item['month'].date() == g_date), 0)
+            data.append(float(total or 0))
+        ctx['earnings_chart'] = {'labels': labels, 'data': data}
         return ctx
+
 
 #User
 class UserListView(OffiMixin, ListView):
