@@ -1,3 +1,4 @@
+from cart.models import Cart, CartDetail
 from .models import SiteSetting, FooterLinkBox
 from django.core.cache import cache
 from iranian_cities.models import Province
@@ -56,4 +57,26 @@ def main_categories_processor(request):
     main_categories = ProductCategory.objects.filter(is_active=True, parent=None).prefetch_related('children')
     return {
         'main_categories': main_categories
+    }
+
+
+
+
+
+
+
+
+def cart_context_processor(request):
+    cart_items = []
+    total_price = 0
+
+    if request.user.is_authenticated:
+        cart = Cart.objects.filter(user=request.user, is_paid=False).first()
+        if cart:
+            cart_items = CartDetail.objects.filter(cart=cart)
+            total_price = sum(item.get_total_price() for item in cart_items)
+
+    return {
+        'cart_items': cart_items,
+        'total_price': total_price,
     }

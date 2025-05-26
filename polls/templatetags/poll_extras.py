@@ -3,6 +3,8 @@ from django import template
 from jalali_date import date2jalali
 from datetime import datetime
 
+from cart.models import Cart, CartDetail
+
 register = template.Library()
 
 
@@ -46,3 +48,14 @@ def mul(value, arg):
 def get_item(dictionary, key):
     """برای دسترسی به مقادیر دیکشنری در قالب"""
     return dictionary.get(key)
+
+
+
+
+@register.inclusion_tag('product/includes/category_tree.html')
+def render_category_tree(category, current_level=1, max_level=5):
+    return {
+        'category': category,
+        'current_level': current_level,
+        'max_level': max_level,
+    }

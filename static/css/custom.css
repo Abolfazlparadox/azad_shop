@@ -39,7 +39,59 @@ select:not(:-internal-list-box):not([multiple]) option {
 
 
 .custom-img-box {
-    background-color: #fff;
-    max-width: 800px;
+    max-width: 1000px;
     margin: 0 auto; /* برای وسط‌چین افقی */
 }
+
+
+
+
+.main-category-item {
+    font-weight: bold !important;
+    font-size: 15px !important;
+    margin-bottom: 5px !important;
+}
+
+.dropdown-item.level-2 {
+    font-size: 14px !important;
+    padding-right: 20px !important;
+}
+
+.dropdown-item.level-3 {
+    font-size: 13px !important;
+    padding-right: 30px !important;
+}
+
+.dropdown-item.level-4 {
+    font-size: 12px !important;
+    padding-right: 40px !important;
+}
+
+.dropdown-item.level-5 {
+    font-size: 12px !important;
+    padding-right: 50px !important;
+}
+
+
+header .navbar-expand-xl .dropdown-menu .dropdown-item::after {
+    content: '';
+    display: block;
+    height: 2px;
+    position: absolute;
+    bottom: 5px;
+    right: 0;
+    left: auto;
+    width: 0;
+    transition: width 0.3s ease;
+}
+
+header .navbar-expand-xl .dropdown-menu .dropdown-item:hover::after {
+    width: 100% !important;
+}
+
+header .navbar-expand-xl .dropdown-menu .dropdown-item {
+    position: relative;
+    display: inline-block;
+    padding-bottom: 5px; /* فاصله برای خط */
+}
+

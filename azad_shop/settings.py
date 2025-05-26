@@ -111,6 +111,7 @@ TEMPLATES = [
                 'home.context_processors.location_data',
                 'home.context_processors.user_city',
                 'home.context_processors.main_categories_processor',  # ← این خط رو اضافه کن
+                'home.context_processors.cart_context_processor'
                 # 'unit_admin.context_processors.unit_admin_notifications',
             ],
         },
