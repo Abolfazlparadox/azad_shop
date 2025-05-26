@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load i18n static thumbnail %}
+{% load i18n static thumbnail poll_extras %}
 {% block title %}لیست دانشگاه‌ها{% endblock %}
 {% block body %}
 <!-- university Section Start -->
@@ -70,6 +70,31 @@
                             <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse show">
                                 <div class="accordion-body pt-0">
                                     <div class="recent-post-box">
+                                        {% for post in last_blog_post %}
+                                            <div class="recent-box">
+                                              <a href="{% url 'single_post' post.slug %}" class="recent-image">
+                                                {% if post.banner_image %}
+                                                    1
+                                                  {% thumbnail post.banner_image "450x300" crop="center" as im %}
+                                                    <img src="{{ im.url }}"
+                                                            width="{{ thumb.width }}"
+                                                            height="{{ thumb.height }}"
+                                                            class="bg-img blur-up lazyload" alt="{{ post.title }}">
+                                                  {% endthumbnail %}
+                                                {% else %}
+                                                    <img src="{% static 'images/vegetable/blog/1.jpg' %}" class="bg-img blur-up lazyload"
+                                                    alt="">
+                                                {% endif %}
+                                              </a>
+                                              <div class="recent-detail">
+                                                <a href="{% url 'single_post' post.slug %}">
+                                                  <h5 class="recent-name">{{ post.title }}</h5>
+                                                </a>
+                                                <h6>{{ post.created_at|show_jalali_date }}  <i data-feather="thumbs-up"></i></h6>
+                                              </div>
+                                            </div>
+                                        {% endfor %}
+
                                     </div>
                                 </div>
                             </div>
@@ -84,6 +109,18 @@
                                 <div class="accordion-body p-0">
                                     <div class="category-list-box">
                                         <ul>
+                                            {% for cat in list_category %}
+                                            		<li>
+                                                      <a href="{% url 'product:list' %}">
+                                                        <div class="category-name">
+                                                          <h5>{{ cat.title }}</h5>
+                                                          {% if cat.icon %}
+                                                          	<span><img src="{{ cat.icon.url }}" alt="{{ cat.title }}"></span>
+                                                          {% endif %}
+                                                        </div>
+                                                      </a>
+                                                    </li>
+                                            {% endfor %}
                                         </ul>
                                     </div>
                                 </div>
@@ -100,6 +137,9 @@
                                 <div class="accordion-body pt-0">
                                     <div class="product-tags-box">
                                         <ul>
+                                            <li>
+                                              <a href="javascript:void(0)">میوه و سبزیجات</a>
+                                            </li>
                                         </ul>
                                     </div>
                                 </div>

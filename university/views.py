@@ -7,8 +7,10 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.contrib.contenttypes.models import ContentType
 from account.models import Membership
+from blog.models import BlogPost
 from comment.forms import CommentForm
 from comment.models import Comment
+from product.models import ProductCategory
 from .models import University
 
 
@@ -17,7 +19,13 @@ class UniversityListView(ListView):
     template_name = 'university/university_list.html'
     context_object_name = 'universities'
     paginate_by = 10
-
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        last_blog_post  = BlogPost.objects.filter(is_published=True).order_by('-published_at')[0:5]
+        list_category = ProductCategory.objects.filter(parent=None).order_by('title')[0:5]
+        ctx['last_blog_post'] = last_blog_post
+        ctx['list_category'] = list_category
+        return ctx
     def get_queryset(self):
         qs = super().get_queryset().filter(status=True).order_by('name')
         q = self.request.GET.get('q', '').strip()

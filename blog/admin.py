@@ -4,9 +4,31 @@ from django.utils.translation import gettext_lazy as _
 from import_export.admin import ImportExportModelAdmin
 
 from .models import BlogPost
+class UniversityAccessAdmin(admin.ModelAdmin):
+    """کلاس پایه برای دسترسی مبتنی بر دانشگاه"""
 
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+
+        # اگر کاربر سوپر یوزر است همه چیز را ببینید
+        if request.user.is_superuser:
+            return qs
+
+        membership = request.user.memberships.filter(role='OFFI', is_confirmed=True).first()
+        return qs.filter(university=membership.university) if membership else qs.none()
+
+    def save_model(self, request, obj, form, change):
+        # تنظیم خودکار دانشگاه هنگام ایجاد رکورد جدید
+        if not change and not obj.university:
+            membership = request.user.memberships.filter(
+                role='OFFI',
+                is_confirmed=True
+            ).first()
+            if membership:
+                obj.university = membership.university
+        super().save_model(request, obj, form, change)
 @admin.register(BlogPost)
-class BlogPostAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+class BlogPostAdmin(ImportExportModelAdmin,UniversityAccessAdmin):
     list_display = (
         'title', 'author', 'category', 'is_published', 'published_at', 'views'
     )

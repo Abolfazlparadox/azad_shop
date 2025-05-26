@@ -5,6 +5,52 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from .models import University
+from import_export.admin import ImportExportModelAdmin
+
+
+class UniversityAccessAdmin(admin.ModelAdmin):
+    """
+    Admin mixin that limits queryset to the user's associated university
+    (role='OFFI', is_confirmed=True). Compatible with University model itself
+    or models with a ForeignKey to University.
+    """
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+
+        # Superusers see everything
+        if request.user.is_superuser:
+            return qs
+
+        # Get user's confirmed OFFI membership
+        membership = request.user.memberships.filter(role='OFFI', is_confirmed=True).first()
+        if not membership:
+            return qs.none()
+
+        # If the model is University itself, filter by the user's university ID
+        if self.model.__name__ == "University":
+            return qs.filter(id=membership.university_id)
+
+        # Otherwise, assume there is a university ForeignKey on the model
+        if hasattr(self.model, 'university'):
+            return qs.filter(university=membership.university)
+
+        # Fallback to no access if university filtering is not applicable
+        return qs.none()
+
+    def save_model(self, request, obj, form, change):
+        """
+        On object creation, set university to the one associated with user (if any)
+        Only applies if the model has a university field and it's not already set.
+        """
+        if not change:
+            if hasattr(obj, 'university') and not getattr(obj, 'university', None):
+                membership = request.user.memberships.filter(role='OFFI', is_confirmed=True).first()
+                if membership:
+                    obj.university = membership.university
+
+        super().save_model(request, obj, form, change)
+
 
 class UniversityAdminForm(forms.ModelForm):
     name_suffix = forms.CharField(
@@ -35,7 +81,7 @@ class UniversityAdminForm(forms.ModelForm):
         return suffix.strip()
 
 @admin.register(University)
-class UniversityAdmin(admin.ModelAdmin):
+class UniversityAdmin(ImportExportModelAdmin,UniversityAccessAdmin):
     form = UniversityAdminForm
     list_display = (
         'name_display',
